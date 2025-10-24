@@ -4,7 +4,7 @@ const projects = [
   {
     title: "Cutting Works",
     description: "精密加工メーカーのブランディング刷新と新規ウェブサイト制作。",
-    image: "/projects/cuttingworks.jpg",
+    image: "/projects/bg cwb.png",
     url: "https://cuttingworks.burst.style",
   },
   {
