@@ -5,14 +5,14 @@ const projects = [
     title: "Cutting Works",
     description: "精密加工メーカーのブランディング刷新と新規ウェブサイト制作。",
     image: "/projects/cuttingworks.jpg",
-    href: "#cuttingworks",
+    url: "https://cuttingworks.burst.style",
   },
   {
     title: "Aiday",
     description:
       "AIアートプラットフォームのUIデザインとデジタルアセットガイドライン策定。",
     image: "/projects/aiday.jpg",
-    href: "#aiday",
+    url: "#aiday",
   },
 ];
 
@@ -57,7 +57,7 @@ export default function Projects() {
                 </p>
               </div>
               <a
-                href={project.href}
+                href={project.url}
                 className="text-sm font-medium text-zinc-900 underline-offset-4 transition hover:underline dark:text-zinc-100"
               >
                 View project
