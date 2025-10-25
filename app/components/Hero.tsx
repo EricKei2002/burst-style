@@ -5,20 +5,6 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
 
-const socials = [
-  {
-    href: "https://www.dribbble.com",
-    label: "Dribbble",
-  },
-  {
-    href: "https://www.behance.net",
-    label: "Behance",
-  },
-  {
-    href: "mailto:hello@burst.style",
-    label: "Email",
-  },
-];
 
 export default function Hero() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -70,7 +56,7 @@ export default function Hero() {
       <div className="flex flex-1 flex-col gap-6">
         <div className="space-y-4">
           <p className="text-sm uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
-            Burst Style Studio
+            Burst Style 
           </p>
           <h1
             ref={headlineRef}
@@ -78,17 +64,6 @@ export default function Hero() {
           >
             ブランドに寄り添う、洗練されたデザインとクリエイティブを。
           </h1>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
-          {socials.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-900 transition-colors hover:border-zinc-900 hover:bg-zinc-900 hover:text-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:border-zinc-50 dark:hover:bg-zinc-50 dark:hover:text-zinc-950"
-            >
-              {item.label}
-            </a>
-          ))}
         </div>
       </div>
     </section>

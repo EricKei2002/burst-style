@@ -46,7 +46,7 @@ export default function RootLayout({
                   href="/about"
                   className="transition hover:text-zinc-500 dark:hover:text-zinc-300"
                 >
-                  自己紹介
+                  About 
                 </Link>
               </nav>
             </div>
