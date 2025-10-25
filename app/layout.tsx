@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Burst Style Studio",
+  title: "Burst Style ",
   description:
     "ブランドデザインとデジタルプロダクトに特化したクリエイティブスタジオ。",
 };
