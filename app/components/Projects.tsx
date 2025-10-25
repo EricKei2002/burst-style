@@ -3,14 +3,14 @@ import Image from "next/image";
 const projects = [
   {
     title: "Cutting Works",
-    description: "精密加工メーカーのブランディング刷新と新規ウェブサイト制作。",
+    description: "お店看板、クルマやバイクのドレスアップなど、多彩なカッティングステッカー・デザインサイト制作",
     image: "/projects/bg cwb.jpeg",
     url: "https://cuttingworks.burst.style",
   },
   {
-    title: "Aiday",
+    title: "AiDay",
     description:
-      "AIアートプラットフォームのUIデザインとデジタルアセットガイドライン策定。",
+      "AIが予定を分析し、最適なスケジュールを提案する次世代カレンダーアプリ",
     image: "/projects/aiday.jpg",
     url: "#aiday",
   },
@@ -24,10 +24,10 @@ export default function Projects() {
           Featured Projects
         </p>
         <h2 className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
-          クリエイティブで課題を解決する事例
+          創造力で価値を生み出すプロジェクト
         </h2>
         <p className="max-w-2xl text-base leading-7 text-zinc-600 dark:text-zinc-400">
-          戦略立案からアウトプットまで一貫して伴走し、ブランドの価値を最大化したプロジェクトの一部をご紹介します。
+          デザインとテクノロジーを融合し、課題を解決しながらブランドの魅力を引き出した事例をご紹介します。
         </p>
       </header>
 
