@@ -13,9 +13,9 @@ const experience = [
   },
 ];
 
-export default function AboutPage() {
+export default function AboutSection() {
   return (
-    <section className="flex flex-col gap-10">
+    <section className="flex flex-col gap-10 rounded-3xl border border-zinc-200/70 bg-white/80 p-8 shadow-lg backdrop-blur dark:border-zinc-800/70 dark:bg-zinc-900/70 sm:p-10">
       <header className="space-y-4">
         <p className="text-sm uppercase tracking-[0.4em] text-zinc-500 dark:text-zinc-400">
           About
@@ -31,7 +31,7 @@ export default function AboutPage() {
       </header>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/30">
+        <div className="space-y-4 rounded-2xl border border-zinc-200/70 bg-white/90 p-6 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40">
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
             ミッション
           </h2>
@@ -40,7 +40,7 @@ export default function AboutPage() {
             リサーチに基づいた戦略設計と、ディテールまでこだわった表現で、共感を得るデザインを提供します。
           </p>
         </div>
-        <div className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/30">
+        <div className="space-y-4 rounded-2xl border border-zinc-200/70 bg-white/90 p-6 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40">
           <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
             スキルセット
           </h2>
@@ -57,11 +57,11 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
           経歴
         </h2>
-        <div className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {experience.map((role) => (
             <article
               key={role.title}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950/30"
+              className="rounded-2xl border border-zinc-200/70 bg-white/90 p-6 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40"
             >
               <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
                 <h3 className="text-base font-semibold text-zinc-950 dark:text-zinc-50">

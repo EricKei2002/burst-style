@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Burst Style
 
-## Getting Started
+Next.js (App Router) と Tailwind CSS で構築されたポートフォリオサイトです。`create-next-app` を叩いた雛形をベースに、`app` ディレクトリ内のレイアウトやコンポーネント (`Hero`, `Projects` など) を編集してコンテンツを更新します。
 
-First, run the development server:
+## 開発を始めるには
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. 依存関係をインストール
+   ```bash
+   bun install   # もしくは npm install / pnpm install
+   ```
+2. 開発サーバーを起動
+   ```bash
+   bun dev      # もしくは npm run dev
+   ```
+3. ブラウザで [http://localhost:3000](http://localhost:3000) を開き、変更結果を即時プレビューします。`app/page.tsx` に手を入れるとホットリロードで自動反映されます。
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 用意されているスクリプト
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| コマンド | 役割 |
+| --- | --- |
+| `bun dev` | 開発サーバー (ホットリロード) |
+| `bun run build` | 本番ビルドの作成 |
+| `bun start` | ビルド済みアプリの実行 |
+| `bun run lint` | ESLint による静的解析 |
+| `bun run format` / `bun run format:check` | Prettier でコード整形 or 差分チェック |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+※ npm / pnpm を使う場合は `bun` の部分を各パッケージマネージャーに置き換えてください。
 
-## Learn More
+## 開発のヒント
 
-To learn more about Next.js, take a look at the following resources:
+- フォントは [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) で [Geist](https://vercel.com/font) を自動読み込みしています。
+- 新しいセクションやカードを追加する際は `app/components` 以下にコンポーネントを作り、`app/page.tsx` かレイアウトで読み込みます。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 参考リンク
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Next.js ドキュメント](https://nextjs.org/docs) – API や App Router の詳細
+- [Next.js Learn](https://nextjs.org/learn) – 公式のインタラクティブ講座
+- [Next.js GitHub](https://github.com/vercel/next.js) – Issue や PR の参照
 
-## Deploy on Vercel
+## デプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+本番公開には [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) が最も簡単です。その他のホスティング先でも、`bun run build`（または `npm run build`）で生成される成果物をサーバーに配置し `start` コマンドで起動すれば動作します。詳しくは [Next.js デプロイドキュメント](https://nextjs.org/docs/app/building-your-application/deploying) を参照してください。
