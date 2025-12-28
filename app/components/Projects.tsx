@@ -11,7 +11,7 @@ const projects = [
     title: "Discord Bot",
     description:
       "自作 Discord Bot",
-    image: "/projects/aiday.jpg",
+    image: "/discord.png",
     url: "#aiday",
   },
 ];
@@ -33,8 +33,9 @@ export default function Projects() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {projects.map((project) => (
-          <article
+          <a
             key={project.title}
+            href={project.url}
             className="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white/90 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-zinc-800/70 dark:bg-zinc-950/40"
           >
             <div className="relative h-56 w-full bg-zinc-100 dark:bg-zinc-900">
@@ -56,14 +57,8 @@ export default function Projects() {
                   {project.description}
                 </p>
               </div>
-              <a
-                href={project.url}
-                className="text-sm font-medium text-zinc-900 underline-offset-4 transition hover:underline dark:text-zinc-100"
-              >
-                View project
-              </a>
             </div>
-          </article>
+          </a>
         ))}
       </div>
     </section>
