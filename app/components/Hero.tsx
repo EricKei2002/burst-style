@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import TechCarousel from "./TechCarousel";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -59,6 +60,12 @@ export default function Hero() {
     .to(".loading-text", {
       opacity: 1,
       duration: 0.1,
+    })
+    // Tech Carousel Fade In (Early reveal)
+    .to([".tech-carousel", ".tech-carousel-title"], {
+       opacity: 1,
+       duration: 0.8,
+       delay: 0.5
     });
   }, { scope: containerRef });
 
@@ -145,7 +152,7 @@ export default function Hero() {
                 <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-500">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-500">~ &gt;</span></span>
                 <SplitText charClassName="ls-char">ls</SplitText>
               </div>
-              <div className="flex gap-6 pl-4">
+             <div className="flex gap-6 pl-4">
                  <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">Projects/</a>
                  <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">About/</a>
               </div>
@@ -154,6 +161,15 @@ export default function Hero() {
 
         </div>
       </div>
+
+      {/* Tech Carousel (Full Width) */}
+      <div className="w-full mt-16 relative z-10">
+        <h2 className="text-center font-mono text-xl md:text-2xl text-green-500 mb-8 opacity-0 tech-carousel-title">
+          &gt; My Skills
+        </h2>
+        <TechCarousel />
+      </div>
+
     </section>
   );
 }
