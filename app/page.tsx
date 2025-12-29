@@ -4,7 +4,7 @@ import Projects from "./components/Projects";
 
 export default function Home() {
   return (
-    <div className="space-y-16">
+    <div className="flex flex-col">
       <Hero />
       <Projects />
       <AboutSection />
