@@ -26,15 +26,35 @@ export default function Hero() {
   const textRef = useRef<HTMLDivElement>(null);
 
   const { contextSafe } = useGSAP(() => {
-    const tl = gsap.timeline({ delay: 0.2 });
+    const tl = gsap.timeline();
+
+    // Preloader Sequence
+    tl.to(".welcome-char", {
+      opacity: 1,
+      duration: 0.05,
+      stagger: 0.03,
+      ease: "none",
+    })
+    .to(".welcome-char", {
+      opacity: 0,
+      duration: 0.5,
+      delay: 1.0,
+    })
+    .to(".preloader", {
+      opacity: 0,
+      duration: 0.8,
+      onComplete: () => {
+         gsap.set(".preloader", { display: "none" });
+      }
+    })
 
     // Typewriter Effect for Title
-    tl.to(".title-char", {
+    .to(".title-char", {
       opacity: 1,
       duration: 0.05,
       stagger: 0.08,
       ease: "none",
-    })
+    }, "-=0.2")
     // Loading Sequence
     .to(".loading-text", {
       opacity: 1,
@@ -61,6 +81,15 @@ export default function Hero() {
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
       
+      {/* Preloader Overlay */}
+      <div className="preloader fixed inset-0 z-50 flex items-center justify-center bg-[#0a0a0a] px-4">
+        <div className="text-4xl sm:text-6xl md:text-8xl font-black font-mono text-green-500 tracking-tighter text-center">
+          <SplitText charClassName="welcome-char">
+            &gt; Welcome to my portfolio website.
+          </SplitText>
+        </div>
+      </div>
+
       {/* Foreground Text Content */}
       <div className="container relative z-10 mx-auto px-6">
         <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center">
