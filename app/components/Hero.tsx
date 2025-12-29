@@ -141,8 +141,8 @@ export default function Hero() {
 
             {/* Command Prompt Area */}
             <div className="font-mono text-green-500 text-sm sm:text-base">
-              <div className="command-prompt opacity-0 flex items-center gap-2 mb-2">
-                <span>&gt;</span>
+              <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
+                <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-500">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-500">~ &gt;</span></span>
                 <SplitText charClassName="ls-char">ls</SplitText>
               </div>
               <div className="flex gap-6 pl-4">
