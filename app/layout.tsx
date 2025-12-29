@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
+import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+
+import SmoothScroll from "./components/SmoothScroll";
+import StarBackground from "./components/StarBackground";
 
 export const metadata: Metadata = {
   title: "Burst Style | Eric Kei Portfolio",
@@ -13,10 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased">
-        <main className="min-h-screen w-full">
-          {children}
-        </main>
+      <body className={`min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased ${jetbrainsMono.variable} font-mono`}>
+        <SmoothScroll>
+          <StarBackground />
+          <main className="min-h-screen w-full">
+            {children}
+          </main>
+        </SmoothScroll>
       </body>
     </html>
   );
