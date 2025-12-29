@@ -66,7 +66,7 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative w-full overflow-hidden py-24 sm:py-32">
+    <section id="about" ref={sectionRef} className="relative w-full overflow-hidden py-24 sm:py-32">
       <div className="bg-grid absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">

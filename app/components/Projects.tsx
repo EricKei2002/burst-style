@@ -50,7 +50,7 @@ export default function Projects() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative w-full py-24 sm:py-32">
+    <section id="projects" ref={sectionRef} className="relative w-full py-24 sm:py-32">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 
         {/* Header */}

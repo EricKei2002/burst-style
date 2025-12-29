@@ -63,18 +63,39 @@ export default function Hero() {
   }, { scope: containerRef });
 
   const showDescription = contextSafe(() => {
-    gsap.to(".desc-char", {
+    const tl = gsap.timeline();
+
+    tl.to(".desc-char", {
       opacity: 1,
       duration: 0.03,
       stagger: 0.02,
       ease: "none",
-    });
+    })
     
     // Stop blinking and change style to indicate active state
-    gsap.to(".trigger-btn", { 
+    .to(".trigger-btn", { 
       opacity: 0.5, 
       pointerEvents: "none",
       className: "trigger-btn font-mono text-xs opacity-50 cursor-default" 
+    }, "<")
+
+    // Command Prompt Sequence
+    .to(".command-prompt", {
+      opacity: 1,
+      duration: 0.1,
+      delay: 0.5
+    })
+    .to(".ls-char", {
+      opacity: 1,
+      duration: 0.05,
+      stagger: 0.1,
+      ease: "none",
+    })
+    .to(".ls-result", {
+      opacity: 1,
+      duration: 0.1,
+      stagger: 0.05,
+      delay: 0.2
     });
   });
 
@@ -107,16 +128,28 @@ export default function Hero() {
             </div>
           </h1>
           
-          <div className="max-w-3xl w-full px-4 mt-8">
+          <div className="max-w-3xl w-full px-4 mt-8 text-left">
             <div className="loading-text font-mono text-green-500 text-sm mb-4 opacity-0">
                &gt; ESTABLISHING CONNECTION...<br />
                &gt; What is Burst Style ? <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block">[ DONE ]</span>
             </div>
-            <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono text-left">
+            <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
               <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
               <br className="hidden sm:block" />
               <SplitText charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
             </p>
+
+            {/* Command Prompt Area */}
+            <div className="font-mono text-green-500 text-sm sm:text-base">
+              <div className="command-prompt opacity-0 flex items-center gap-2 mb-2">
+                <span>&gt;</span>
+                <SplitText charClassName="ls-char">ls</SplitText>
+              </div>
+              <div className="flex gap-6 pl-4">
+                 <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">Projects/</a>
+                 <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">About/</a>
+              </div>
+            </div>
           </div>
 
         </div>
