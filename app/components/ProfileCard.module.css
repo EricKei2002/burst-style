@@ -1,0 +1,151 @@
+/* ProfileCard.module.css */
+.wrapper {
+  perspective: 500px;
+  position: relative;
+  touch-action: none;
+}
+
+.behind {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    var(--behind-glow-color) 0%,
+    transparent var(--behind-glow-size)
+  );
+  filter: blur(50px) saturate(1.1);
+  opacity: calc(0.8 * var(--card-opacity, 1));
+  z-index: 10;
+}
+
+.shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+  transition: transform 0.1s linear;
+  z-index: 20;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 30px;
+  background: var(--inner-gradient);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.1) 0%,
+    rgba(0,0,0,0.4) 50%,
+    rgba(0,0,0,0.9) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.inside {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.shine {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    rgba(255, 255, 255, 0.3) 0%,
+    transparent 60%
+  );
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    125deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.2) 45%,
+    transparent 50%
+  );
+  transform: translateX(var(--background-x)) translateY(var(--background-y));
+  filter: blur(5px);
+  mix-blend-mode: color-dodge;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.avatarContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.userInfo {
+  text-align: right;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.details h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #fff, #a2a2a2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.details p {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}

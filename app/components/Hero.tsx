@@ -154,7 +154,7 @@ export default function Hero() {
               </div>
              <div className="flex gap-6 pl-4">
                  <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">Projects/</a>
-                 <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">About/</a>
+                 <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">About Me/</a>
               </div>
             </div>
           </div>

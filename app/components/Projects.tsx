@@ -14,10 +14,10 @@ const projects = [
     tags: ["Next.js", "MicroCMS", "Tailwind CSS"]
   },
   {
-    title: "Discord Bot",
-    description: "コミュニティ運営を効率化する多機能Discord Bot。サーバー管理の自動化から、エンターテインメント機能まで幅広く提供。",
+    title: "Discord 自己紹介認証Bot",
+    description: "コミュニティ運営を効率化する自己紹介認証Discord Bot。自宅サーバー × CI/CD による実運用経験",
     image: "/discord.png",
-    url: "#",
+    url: "https://github.com/EricKei2002/role-bot-ts",
     tags: ["Node.js", "Discord.js", "TypeScript"]
   },
 ];
@@ -60,10 +60,11 @@ export default function Projects() {
             <span className="font-mono text-xs tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
-            Crafting Digital Solutions
+            Projects
           </h2>
           <p className="text-zinc-400 leading-relaxed">
-            デザインとテクノロジーを融合し、課題を解決しながらブランドの魅力を引き出した主要なプロジェクトです。
+            既成概念を打ち砕き、記憶に残る体験を。<br />
+            デザインと技術を融合した『Burst Style』の実践。
           </p>
         </div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import ProfileCard from "./ProfileCard";
 
 const experience = [
   {
@@ -21,10 +22,9 @@ const experience = [
   },
 ];
 
-const skills = [
-  { category: "Design", items: ["UI/UX Design", "Brand Identity", "Motion Design", "Design Systems"] },
-  { category: "Engineering", items: ["React / Next.js", "TypeScript", "WebGL / Three.js", "Headless CMS"] },
-];
+
+
+
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -70,48 +70,34 @@ export default function AboutSection() {
       <div className="bg-grid absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-16 max-w-2xl">
+          <div className="flex items-center gap-2 text-fuchsia-400 mb-4">
+            <span className="h-px w-8 bg-current"></span>
+            <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
+            About Me
+          </h2>
+        </div>
+
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
 
-          {/* Left Column: Heading & Bio */}
-          <div className="about-card space-y-8">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 text-fuchsia-400">
-                <span className="h-px w-8 bg-current"></span>
-                <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
-              </div>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Designing with Logic,<br />
-                Coding with Emotion.
-              </h2>
+          {/* Left Column: Profile Card & Skills */}
+          <div className="about-card space-y-12">
+            
+            {/* Profile Card */}
+            <div className="flex justify-center lg:justify-start">
+              <ProfileCard 
+                name="Eric Kei" 
+                title="Creative Developer"
+                className="w-full max-w-[500px] aspect-[4/5] lg:h-full lg:max-h-[600px]"
+                innerGradient="linear-gradient(145deg, #18181b 0%, #09090b 100%)"
+                backgroundImageUrl="/profile-eric.jpg"
+              />
             </div>
 
-            <div className="prose prose-invert text-zinc-400">
-              <p>
-                Burst Style のクリエイティブディレクター。
-                <br />
-                デザインと言葉を行き来しながら、ブランドの可能性を最大化する体験づくりを追求しています。
-                「伝えたい価値が正しく届く」ブランドコミュニケーションの実現に向け、リサーチに基づいた戦略設計と、ディテールまでこだわった実装を提供します。
-              </p>
-            </div>
 
-            {/* Skills Grid */}
-            <div className="grid gap-6 sm:grid-cols-2">
-              {skills.map((skillGroup) => (
-                <div key={skillGroup.category} className="space-y-3">
-                  <h3 className="text-sm font-semibold text-zinc-200 border-b border-zinc-800 pb-2">
-                    {skillGroup.category}
-                  </h3>
-                  <ul className="space-y-2">
-                    {skillGroup.items.map((item) => (
-                      <li key={item} className="flex items-center gap-2 text-sm text-zinc-500">
-                        <span className="h-1 w-1 rounded-full bg-blue-500/50" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Right Column: Timeline */}
