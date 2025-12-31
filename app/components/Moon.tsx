@@ -21,7 +21,7 @@ export default function Moon() {
       meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // Same vertical wave
       meshRef.current.position.z = Math.cos(t) * radius - 20;
 
-      meshRef.current.rotation.y += 0.001;
+      meshRef.current.rotation.y += 0.005; // Visibly spin
     }
   });
 
