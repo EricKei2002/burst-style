@@ -91,7 +91,7 @@ export default function AboutSection() {
               <ProfileCard 
                 name="Eric Kei" 
                 title="Creative Developer"
-                className="w-full max-w-[500px] aspect-[4/5] lg:h-full lg:max-h-[600px]"
+                className="w-full max-w-[500px] aspect-4/5 lg:h-full lg:max-h-[600px]"
                 innerGradient="linear-gradient(145deg, #18181b 0%, #09090b 100%)"
                 backgroundImageUrl="/profile-new.jpg"
               />

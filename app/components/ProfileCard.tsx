@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useMemo } from 'react';
+import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
 import styles from './ProfileCard.module.css';
 
@@ -34,17 +35,9 @@ export default function ProfileCard({
   backgroundImageUrl,
 }: ProfileCardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
-// ... (omitting unchanged lines for brevity in search block if possible, but I need to start higher for function signature)
-
-// Let's use a tighter replacement for just the function signature and then another for the render if needed, or one big block.
-// The file is small enough (200 lines). But I should be precise.
-
-// Replacement 1: Function Signature
-
   const shellRef = useRef<HTMLDivElement>(null);
 
   const tiltEngine = useMemo(() => {
-    // ... (tilt logic remains same)
     if (!enableTilt) return null;
     let rafId: number | null = null;
     let running = false;
@@ -193,10 +186,14 @@ export default function ProfileCard({
           <div className={styles.inside}>
             {backgroundImageUrl && (
               <>
-                <img 
+                <Image 
                   src={backgroundImageUrl} 
                   alt="Profile Background" 
-                  className={styles.backgroundImage} 
+                  className={styles.backgroundImage}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 500px"
+                  priority
+                  style={{ objectFit: 'cover' }}
                 />
                 <div className={styles.cardOverlay} />
               </>
@@ -208,11 +205,12 @@ export default function ProfileCard({
             <div className={styles.content}>
               <div className={styles.avatarContent}>
                 {avatarUrl && (
-                  <img 
+                  <Image 
                     className={styles.avatar} 
                     src={avatarUrl} 
                     alt={name} 
-                    loading="lazy" 
+                    width={80}
+                    height={80}
                   />
                 )}
                 <div className={styles.userInfo}>
