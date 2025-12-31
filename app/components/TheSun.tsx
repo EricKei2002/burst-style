@@ -5,7 +5,7 @@ import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { TextureLoader } from "three";
 
-export default function Sun() {
+export default function TheSun() {
   const meshRef = useRef<THREE.Mesh>(null);
   
   // Using local texture for reliability

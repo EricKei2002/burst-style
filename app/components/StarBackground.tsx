@@ -5,7 +5,7 @@ import { Stars } from "@react-three/drei";
 import { useRef, Suspense } from "react";
 import * as THREE from "three";
 // Components
-import Sun from "./Sun";
+import TheSun from "./TheSun";
 import Moon from "./Moon";
 
 function RotatingStars() {
@@ -33,7 +33,7 @@ export default function StarBackground() {
       >
         <ambientLight intensity={0.1} />
         <Suspense fallback={null}>
-          <Sun />
+          <TheSun />
           <Moon />
         </Suspense>
         <RotatingStars />
