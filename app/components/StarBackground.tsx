@@ -7,6 +7,7 @@ import * as THREE from "three";
 // Components
 import TheSun from "./TheSun";
 import Moon from "./Moon";
+import Earth from "./Earth";
 
 function RotatingStars() {
   const starsRef = useRef<THREE.Group>(null);
@@ -35,6 +36,7 @@ export default function StarBackground() {
         <Suspense fallback={null}>
           <TheSun />
           <Moon />
+          <Earth />
         </Suspense>
         <RotatingStars />
       </Canvas>
