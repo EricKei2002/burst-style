@@ -12,6 +12,7 @@ export default function ContactSection() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -56,6 +57,7 @@ export default function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
     
     try {
         const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -71,14 +73,11 @@ export default function ContactSection() {
             setTimeout(() => setIsSent(false), 10000);
         } else {
             console.error('Submission failed');
-            // Optimistically show success to user or show error? 
-            // For a portfolio, maybe just showing "Sent" is better UX even if backend fails typically, 
-            // but let's stick to truthy feedback for now.
-             alert("送信に失敗しました。時間をおいて再度お試しください。");
+            setErrorMessage("ERROR: TRANSMISSION FAILED. PLEASE RETRY.");
         }
     } catch (error) {
         console.error('Submission error:', error);
-        alert("送信エラーが発生しました。");
+        setErrorMessage("CRITICAL ERROR: CONNECTION LOST.");
     } finally {
         setIsSubmitting(false);
     }
@@ -160,7 +159,12 @@ export default function ContactSection() {
                                 />
                             </div>
 
-                            <div className="flex justify-end pt-4">
+                            <div className="flex flex-col items-end gap-4 pt-4">
+                                {errorMessage && (
+                                    <p className="font-mono text-xs text-red-500 tracking-wider animate-pulse">
+                                        &gt; {errorMessage}
+                                    </p>
+                                )}
                                 <MagneticButton strength={0.3} className="inline-block">
                                     <button 
                                         type="submit" 
