@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "Burst Style",
     images: [
       {
-        url: "/icon.jpg", // Using the icon as fallback OG image if no specific OG image yet
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Burst Style Portfolio",
@@ -40,10 +40,7 @@ export const metadata: Metadata = {
     title: "Burst Style | Web Developer Portfolio",
     description: "Eric Keiのポートフォリオサイト。創造性を爆発させるWeb体験。",
     // creator: "@your_twitter_handle", // User removed twitter link, so maybe omit or keep generic
-    images: ["/icon.jpg"],
-  },
-  icons: {
-    icon: "/icon.jpg",
+    images: ["/og-image.jpg"],
   },
 };
 

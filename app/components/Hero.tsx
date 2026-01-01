@@ -151,7 +151,7 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
-      <div ref={flashRef} className="pointer-events-none fixed inset-0 z-[60] bg-white opacity-0 mix-blend-overlay"></div>
+      <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
       
       {/* Preloader Overlay (System Boot) */}
       <div className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait">
