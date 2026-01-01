@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     // 2. Send Auto-reply via Resend
     if (process.env.RESEND_API_KEY) {
         await resend.emails.send({
-            from: 'Eric Kei <noreply@burst.style>',
+            from: 'Eric Kei <Contact@burst.style>',
             to: email,
             subject: 'Thank you for contacting Burst Style',
             html: `
