@@ -35,44 +35,49 @@ export async function POST(request: Request) {
             html: `
                 <!DOCTYPE html>
                 <html>
-                <body style="background-color: #000000; margin: 0; padding: 0; font-family: 'Courier New', monospace;">
-                    <div style="background-color: #0a0a0a; color: #e4e4e7; padding: 40px 20px; text-align: center;">
-                        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 12px; overflow: hidden; background-color: #111; box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1);">
+                <body style="background-color: #000000; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; color: #e4e4e7;">
+                    <div style="background-color: #000000; padding: 40px 20px; text-align: center;">
+                        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #0a0a0a; box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);">
                             
                             <!-- Header Image -->
-                            <div style="width: 100%; height: 200px; background-image: url('https://burst.style/og-image.jpg'); background-size: cover; background-position: center; background-color: #222;">
-                                <!-- Fallback for email clients that strip background images -->
+                            <div style="width: 100%; height: 200px; background-image: url('https://burst.style/og-image.jpg'); background-size: cover; background-position: center; border-bottom: 1px solid #333;">
                                 <img src="https://burst.style/og-image.jpg" alt="Burst Style" style="width: 100%; height: 100%; object-fit: cover; opacity: 0;" />
                             </div>
 
-                            <div style="padding: 40px 30px;">
-                                <!-- Title -->
-                                <h1 style="color: #22c55e; font-size: 24px; letter-spacing: -1px; margin: 0 0 20px 0; border-bottom: 2px solid #22c55e; display: inline-block; padding-bottom: 8px;">
-                                    &gt; SYSTEM_MESSAGE_
-                                </h1>
+                            <div style="padding: 40px 30px; text-align: left;">
+                                <!-- Terminal Header -->
+                                <div style="margin-bottom: 30px; border-bottom: 1px dashed #333; padding-bottom: 20px;">
+                                    <h1 style="color: #22c55e; font-size: 20px; letter-spacing: -0.5px; margin: 0;">
+                                        <span style="color: #d946ef;">&gt;</span> SYSTEM_BOOT_SEQUENCE<span style="animation: blink 1s infinite;">_</span>
+                                    </h1>
+                                    <p style="color: #666; font-size: 12px; margin: 5px 0 0 0;">STATUS: CONFIRMED</p>
+                                </div>
 
                                 <!-- Greeting -->
-                                <p style="font-size: 16px; line-height: 1.8; margin-bottom: 30px; text-align: left;">
-                                    Hello <span style="color: #d946ef; font-weight: bold;">${name}</span>,<br><br>
+                                <p style="font-size: 15px; line-height: 1.8; margin-bottom: 30px; color: #e4e4e7;">
+                                    Hello <span style="color: #22c55e; font-weight: bold;">${name}</span>,<br><br>
                                     お問い合わせありがとうございます。<br>
-                                    あなたのメッセージは <strong>BURST SYSTEM</strong> に正常に転送されました。<br>
+                                    あなたのメッセージは <strong style="color: #d946ef;">BURST SYSTEM</strong> に正常に転送されました。<br>
                                     内容を確認の上、Eric Kei より直接ご連絡いたします。
                                 </p>
                                 
-                                <!-- User Message -->
-                                <div style="background-color: #000; padding: 20px; text-align: left; border-left: 4px solid #d946ef; margin-bottom: 30px; border-radius: 4px;">
-                                    <p style="margin: 0 0 10px 0; font-size: 12px; color: #a1a1aa; text-transform: uppercase; letter-spacing: 1px;">&gt; Incoming Transmission:</p>
-                                    <p style="margin: 0; white-space: pre-wrap; color: #e4e4e7; font-size: 14px;">${message}</p>
+                                <!-- User Message Box (Terminal Style) -->
+                                <div style="background-color: #111; border: 1px solid #333; border-radius: 4px; padding: 20px; margin-bottom: 30px; font-size: 13px;">
+                                    <div style="color: #888; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; display: flex;">
+                                        <span style="color: #d946ef; margin-right: 10px;">➜</span>
+                                        <span>INPUT_TRANSMISSION</span>
+                                    </div>
+                                    <p style="margin: 0; white-space: pre-wrap; color: #ccc; line-height: 1.6;">${message}</p>
                                 </div>
 
                                 <!-- Footer -->
-                                <p style="font-size: 14px; color: #a1a1aa; margin-top: 40px; border-top: 1px dashed #333; padding-top: 20px;">
-                                    Wait for connection...
-                                </p>
-                                
-                                <div style="margin-top: 30px; font-size: 12px; color: #52525b;">
-                                    <p style="margin-bottom: 10px;">BURST STYLE | Eric Kei Portfolio</p>
-                                    <a href="https://burst.style" style="color: #22c55e; text-decoration: none; border: 1px solid #22c55e; padding: 8px 16px; border-radius: 20px; display: inline-block;">Visit Website</a>
+                                <div style="border-top: 1px dashed #333; padding-top: 20px; margin-top: 40px; text-align: center;">
+                                    <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Wait for connection...</p>
+                                    <div style="margin-top: 20px;">
+                                        <a href="https://burst.style" style="color: #e4e4e7; text-decoration: none; font-size: 12px; border: 1px solid #333; padding: 8px 16px; border-radius: 4px; background: #000;">
+                                            <span style="color: #22c55e;">&gt;</span> Return to Website
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
