@@ -8,10 +8,20 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+     if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
+       setIsTouch(true);
+     }
+  }, []);
 
   useGSAP(() => {
+    if (isTouch) return;
     const cursor = cursorRef.current;
     const follower = followerRef.current;
+    
+    if (!cursor || !follower) return;
     
     // Initial position off-screen
     gsap.set(cursor, { xPercent: -50, yPercent: -50, opacity: 0 });
@@ -60,12 +70,15 @@ export default function CustomCursor() {
       });
       observer.disconnect();
     };
-  }, []);
+  }, [isTouch]);
 
   useEffect(() => {
+    if (isTouch) return;
     // Animate cursor scale based on hover state
     const cursor = cursorRef.current;
     const follower = followerRef.current;
+    
+    if (!cursor || !follower) return;
     
     if (isHovering) {
         gsap.to(cursor, { scale: 0.5, duration: 0.2 });
@@ -74,7 +87,9 @@ export default function CustomCursor() {
         gsap.to(cursor, { scale: 1, duration: 0.2 });
         gsap.to(follower, { scale: 1, backgroundColor: "transparent", duration: 0.2 });
     }
-  }, [isHovering]);
+  }, [isHovering, isTouch]);
+
+  if (isTouch) return null;
 
   return (
     <>

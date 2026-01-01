@@ -135,7 +135,7 @@ export default function Hero() {
       <div className="container relative z-10 mx-auto px-6">
         <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center">
           
-          <h1 className="text-6xl font-black tracking-tighter text-white sm:text-8xl lg:text-9xl flex flex-col items-center gap-2">
+          <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
             <div className="flex items-center justify-center">
               <span className="font-mono text-fuchsia-400 mr-2">&gt;</span>
               <SplitText charClassName="title-char">Hello, I&apos;m</SplitText>
@@ -168,7 +168,7 @@ export default function Hero() {
                 <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-500">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-500">~ &gt;</span></span>
                 <SplitText charClassName="ls-char">ls</SplitText>
               </div>
-             <div className="flex gap-6 pl-4">
+             <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">
                  <MagneticButton>
                     <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
                         <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />

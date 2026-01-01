@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Point {
   x: number;
@@ -15,8 +15,16 @@ export default function MouseTrail() {
   const requestRef = useRef<number>(0);
   const pointsRef = useRef<Point[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
+     if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
+       setIsTouch(true);
+     }
+  }, []);
+
+  useEffect(() => {
+    if (isTouch) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -92,7 +100,9 @@ export default function MouseTrail() {
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(requestRef.current);
     };
-  }, []);
+  }, [isTouch]);
+
+  if (isTouch) return null;
 
   return (
     <canvas 
