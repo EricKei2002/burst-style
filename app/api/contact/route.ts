@@ -35,49 +35,59 @@ export async function POST(request: Request) {
             html: `
                 <!DOCTYPE html>
                 <html>
-                <body style="background-color: #000000; margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; color: #e4e4e7;">
-                    <div style="background-color: #000000; padding: 40px 20px; text-align: center;">
-                        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #0a0a0a; box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);">
+                <body style="margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; color: #e4e4e7; background-color: #030014;">
+                    <!-- Outer Container with Starry/Space Background -->
+                    <div style="background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%); padding: 40px 20px; text-align: center; min-height: 100vh;">
+                        
+                        <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ffffff20; border-radius: 16px; overflow: hidden; background-color: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);">
                             
-                            <!-- Header Image -->
-                            <div style="width: 100%; height: 200px; background-image: url('https://burst.style/og-image.jpg'); background-size: cover; background-position: center; border-bottom: 1px solid #333;">
-                                <img src="https://burst.style/og-image.jpg" alt="Burst Style" style="width: 100%; height: 100%; object-fit: cover; opacity: 0;" />
+                            <!-- Header / Icon Area -->
+                            <div style="padding: 40px 0 20px 0; background: linear-gradient(to bottom, rgba(124, 58, 237, 0.1), transparent);">
+                                <img src="https://burst.style/icon.jpg" alt="Eric Kei" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); object-fit: cover;" />
                             </div>
 
-                            <div style="padding: 40px 30px; text-align: left;">
+                            <div style="padding: 20px 30px 40px 30px; text-align: left;">
                                 <!-- Terminal Header -->
-                                <div style="margin-bottom: 30px; border-bottom: 1px dashed #333; padding-bottom: 20px;">
-                                    <h1 style="color: #22c55e; font-size: 20px; letter-spacing: -0.5px; margin: 0;">
-                                        <span style="color: #d946ef;">&gt;</span> SYSTEM_BOOT_SEQUENCE<span style="animation: blink 1s infinite;">_</span>
+                                <div style="text-align: center; margin-bottom: 30px;">
+                                    <h1 style="color: #22c55e; font-size: 22px; letter-spacing: 1px; margin: 0; text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);">
+                                        SYSTEM_BOOT_SEQUENCE<span style="animation: blink 1s infinite;">_</span>
                                     </h1>
-                                    <p style="color: #666; font-size: 12px; margin: 5px 0 0 0;">STATUS: CONFIRMED</p>
+                                    <p style="color: #a78bfa; font-size: 12px; margin: 8px 0 0 0; letter-spacing: 2px;">CONNECTION ESTABLISHED</p>
                                 </div>
 
                                 <!-- Greeting -->
-                                <p style="font-size: 15px; line-height: 1.8; margin-bottom: 30px; color: #e4e4e7;">
-                                    Hello <span style="color: #22c55e; font-weight: bold;">${name}</span>,<br><br>
+                                <p style="font-size: 15px; line-height: 1.8; margin-bottom: 30px; color: #e4e4e7; text-align: center;">
+                                    Hello <span style="color: #22c55e; font-weight: bold;">${name}</span>,<br>
                                     お問い合わせありがとうございます。<br>
                                     あなたのメッセージは <strong style="color: #d946ef;">BURST STYLE</strong> に正常に転送されました。<br>
-                                    内容を確認の上、Eric Kei より直接ご連絡いたします。
+                                    Eric Kei より直接ご連絡いたします。
                                 </p>
-                            
-                                <!-- User Message Box (Terminal Style) -->
-                                <div style="background-color: #111; border: 1px solid #333; border-radius: 4px; padding: 20px; margin-bottom: 30px; font-size: 13px;">
-                                    <div style="color: #888; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; display: flex;">
+                                
+                                <!-- User Message Box (Glass-like Terminal) -->
+                                <div style="background-color: rgba(0, 0, 0, 0.5); border: 1px solid #333; border-radius: 8px; padding: 25px; margin-bottom: 30px; font-size: 13px; position: relative;">
+                                    <!-- Decorative bits -->
+                                    <div style="position: absolute; top: 10px; left: 10px; width: 6px; height: 6px; background: #ef4444; border-radius: 50%;"></div>
+                                    <div style="position: absolute; top: 10px; left: 22px; width: 6px; height: 6px; background: #eab308; border-radius: 50%;"></div>
+                                    <div style="position: absolute; top: 10px; left: 34px; width: 6px; height: 6px; background: #22c55e; border-radius: 50%;"></div>
+
+                                    <div style="color: #888; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #ffffff20; padding-bottom: 10px; padding-left: 40px; display: flex;">
                                         <span style="color: #d946ef; margin-right: 10px;">➜</span>
                                         <span>INPUT_TRANSMISSION</span>
                                     </div>
-                                    <p style="margin: 0; white-space: pre-wrap; color: #ccc; line-height: 1.6;">${message}</p>
+                                    <p style="margin: 0; white-space: pre-wrap; color: #ccc; line-height: 1.6; padding-left: 5px;">${message}</p>
                                 </div>
 
                                 <!-- Footer -->
-                                <div style="border-top: 1px dashed #333; padding-top: 20px; margin-top: 40px; text-align: center;">
-                                    <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Wait for connection...</p>
-                                    <div style="margin-top: 20px;">
-                                        <a href="https://burst.style" style="color: #e4e4e7; text-decoration: none; font-size: 12px; border: 1px solid #333; padding: 8px 16px; border-radius: 4px; background: #000;">
-                                            <span style="color: #22c55e;">&gt;</span> Return to Website
-                                        </a>
-                                    </div>
+                                <div style="border-top: 1px solid #ffffff10; padding-top: 25px; margin-top: 40px; text-align: center;">
+                                    <p style="font-size: 12px; color: #666; margin-bottom: 20px;">Wait for connection...</p>
+                                    
+                                    <a href="https://burst.style" style="color: #e4e4e7; text-decoration: none; font-size: 12px; border: 1px solid #ffffff20; padding: 10px 24px; border-radius: 30px; background: rgba(255,255,255,0.05); transition: all 0.2s;">
+                                        <span style="color: #22c55e;">●</span> Return to Universe
+                                    </a>
+                                    
+                                    <p style="margin-top: 30px; font-size: 10px; color: #444;">
+                                        &copy; 2024 Eric Kei / Burst Style. All systems nominal.
+                                    </p>
                                 </div>
                             </div>
                         </div>
