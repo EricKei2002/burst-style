@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     // 2. Send Auto-reply via Resend
     if (process.env.RESEND_API_KEY) {
         await resend.emails.send({
-            from: 'Eric Kei <Contact@burst.style>',
+            from: 'Contact@burst.style',
             to: email,
             subject: 'Thank you for contacting Burst Style',
             html: `
@@ -57,10 +57,10 @@ export async function POST(request: Request) {
                                 <p style="font-size: 15px; line-height: 1.8; margin-bottom: 30px; color: #e4e4e7;">
                                     Hello <span style="color: #22c55e; font-weight: bold;">${name}</span>,<br><br>
                                     お問い合わせありがとうございます。<br>
-                                    あなたのメッセージは <strong style="color: #d946ef;">BURST SYSTEM</strong> に正常に転送されました。<br>
+                                    あなたのメッセージは <strong style="color: #d946ef;">BURST STYLE</strong> に正常に転送されました。<br>
                                     内容を確認の上、Eric Kei より直接ご連絡いたします。
                                 </p>
-                                
+                            
                                 <!-- User Message Box (Terminal Style) -->
                                 <div style="background-color: #111; border: 1px solid #333; border-radius: 4px; padding: 20px; margin-bottom: 30px; font-size: 13px;">
                                     <div style="color: #888; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; display: flex;">
