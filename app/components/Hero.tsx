@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -28,49 +28,61 @@ const SplitText = ({ children, className = "", charClassName = "" }: { children:
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const mainTlRef = useRef<gsap.core.Timeline | null>(null);
+  const [loaderText, setLoaderText] = useState("INITIALIZING SYSTEM...");
 
   const { contextSafe } = useGSAP(() => {
-    const tl = gsap.timeline();
-
-    // Preloader Sequence
-    tl.to(".welcome-char", {
-      opacity: 1,
-      duration: 0.05,
-      stagger: 0.03,
-      ease: "none",
-    })
-    .to(".welcome-char", {
-      opacity: 0,
-      duration: 0.5,
-      delay: 1.0,
-    })
-    .to(".preloader", {
-      opacity: 0,
-      duration: 0.8,
-      onComplete: () => {
-         gsap.set(".preloader", { display: "none" });
-      }
-    })
-
-    // Typewriter Effect for Title
-    .to(".title-char", {
+    // Main Content Animation Timeline (Paused initially)
+    const tl = gsap.timeline({ paused: true });
+    
+    tl.to(".title-char", {
       opacity: 1,
       duration: 0.05,
       stagger: 0.08,
       ease: "none",
-    }, "-=0.2")
-    // Loading Sequence
+    })
     .to(".loading-text", {
       opacity: 1,
       duration: 0.1,
     })
-    // Tech Carousel Fade In (Early reveal)
     .to([".tech-carousel", ".tech-carousel-title"], {
        opacity: 1,
        duration: 0.8,
        delay: 0.5
     });
+
+    mainTlRef.current = tl;
+
   }, { scope: containerRef });
+
+  // Boot Sequence
+  useEffect(() => {
+    const sequence = async () => {
+        // Step 1: Initializing (Already set)
+        await new Promise(r => setTimeout(r, 1200));
+
+        // Step 2: Loading Modules
+        setLoaderText("LOADING MODULES...");
+        await new Promise(r => setTimeout(r, 1200));
+
+        // Step 3: Access Granted
+        setLoaderText("BURST SYSTEM ONLINE");
+        await new Promise(r => setTimeout(r, 1000));
+
+        // Step 4: Fade out and Start Main
+        gsap.to(".preloader", {
+            opacity: 0,
+            duration: 0.8,
+            ease: "power2.inOut",
+            onComplete: () => {
+                gsap.set(".preloader", { display: "none" });
+                mainTlRef.current?.play();
+            }
+        });
+    };
+
+    sequence();
+  }, []);
 
   const showDescription = contextSafe(() => {
     const tl = gsap.timeline();
@@ -122,12 +134,26 @@ export default function Hero() {
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
       
-      {/* Preloader Overlay */}
-      <div className="preloader fixed inset-0 z-50 flex items-center justify-center bg-[#0a0a0a] px-4">
-        <div className="text-4xl sm:text-6xl md:text-8xl font-black font-mono text-green-500 tracking-tighter text-center">
-          <SplitText charClassName="welcome-char">
-            &gt; Welcome to my portfolio website.
-          </SplitText>
+      {/* Preloader Overlay (System Boot) */}
+      <div className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait">
+        <div className="flex flex-col items-center gap-4">
+             {/* Spinning/Pulse Icon */}
+            <div className="h-12 w-12 rounded-full border-2 border-green-500/20 border-t-green-500 animate-spin"></div>
+            
+            <div className="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-green-500 tracking-wider text-center min-w-[300px]">
+                <span className="mr-2">&gt;</span>
+                <DecryptedText 
+                    text={loaderText} 
+                    speed={50} 
+                    maxIterations={20}
+                    className="inline-block"
+                />
+                <span className="animate-pulse ml-1">_</span>
+            </div>
+            
+            <div className="mt-8 w-64 h-1 bg-zinc-800 overflow-hidden rounded-full">
+                <div className="h-full bg-green-500 animate-[loading-bar_3s_ease-in-out_forwards] w-0"></div>
+            </div>
         </div>
       </div>
 
