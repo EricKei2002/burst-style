@@ -1,13 +1,15 @@
 "use client";
 
+import { useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
-import { useRef, Suspense } from "react";
 import * as THREE from "three";
+
 // Components
 import TheSun from "./TheSun";
 import Moon from "./Moon";
 import Earth from "./Earth";
+import ShootingStars from "./ShootingStars";
 
 function RotatingStars() {
   const starsRef = useRef<THREE.Group>(null);
@@ -39,6 +41,7 @@ export default function StarBackground() {
           <Earth />
         </Suspense>
         <RotatingStars />
+        <ShootingStars />
       </Canvas>
     </div>
   );

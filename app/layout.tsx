@@ -6,6 +6,7 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mon
 
 import SmoothScroll from "./components/SmoothScroll";
 import StarBackground from "./components/StarBackground";
+import MouseTrail from "./components/MouseTrail";
 
 export const metadata: Metadata = {
   title: "Burst Style | Eric Kei Portfolio",
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased ${jetbrainsMono.variable} font-mono`}>
+        <MouseTrail />
         <SmoothScroll>
           <StarBackground />
           <main className="min-h-screen w-full">

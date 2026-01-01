@@ -5,6 +5,9 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TechCarousel from "./TechCarousel";
+import DecryptedText from "./DecryptedText";
+import GlitchText from "./GlitchText";
+import MagneticButton from "./MagneticButton";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -138,9 +141,9 @@ export default function Hero() {
               <SplitText charClassName="title-char">Hello, I&apos;m</SplitText>
             </div>
             <div className="flex items-center justify-center">
-              <SplitText className="font-mono pb-2" charClassName="title-char">
-                Eric Kei.
-              </SplitText>
+              <div className="font-mono pb-2 title-char inline-block">
+                <GlitchText text="Eric Kei." />
+              </div>
               <span className="animate-pulse font-mono text-fuchsia-400 ml-1 pb-2">_</span>
             </div>
           </h1>
@@ -148,7 +151,10 @@ export default function Hero() {
           <div className="max-w-3xl w-full px-4 mt-8 text-left">
             <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
                &gt; ESTABLISHING CONNECTION...<br />
-               &gt; What is Burst Style ? <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block"> /Enter </span>
+               &gt; What is Burst Style ? 
+               <MagneticButton className="ml-2 inline-block">
+                 <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block"> /Enter </span>
+               </MagneticButton>
             </div>
             <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
               <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
@@ -163,8 +169,16 @@ export default function Hero() {
                 <SplitText charClassName="ls-char">ls</SplitText>
               </div>
              <div className="flex gap-6 pl-4">
-                 <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">Projects/</a>
-                 <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all">About Me/</a>
+                 <MagneticButton>
+                    <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                        <DecryptedText text="Projects/" animateOnHover speed={30} className="font-bold" />
+                    </a>
+                 </MagneticButton>
+                 <MagneticButton>
+                    <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                        <DecryptedText text="About Me/" animateOnHover speed={30} className="font-bold" />
+                    </a>
+                 </MagneticButton>
               </div>
             </div>
           </div>
