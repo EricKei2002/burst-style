@@ -44,12 +44,6 @@ export async function POST(request: Request) {
                             
                             <!-- Header / Icon Area -->
                             <div style="padding: 40px 0 20px 0; background: linear-gradient(to bottom, rgba(124, 58, 237, 0.2), transparent); position: relative;">
-                                <!-- Big Stars Decoration -->
-                                <div style="position: absolute; top: 20%; left: 10%; color: #fff; opacity: 0.3; font-size: 24px;">✦</div>
-                                <div style="position: absolute; top: 30%; right: 15%; color: #fff; opacity: 0.2; font-size: 20px;">★</div>
-                                <div style="position: absolute; bottom: 20%; left: 20%; color: #fff; opacity: 0.1; font-size: 16px;">✦</div>
-                                <div style="position: absolute; top: 10%; right: 10%; color: #d946ef; opacity: 0.4; font-size: 12px;">●</div>
-
                                 <img src="https://burst.style/icon.jpg" alt="Eric Kei" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); object-fit: cover;" />
                             </div>
 
