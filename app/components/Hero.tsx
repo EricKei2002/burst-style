@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -106,6 +106,16 @@ export default function Hero() {
     });
   });
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") {
+        showDescription();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showDescription]);
+
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
       
@@ -138,7 +148,7 @@ export default function Hero() {
           <div className="max-w-3xl w-full px-4 mt-8 text-left">
             <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
                &gt; ESTABLISHING CONNECTION...<br />
-               &gt; What is Burst Style ? <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block">[ /Enter ]</span>
+               &gt; What is Burst Style ? <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block"> /Enter </span>
             </div>
             <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
               <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
