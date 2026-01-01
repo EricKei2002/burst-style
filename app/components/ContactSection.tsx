@@ -53,18 +53,35 @@ export default function ContactSection() {
     return () => ctx.revert();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate network request
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSent(true);
-      // Reset form or state after delay
-      setTimeout(() => setIsSent(false), 5000);
-      if (formRef.current) formRef.current.reset();
-    }, 2000);
+    try {
+        const formData = new FormData(e.currentTarget as HTMLFormElement);
+        const response = await fetch('/api/contact', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            setIsSent(true);
+            if (formRef.current) formRef.current.reset();
+            // Reset state after 10 seconds
+            setTimeout(() => setIsSent(false), 10000);
+        } else {
+            console.error('Submission failed');
+            // Optimistically show success to user or show error? 
+            // For a portfolio, maybe just showing "Sent" is better UX even if backend fails typically, 
+            // but let's stick to truthy feedback for now.
+             alert("送信に失敗しました。時間をおいて再度お試しください。");
+        }
+    } catch (error) {
+        console.error('Submission error:', error);
+        alert("送信エラーが発生しました。");
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   return (
@@ -108,6 +125,7 @@ export default function ContactSection() {
                                     <input 
                                         type="text" 
                                         id="name" 
+                                        name="name"
                                         required
                                         className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all"
                                         placeholder="John Doe"
@@ -120,6 +138,7 @@ export default function ContactSection() {
                                     <input 
                                         type="email" 
                                         id="email" 
+                                        name="email"
                                         required
                                         className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all"
                                         placeholder="john@example.com"
@@ -133,6 +152,7 @@ export default function ContactSection() {
                                 </label>
                                 <textarea 
                                     id="message" 
+                                    name="message"
                                     required
                                     rows={6}
                                     className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none"
