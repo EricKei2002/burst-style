@@ -31,6 +31,8 @@ export default function Hero() {
   const mainTlRef = useRef<gsap.core.Timeline | null>(null);
   const [loaderText, setLoaderText] = useState("INITIALIZING SYSTEM...");
 
+  const flashRef = useRef<HTMLDivElement>(null);
+
   const { contextSafe } = useGSAP(() => {
     // Main Content Animation Timeline (Paused initially)
     const tl = gsap.timeline({ paused: true });
@@ -66,10 +68,26 @@ export default function Hero() {
         await new Promise(r => setTimeout(r, 1200));
 
         // Step 3: Access Granted
-        setLoaderText("BURST STYLE ONLINE");
-        await new Promise(r => setTimeout(r, 2500));
+        setLoaderText("BURST SYSTEM ONLINE");
+        // Trigger Burst Effect right when text appears
+        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(200);
+        }
+        
+        await new Promise(r => setTimeout(r, 2000));
 
         // Step 4: Fade out and Start Main
+        const flash = flashRef.current;
+        if (flash) {
+            gsap.to(flash, { opacity: 1, duration: 0.1, yoyo: true, repeat: 1 });
+        }
+        
+        // Shake effect on container
+        gsap.fromTo(containerRef.current, 
+            { x: -10 },
+            { x: 10, duration: 0.05, repeat: 5, yoyo: true, clearProps: "x" }
+        );
+
         gsap.to(".preloader", {
             opacity: 0,
             duration: 0.8,
@@ -133,6 +151,7 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
+      <div ref={flashRef} className="pointer-events-none fixed inset-0 z-[60] bg-white opacity-0 mix-blend-overlay"></div>
       
       {/* Preloader Overlay (System Boot) */}
       <div className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait">
@@ -159,7 +178,7 @@ export default function Hero() {
 
       {/* Foreground Text Content */}
       <div className="container relative z-10 mx-auto px-6">
-        <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center">
+        <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
           
           <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
             <div className="flex items-center justify-center">
