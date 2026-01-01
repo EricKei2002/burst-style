@@ -66,8 +66,8 @@ export default function Hero() {
         await new Promise(r => setTimeout(r, 1200));
 
         // Step 3: Access Granted
-        setLoaderText("BURST SYSTEM ONLINE");
-        await new Promise(r => setTimeout(r, 1000));
+        setLoaderText("BURST STYLE ONLINE");
+        await new Promise(r => setTimeout(r, 2500));
 
         // Step 4: Fade out and Start Main
         gsap.to(".preloader", {
