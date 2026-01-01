@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProfileCard from "./ProfileCard";
+import DecryptedText from "./DecryptedText";
 
 const experience = [
   {
@@ -77,7 +78,7 @@ export default function AboutSection() {
             <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
-            About Me
+            <DecryptedText text="About Me" animateOnHover speed={30} />
           </h2>
         </div>
 

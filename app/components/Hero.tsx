@@ -171,12 +171,17 @@ export default function Hero() {
              <div className="flex gap-6 pl-4">
                  <MagneticButton>
                     <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
-                        <DecryptedText text="Projects/" animateOnHover speed={30} className="font-bold" />
+                        <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />
                     </a>
                  </MagneticButton>
                  <MagneticButton>
                     <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
-                        <DecryptedText text="About Me/" animateOnHover speed={30} className="font-bold" />
+                        <DecryptedText text="/About Me" animateOnHover speed={30} className="font-bold" />
+                    </a>
+                 </MagneticButton>
+                 <MagneticButton>
+                    <a href="#contact" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                        <DecryptedText text="/Contact" animateOnHover speed={30} className="font-bold" />
                     </a>
                  </MagneticButton>
               </div>

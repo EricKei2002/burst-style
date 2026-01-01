@@ -63,7 +63,7 @@ export default function Projects() {
             <span className="font-mono text-xs tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
-            Projects
+            <DecryptedText text="Projects" animateOnHover speed={30} />
           </h2>
           <p className="text-zinc-400 leading-relaxed">
             既成概念を打ち砕き、記憶に残る体験を。<br />
