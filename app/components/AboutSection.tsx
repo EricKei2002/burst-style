@@ -4,10 +4,22 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ReactNode } from "react";
 import ProfileCard from "./ProfileCard";
 import DecryptedText from "./DecryptedText";
+import CsharpCalculator from "./CsharpCalculator";
 
-const timeline = [
+interface TimelineItem {
+  year: string;
+  title: string;
+  description: string;
+  tags: string[];
+  image?: string;
+  images?: string[];
+  extraComponent?: ReactNode;
+}
+
+const timeline: TimelineItem[] = [
   {
     year: "2002",
     title: "Born in Wakayama",
@@ -24,14 +36,21 @@ const timeline = [
   {
     year: "Junior High",
     title: "First Code with C#",
-    description: "初めて本格的なコードを書く。C#を用いて電卓アプリを自作し、ロジック構築の基礎を習得。",
+    description: "友人からC#を教わり、初めてプログラミングに触れる。電卓アプリを自作し、ロジック構築の基礎を習得。",
     tags: ["C#", "Windows Forms", "Algorithms"],
+    extraComponent: <CsharpCalculator />,
   },
   {
     year: "High School",
     title: "Hardware & Silicon Valley",
     description: "シリコンバレーを訪問し、最先端のテックカルチャーに触れる。自作PCの構築を通じてハードウェアの知識も深める。",
     tags: ["Silicon Valley", "PC Build", "Hardware"],
+    images: [
+      "/images/sv/google.jpg",
+      "/images/sv/facebook.jpg",
+      "/images/sv/android.jpg",
+      "/images/sv/intel.jpg"
+    ]
   },
   {
     year: "After High School",
@@ -81,7 +100,7 @@ export default function AboutSection() {
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="relative w-full overflow-hidden py-24 sm:py-32">
+    <section id="about" ref={sectionRef} className="relative w-full py-24 sm:py-32">
       <div className="bg-grid absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
@@ -99,7 +118,7 @@ export default function AboutSection() {
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
 
           {/* Left Column: Profile Card & Skills */}
-          <div className="about-card space-y-12">
+          <div className="about-card space-y-12 lg:sticky lg:top-32 lg:self-start">
             
             {/* Profile Card */}
             <div className="flex justify-center lg:justify-start">
@@ -132,10 +151,10 @@ export default function AboutSection() {
                     <h3 className="text-lg font-semibold text-zinc-200 group-hover:text-fuchsia-400 transition-colors">
                       {item.title}
                     </h3>
-                    <span className="font-mono text-xs text-zinc-500">{item.year}</span>
+                    <span className="font-mono text-base text-zinc-400">{item.year}</span>
                   </div>
                   
-                  <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                  <p className="mt-4 text-base leading-relaxed text-zinc-300">
                     {item.description}
                   </p>
 
@@ -148,6 +167,28 @@ export default function AboutSection() {
                         className="object-contain opacity-80 transition-opacity duration-300 group-hover:opacity-100"
                         sizes="(max-width: 768px) 100vw, 500px"
                       />
+                    </div>
+                  )}
+
+                  {item.extraComponent && (
+                    <div className="mt-6 w-full flex justify-center sm:justify-start">
+                      {item.extraComponent}
+                    </div>
+                  )}
+
+                  {item.images && (
+                    <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-2">
+                       {item.images.map((src, i) => (
+                        <div key={i} className="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
+                          <Image
+                            src={src}
+                            alt={`${item.title} photo ${i + 1}`}
+                            fill
+                            className="object-contain transition-transform duration-500 hover:scale-105"
+                            sizes="(max-width: 768px) 50vw, 300px"
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
 
