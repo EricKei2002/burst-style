@@ -145,7 +145,7 @@ export default function AboutSection() {
                         src={item.image} 
                         alt={item.title} 
                         fill
-                        className="object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                        className="object-contain opacity-80 transition-opacity duration-300 group-hover:opacity-100"
                         sizes="(max-width: 768px) 100vw, 500px"
                       />
                     </div>
