@@ -1,31 +1,45 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import ProfileCard from "./ProfileCard";
 import DecryptedText from "./DecryptedText";
 
-const experience = [
+const timeline = [
   {
-    company: "Burst Style",
-    role: "Creative Director",
-    period: "2020 - Present",
-    description: "ブランド戦略からビジュアル制作まで一貫してリード。グローバルブランドのローンチを複数担当し、デザインシステム構築を指揮。",
-    tech: ["Direction", "Design System", "Next.js"]
+    year: "2002",
+    title: "Born in Wakayama",
+    description: "2002年2月16日、和歌山県にて生を受ける。",
+    tags: ["Wakayama", "Origin"],
   },
   {
-    company: "Freelance",
-    role: "UI/UX Designer",
-    period: "2016 - 2020",
-    description: "BtoB SaaS のプロダクトデザインとデザインシステム構築を支援。アクセシビリティ改善とユーザーリサーチに基づく改善を担当。",
-    tech: ["Figma", "React", "A11y"]
+    year: "Elementary School",
+    title: "Hello, World with Scratch",
+    description: "プログラミングとの初めての出会い。ビジュアルプログラミング言語「Scratch」を使用し、創造する楽しさを学ぶ。",
+    tags: ["Scratch", "Visual Programming"],
+    image: "/scratch-programming.png"
   },
+  {
+    year: "Junior High",
+    title: "First Code with C#",
+    description: "初めて本格的なコードを書く。C#を用いて電卓アプリを自作し、ロジック構築の基礎を習得。",
+    tags: ["C#", "Windows Forms", "Algorithms"],
+  },
+  {
+    year: "High School",
+    title: "Hardware & Silicon Valley",
+    description: "シリコンバレーを訪問し、最先端のテックカルチャーに触れる。自作PCの構築を通じてハードウェアの知識も深める。",
+    tags: ["Silicon Valley", "PC Build", "Hardware"],
+  },
+  {
+    year: "After High School",
+    title: "Server & Infrastructure",
+    description: "Raspberry PiにLinuxを導入し、自宅サーバーを構築。ネットワークやOSの仕組みを実践的に学ぶ。",
+    tags: ["Linux", "Raspberry Pi", "Home Server", "Network"],
+  }
 ];
-
-
-
-
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -106,7 +120,7 @@ export default function AboutSection() {
             {/* Timeline Line */}
             <div className="absolute left-4 top-2 h-full w-px bg-zinc-800 sm:left-8" />
 
-            {experience.map((item, index) => (
+            {timeline.map((item, index) => (
               <div key={index} className="relative pl-12 sm:pl-16">
                 {/* Dot */}
                 <div className="absolute left-[13px] top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#0a0a0a] ring-1 ring-zinc-700 sm:left-[29px]">
@@ -116,15 +130,29 @@ export default function AboutSection() {
                 <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/50">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3 className="text-lg font-semibold text-zinc-200 group-hover:text-fuchsia-400 transition-colors">
-                      {item.role} <span className="text-zinc-500 text-sm font-normal">at {item.company}</span>
+                      {item.title}
                     </h3>
-                    <span className="font-mono text-xs text-zinc-500">{item.period}</span>
+                    <span className="font-mono text-xs text-zinc-500">{item.year}</span>
                   </div>
+                  
                   <p className="mt-4 text-sm leading-relaxed text-zinc-400">
                     {item.description}
                   </p>
+
+                  {item.image && (
+                    <div className="mt-4 overflow-hidden rounded-lg border border-zinc-800 relative w-full aspect-video">
+                      <Image 
+                        src={item.image} 
+                        alt={item.title} 
+                        fill
+                        className="object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                        sizes="(max-width: 768px) 100vw, 500px"
+                      />
+                    </div>
+                  )}
+
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {item.tech.map((t) => (
+                    {item.tags.map((t) => (
                       <span key={t} className="rounded-md border border-zinc-800 bg-black/50 px-2 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
                         {t}
                       </span>
