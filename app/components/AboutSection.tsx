@@ -31,7 +31,7 @@ const timeline: TimelineItem[] = [
     title: "Hello, World with Scratch",
     description: "プログラミングとの初めての出会い。ビジュアルプログラミング言語「Scratch」を使用し、創造する楽しさを学ぶ。",
     tags: ["Scratch", "Visual Programming"],
-    image: "/scratch-programming.png"
+    image: "/scratch.png"
   },
   {
     year: "Junior High",
