@@ -59,13 +59,17 @@ export default function Hero() {
 
   // Boot Sequence
   useEffect(() => {
+    let isMounted = true;
+    
     const sequence = async () => {
         // Step 1: Initializing (Already set)
         await new Promise(r => setTimeout(r, 1200));
+        if (!isMounted) return;
 
         // Step 2: Loading Modules
         setLoaderText("LOADING MODULES...");
         await new Promise(r => setTimeout(r, 1200));
+        if (!isMounted) return;
 
         // Step 3: Access Granted
         setLoaderText("BURST SYSTEM ONLINE");
@@ -75,6 +79,7 @@ export default function Hero() {
         }
         
         await new Promise(r => setTimeout(r, 2000));
+        if (!isMounted) return;
 
         // Step 4: Fade out and Start Main
         const flash = flashRef.current;
@@ -93,13 +98,17 @@ export default function Hero() {
             duration: 0.8,
             ease: "power2.inOut",
             onComplete: () => {
-                gsap.set(".preloader", { display: "none" });
-                mainTlRef.current?.play();
+                if (isMounted) {
+                    gsap.set(".preloader", { display: "none" });
+                    mainTlRef.current?.play();
+                }
             }
         });
     };
 
     sequence();
+    
+    return () => { isMounted = false; };
   }, []);
 
   const showDescription = contextSafe(() => {

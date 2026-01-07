@@ -33,7 +33,8 @@ export default function ProfileCard({
   innerGradient = DEFAULT_INNER_GRADIENT,
   behindGlowColor = 'rgba(232, 121, 249, 0.4)', // Fuchsia tint
   backgroundImageUrl,
-}: ProfileCardProps) {
+  growthImages = [],
+}: ProfileCardProps & { growthImages?: string[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
 
@@ -168,6 +169,8 @@ export default function ProfileCard({
     };
   }, [tiltEngine]);
 
+
+
   return (
     <div 
       ref={wrapRef} 
@@ -184,20 +187,44 @@ export default function ProfileCard({
       <div ref={shellRef} className={styles.shell}>
         <div className={styles.card}>
           <div className={styles.inside}>
+            {/* Base Image */}
             {backgroundImageUrl && (
-              <>
-                <Image 
-                  src={backgroundImageUrl} 
-                  alt="Profile Background" 
-                  className={styles.backgroundImage}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 500px"
-                  priority
-                  style={{ objectFit: 'cover' }}
-                />
-                <div className={styles.cardOverlay} />
-              </>
+              <Image 
+                src={backgroundImageUrl} 
+                alt="Profile Background Base" 
+                className={styles.backgroundImage}
+                fill
+                sizes="(max-width: 768px) 100vw, 500px"
+                priority
+                style={{ objectFit: 'cover', objectPosition: 'top' }}
+              />
             )}
+
+            {/* Growth Images (Stacked) */}
+            {growthImages.map((src, index) => {
+               const isLast = index === growthImages.length - 1;
+               // On mobile (default), if it's the last image, make it visible. 
+               // On desktop (lg), initially hidden (opacity-0) and animated by GSAP.
+               // We use 'lg:opacity-0' to ensure desktop starts hidden. 
+               // For non-last images, they remain hidden by default and animated on desktop.
+               
+               const mobileClass = isLast ? "opacity-100 lg:opacity-0" : "opacity-0";
+
+               return (
+                 <Image 
+                   key={src}
+                   src={src} 
+                   alt={`Profile Growth Stage ${index + 1}`} 
+                   className={`${styles.backgroundImage} growth-stage-${index} ${mobileClass}`}
+                   fill
+                   sizes="(max-width: 768px) 100vw, 500px"
+                   priority
+                   style={{ objectFit: 'cover', objectPosition: 'top' }}
+                 />
+               );
+            })}
+            
+            <div className={styles.cardOverlay} />
 
             <div className={styles.shine} />
             <div className={styles.glare} />

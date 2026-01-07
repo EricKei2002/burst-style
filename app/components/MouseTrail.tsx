@@ -15,12 +15,17 @@ export default function MouseTrail() {
   const requestRef = useRef<number>(0);
   const pointsRef = useRef<Point[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
-  const [isTouch] = useState(() => {
-    if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
-      return true;
-    }
-    return false;
-  });
+  const [isTouch, setIsTouch] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(pointer: coarse)");
+    const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    
+    setTimeout(() => setIsTouch(mql.matches), 0);
+    
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     if (isTouch) return;

@@ -8,12 +8,18 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
-  const [isTouch] = useState(() => {
-    if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
-      return true;
-    }
-    return false;
-  });
+  const [isTouch, setIsTouch] = useState(false);
+  
+  useEffect(() => {
+    const mql = window.matchMedia("(pointer: coarse)");
+    const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    
+    // Set initial value
+    setTimeout(() => setIsTouch(mql.matches), 0);
+    
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
 
   useGSAP(() => {
     if (isTouch) return;

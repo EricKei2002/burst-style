@@ -11,6 +11,7 @@ import MouseTrail from "./components/MouseTrail";
 import CustomCursor from "./components/CustomCursor";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://burst.style"),
   title: {
     default: "Burst Style | Web Developer Portfolio",
     template: "%s | Burst Style",
