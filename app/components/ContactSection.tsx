@@ -59,7 +59,11 @@ export default function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!turnstileToken) {
-        setErrorMessage("ERROR: SECURITY CHECK FAILED.");
+        if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+             setErrorMessage("ERROR: CONFIGURATION MISSING (SITE_KEY).");
+        } else {
+             setErrorMessage("ERROR: SECURITY CHECK FAILED. PLEASE VERIFY YOU ARE HUMAN.");
+        }
         return;
     }
 
