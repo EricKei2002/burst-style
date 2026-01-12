@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "./DecryptedText";
 import MagneticButton from "./MagneticButton";
 import TiltCard from "./TiltCard";
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -13,6 +14,7 @@ export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -56,11 +58,18 @@ export default function ContactSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!turnstileToken) {
+        setErrorMessage("ERROR: SECURITY CHECK FAILED.");
+        return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage("");
     
     try {
         const formData = new FormData(e.currentTarget as HTMLFormElement);
+        formData.append('cf-turnstile-response', turnstileToken);
+
         const response = await fetch('/api/contact', {
             method: 'POST',
             body: formData,
@@ -69,6 +78,7 @@ export default function ContactSection() {
         if (response.ok) {
             setIsSent(true);
             if (formRef.current) formRef.current.reset();
+            setTurnstileToken(null);
             // Reset state after 10 seconds
             setTimeout(() => setIsSent(false), 10000);
         } else {
@@ -156,6 +166,17 @@ export default function ContactSection() {
                                     rows={6}
                                     className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
                                     placeholder="お問い合わせ内容をご入力ください..."
+                                />
+                            </div>
+
+                            <div className="flex flex-col items-center gap-4 pt-2">
+                                <Turnstile 
+                                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""} 
+                                    onSuccess={setTurnstileToken}
+                                    options={{
+                                        theme: 'dark',
+                                        action: 'contact-form',
+                                    }}
                                 />
                             </div>
 

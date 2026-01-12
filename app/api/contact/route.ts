@@ -9,7 +9,27 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
+
     const message = formData.get('message') as string;
+    const turnstileToken = formData.get('cf-turnstile-response') as string;
+
+    // 0. Verify Turnstile Token
+    if (process.env.TURNSTILE_SECRET_KEY) {
+        const verifyFormData = new FormData();
+        verifyFormData.append('secret', process.env.TURNSTILE_SECRET_KEY);
+        verifyFormData.append('response', turnstileToken);
+
+        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            body: verifyFormData,
+        });
+
+        const turnstileResult = await turnstileResponse.json();
+        if (!turnstileResult.success) {
+            console.error('Turnstile verification failed:', turnstileResult);
+            return NextResponse.json({ success: false, error: 'Security check failed' }, { status: 400 });
+        }
+    }
 
     // 1. Forward to Formspree (Admin Notification)
     // We forward the form data exactly as received
