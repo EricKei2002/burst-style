@@ -59,11 +59,7 @@ export default function ContactSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!turnstileToken) {
-        if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
-             setErrorMessage("ERROR: CONFIGURATION MISSING (SITE_KEY).");
-        } else {
-             setErrorMessage("ERROR: SECURITY CHECK FAILED. PLEASE VERIFY YOU ARE HUMAN.");
-        }
+        setErrorMessage("ERROR: SECURITY CHECK FAILED.");
         return;
     }
 
@@ -175,9 +171,7 @@ export default function ContactSection() {
 
                             <div className="flex flex-col items-center gap-4 pt-2">
                                 <Turnstile 
-                                    // TEMPORARY DEBUG: Paste your Site Key directly here to test
-                                    // process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""
-                                    siteKey="0x4AAAAAACMEdoY3D-U7Ag2L"
+                                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""} 
                                     onSuccess={setTurnstileToken}
                                     options={{
                                         theme: 'dark',
