@@ -171,7 +171,7 @@ export default function ContactSection() {
 
                             <div className="flex flex-col items-center gap-4 pt-2">
                                 <Turnstile 
-                                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""} 
+                                    siteKey="0x4AAAAAACMEdoY3D-U7Ag2L"
                                     onSuccess={setTurnstileToken}
                                     options={{
                                         theme: 'dark',
