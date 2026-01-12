@@ -119,43 +119,43 @@ export default function ContactSection() {
                             <div className="grid gap-6 sm:grid-cols-2">
                                 <div className="space-y-2">
                                     <label htmlFor="name" className="text-xs font-mono text-fuchsia-400 ml-1">
-                                        <DecryptedText text="CD// NAME" animateOnHover speed={20} />
+                                        <DecryptedText text="NAME / お名前" animateOnHover speed={20} />
                                     </label>
                                     <input 
                                         type="text" 
                                         id="name" 
                                         name="name"
                                         required
-                                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all"
-                                        placeholder="John Doe"
+                                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                                        placeholder="山田 太郎"
                                     />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="email" className="text-xs font-mono text-fuchsia-400 ml-1">
-                                        <DecryptedText text="CD// EMAIL" animateOnHover speed={20} />
+                                        <DecryptedText text="EMAIL / メールアドレス" animateOnHover speed={20} />
                                     </label>
                                     <input 
                                         type="email" 
                                         id="email" 
                                         name="email"
                                         required
-                                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all"
-                                        placeholder="john@example.com"
+                                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                                        placeholder="email@example.com"
                                     />
                                 </div>
                             </div>
                             
                             <div className="space-y-2">
                                 <label htmlFor="message" className="text-xs font-mono text-fuchsia-400 ml-1">
-                                    <DecryptedText text="CD// MESSAGE" animateOnHover speed={20} />
+                                    <DecryptedText text="MESSAGE / 本文" animateOnHover speed={20} />
                                 </label>
                                 <textarea 
                                     id="message" 
                                     name="message"
                                     required
                                     rows={6}
-                                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none"
-                                    placeholder="Enter transmission data..."
+                                    className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
+                                    placeholder="お問い合わせ内容をご入力ください..."
                                 />
                             </div>
 
@@ -172,7 +172,7 @@ export default function ContactSection() {
                                         className="relative overflow-hidden group bg-zinc-100 text-zinc-950 px-8 py-3 rounded-full font-bold tracking-wide transition-all hover:bg-fuchsia-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         <span className="relative z-10 flex items-center gap-2">
-                                            {isSubmitting ? 'TRANSMITTING...' : 'SEND TRANSMISSION'}
+                                            {isSubmitting ? 'TRANSMITTING...' : 'TRANSMIT / 送信'}
                                             {!isSubmitting && (
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                                             )}
@@ -183,18 +183,20 @@ export default function ContactSection() {
                         </form>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-500">
-                             <div className="w-16 h-16 bg-fuchsia-500/20 text-fuchsia-400 rounded-full flex items-center justify-center mb-6">
+                             <div className="w-16 h-16 bg-fuchsia-500/20 text-fuchsia-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                              </div>
-                             <h3 className="text-2xl font-bold text-white mb-2">Transmission Received</h3>
-                             <p className="text-zinc-400 max-w-md">
-                                 通信を受信しました。内容を確認次第、安全な回線を通じて応答します。
+                             <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Transmission Complete</h3>
+                             <p className="text-zinc-400 max-w-md leading-relaxed">
+                                 お問い合わせありがとうございます。<br/>
+                                 送信されたデータは正常に受信されました。<br/>
+                                 確認次第、折り返しご連絡いたします。
                              </p>
                              <button 
                                 onClick={() => setIsSent(false)}
-                                className="mt-8 text-sm text-fuchsia-400 hover:text-fuchsia-300 underline underline-offset-4"
+                                className="mt-8 text-sm text-fuchsia-400 hover:text-fuchsia-300 underline underline-offset-4 font-mono uppercase tracking-wider"
                              >
-                                Send another message
+                                &lt; Send another message
                              </button>
                         </div>
                     )}
