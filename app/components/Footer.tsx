@@ -13,7 +13,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative w-full border-t border-zinc-900 bg-[#0a0a0a] py-12">
+    <footer className="relative w-full border-t border-zinc-900 bg-[#0a0a0a] pt-12 pb-10">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 lg:flex-row lg:px-8">
         
         {/* Left: Copyright & Name */}
