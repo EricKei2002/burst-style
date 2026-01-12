@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,6 +14,7 @@ interface TimelineItem {
   year: string;
   title: string;
   description: string | ReactNode;
+  professionalDescription?: string | ReactNode;
   tags: string[];
   image?: string;
   images?: string[];
@@ -91,10 +92,23 @@ const timeline: TimelineItem[] = [
             <span className="text-blue-400 font-mono text-xs shrink-0 mt-1">[System]</span>
             <span>コアカーネル（生命）が正常に起動。</span>
           </li>
+          <li className="flex gap-2">
+            <span className="text-green-400 font-mono text-xs shrink-0 mt-1">[Inherit]</span>
+            <span>親プロセス（父）からエンジニア属性を継承。</span>
+          </li>
         </ul>
       </div>
     ),
-    tags: ["Wakayama", "Origin"],
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>和歌山県にて出生。エンジニアである父の影響を強く受けて育ちました。</p>
+        <p>
+          幼少期から、父が自宅でリモートワークをしている姿を日常的に見ていたため、場所にとらわれずに働くITの仕事に興味を抱くようになりました。
+          自然豊かな環境で育まれた好奇心と、身近にあったテクノロジーへの憧れが、現在のエンジニアとしての原点となっています。
+        </p>
+      </div>
+    ),
+    tags: ["Wakayama", "Origin", "Engineer Father"],
   },
   {
     year: "Elementary School",
@@ -112,6 +126,15 @@ const timeline: TimelineItem[] = [
             <span>論理演算と創造性アルゴリズムを改善。</span>
           </li>
         </ul>
+      </div>
+    ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>プログラミングとの初めての出会いは、ビジュアルプログラミング言語「Scratch」でした。</p>
+        <p>
+          この経験を通じて、コンピュータに対して論理的に指示を出すことの面白さや、自分のアイデアが形になる喜びを知りました。
+          プログラミング的思考（ロジカルシンキング）の基礎がこの時期に養われました。
+        </p>
       </div>
     ),
     tags: ["Scratch", "Visual Programming"],
@@ -135,6 +158,15 @@ const timeline: TimelineItem[] = [
         </ul>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>友人の影響を受け、より本格的な開発言語であるC#の学習を開始しました。</p>
+        <p>
+          Visual Studioを用いたWindowsフォームアプリケーションの開発を通じて、変数、条件分岐、ループ処理といったプログラミングの基礎概念に加え、オブジェクト指向の初歩を独学で習得しました。
+          実際に動作する電卓アプリを作成し、友人に使ってもらうことで、ユーザー視点での開発の重要性を学びました。
+        </p>
+      </div>
+    ),
     tags: ["C#", "Windows Forms", "Algorithms"],
     extraComponent: <CsharpCalculator />,
   },
@@ -154,6 +186,15 @@ const timeline: TimelineItem[] = [
             <span>自作PCビルド機能を追加。</span>
           </li>
         </ul>
+      </div>
+    ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>ソフトウェアへの関心に加え、ハードウェア領域へも興味を広げました。</p>
+        <p>
+          自作PCの組み立てを通じて、CPU、GPU、メモリ、ストレージといった主要コンポーネントの役割や、それらがシステム全体に与える影響について深く理解しました。
+          また、オーバークロックなどのパフォーマンスチューニング試行を通じ、ボトルネックの特定と解消というエンジニアリングの基本プロセスを実践的に学びました。
+        </p>
       </div>
     ),
     tags: ["PC Build", "Hardware", "Overclocking"],
@@ -182,6 +223,15 @@ const timeline: TimelineItem[] = [
         </ul>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>高校時代、中学時代にC#を教えてくれた友人がGoogleに入社したため、彼を訪ねて米国のシリコンバレーを訪問しました。Google, Meta, Intelといった世界的テック企業も見学しました。</p>
+        <p>
+          現地のエンジニアが働く環境や、イノベーションを生み出す文化に直接触れたことは、自身のキャリア観に大きな影響を与えました。
+          「世界を変える技術」が情熱を持った人々によって作られていることを肌で感じ、将来は自分もテクノロジーで価値を提供する側に立ちたいという思いを強くしました。
+        </p>
+      </div>
+    ),
     tags: ["Silicon Valley", "Tech Culture", "Global Mindset"],
     images: [
       "/images/sv/google.jpg",
@@ -208,6 +258,15 @@ const timeline: TimelineItem[] = [
         </ul>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>パンデミックの影響で留学計画が変更となる中、オンラインコミュニティ（Discord）での活動に活路を見出しました。</p>
+        <p>
+          ゲームを通じた国際交流により、日常的な英会話能力を向上させるとともに、国籍や文化の異なる人々とのコミュニケーションスキルを磨きました。
+          また、東京でのシェアハウス生活も経験し、多様な背景を持つ人々との共同生活を通じて、協調性や対人折衝力を高めました。
+        </p>
+      </div>
+    ),
     tags: ["Discord", "Community Builder", "Gaming", "Tokyo Life"],
     images: [
       "/images/pandemic/gaming_setup.jpg",
@@ -230,6 +289,15 @@ const timeline: TimelineItem[] = [
             <span>英語通信プラグインとグローバルマップデータを拡張。</span>
           </li>
         </ul>
+      </div>
+    ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>オンラインで親交を深めた友人を訪ねるため、単身で北米（カナダ・アメリカ）へ渡航しました。</p>
+        <p>
+          現地での生活や人々との交流を通じて、英語での実践的なコミュニケーション能力を確認するとともに、計画から実行までを独力で行う行動力を実証しました。
+          オンライン上の関係を現実世界の信頼関係へと発展させたこの経験は、デジタルとリアルの架け橋となることへの関心を一層深めるものとなりました。
+        </p>
       </div>
     ),
     tags: ["Canada", "USA", "Real-life Meetup", "Family Visit"],
@@ -258,6 +326,15 @@ const timeline: TimelineItem[] = [
         </ul>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>白馬やニセコといったリゾート地での住み込み業務に従事しました。現地は外国人の来訪者が多く、業務や日常生活において英語でのコミュニケーションが必須の国際色豊かな環境でした。</p>
+        <p>
+          そこでの経験を通じて、多様な文化背景を持つ人々との協働スキルを磨きました。
+          また、過酷な自然環境下での業務で養った精神力（グリット）に加え、業務時間外にはプログラミング学習を継続し、高い自己管理能力と学習習慣を確立しました。「どのような環境でも適応し、目標に向かって努力を継続できる」ことが私の強みです。
+        </p>
+      </div>
+    ),
     tags: ["Hakuba", "Niseko", "Snowboarding", "Self-Taught"],
     images: [
       "/images/resort/hakuba.jpg",
@@ -283,6 +360,16 @@ const timeline: TimelineItem[] = [
             <span>型安全性とコンポーネント設計の課題を修正。</span>
           </li>
         </ul>
+      </div>
+    ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>Webエンジニアとしてのキャリアを志し、モダンなWeb開発技術（HTML, CSS, JavaScript, TypeScript, React）を集中的に学習しました。</p>
+        <p>
+          学習の過程では、単なる写経にとどまらず、実際にTodoアプリなどの成果物を作成することで、実践的なスキルを習得しました。
+          特にTypeScriptによる型安全な開発や、Reactのコンポーネント設計思想、Hooksの使用法など、実務で求められるレベルの技術理解を深めることに注力しました。
+          また、エラー解決にはAIツールを積極的に活用し、効率的な問題解決能力も身につけました。
+        </p>
       </div>
     ),
     tags: ["Web Development", "TypeScript", "Frontend", "Study"],
@@ -322,6 +409,16 @@ const timeline: TimelineItem[] = [
         </ul>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>フロントエンド開発に加え、バックエンドやインフラ領域への理解を深めるため、自宅サーバーの構築・運用を行っています。</p>
+        <p>
+          Raspberry Piを用いたLinuxサーバーのセットアップ、SSH接続設定、Dockerコンテナによるアプリケーション（Discord Bot等）の運用を通じて、
+          黒い画面（CUI）への抵抗感をなくし、サーバーOSの基礎知識やネットワークの仕組みを実践的に学びました。
+          フルスタックな視点を持つエンジニアを目指し、技術領域を広げ続けています。
+        </p>
+      </div>
+    ),
     tags: ["Linux", "Raspberry Pi", "Home Server", "Network"],
     extraComponent: <ServerSpecs />
   },
@@ -348,6 +445,16 @@ const timeline: TimelineItem[] = [
         <p>この最新バージョンを本番環境で運用してくれる企業様、プルリクエストをお待ちしています！</p>
       </div>
     ),
+    professionalDescription: (
+      <div className="space-y-4 text-zinc-300">
+        <p>現在、フロントエンドエンジニアとしての就業機会を求めています。</p>
+        <p>
+          独学で培った確かな技術力（React, TypeScript）に加え、海外経験やリゾートバイトで培った「新しい環境への適応力」「英語力」「困難に立ち向かう精神力」が私の強みです。
+          技術トレンドへの感度を高く持ち続け、チーム開発においても積極的に貢献できるエンジニアとして成長していきたいと考えています。
+          私のスキルや経験が貴社の事業に貢献できると確信しています。
+        </p>
+      </div>
+    ),
     tags: ["Open to Work", "Job Seeker", "Frontend Engineer", "Creative"],
     extraComponent: (
       <div className="mt-4">
@@ -367,6 +474,7 @@ const timeline: TimelineItem[] = [
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [isProfessional, setIsProfessional] = React.useState(false);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -436,9 +544,35 @@ export default function AboutSection() {
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
           </div>
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
-            <DecryptedText text="About Me" animateOnHover speed={30} />
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              <DecryptedText text="About Me" animateOnHover speed={30} />
+            </h2>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-3 bg-black/40 p-1.5 rounded-full border border-zinc-800 self-start sm:self-auto">
+              <button
+                onClick={() => setIsProfessional(false)}
+                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
+                  !isProfessional 
+                    ? "bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30" 
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Geek Mode
+              </button>
+              <button
+                onClick={() => setIsProfessional(true)}
+                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
+                  isProfessional 
+                    ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" 
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                Pro Mode
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
@@ -486,7 +620,18 @@ export default function AboutSection() {
                   </div>
                   
                   <div className="mt-4 text-base leading-relaxed text-zinc-300">
-                    {item.description}
+                    {/* Animated Content Switch */}
+                    <div className="relative min-h-[60px]">
+                      {isProfessional && item.professionalDescription ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          {item.professionalDescription}
+                        </div>
+                      ) : (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                          {item.description}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {item.image && (
