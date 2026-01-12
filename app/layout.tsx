@@ -29,19 +29,12 @@ export const metadata: Metadata = {
     siteName: "Burst Style",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/icon.jpg",
         width: 1200,
         height: 630,
         alt: "Burst Style Portfolio",
       },
     ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Burst Style | Web Developer Portfolio",
-    description: "Eric Keiのポートフォリオサイト。創造性を爆発させるWeb体験。",
-    // creator: "@your_twitter_handle", // User removed twitter link, so maybe omit or keep generic
-    images: ["/og-image.jpg"],
   },
 };
 
