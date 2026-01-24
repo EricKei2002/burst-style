@@ -54,10 +54,10 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    User[User / Client] -->|Browse Gallery| NextJS[Next.js App Router]
-    NextJS -->|Fetch Content| MicroCMS[MicroCMS API]
-    NextJS -->|Serve Static Assets| Vercel[Vercel CDN]
-    Admin[Admin / Client] -->|Update Content| MicroCMS
+    User[ユーザー / クライアント] -->|ギャラリー閲覧| NextJS[Next.js App Router]
+    NextJS -->|コンテンツ取得| MicroCMS[MicroCMS API]
+    NextJS -->|静的アセット配信| Vercel[Vercel CDN]
+    Admin[管理者 / クライアント] -->|コンテンツ更新| MicroCMS
 `
     }
   },
@@ -103,23 +103,23 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `sequenceDiagram
-    participant User
-    participant DiscordAPI
+    participant User as ユーザー
+    participant DiscordAPI as Discord API
     participant Bot as Node.js Bot
-    participant LogChannel
+    participant LogChannel as 管理ログ
 
-    User->>DiscordAPI: Click "Authenticate"
-    DiscordAPI->>Bot: Interaction Create (Button)
-    Bot->>DiscordAPI: Show Modal (Form)
-    User->>DiscordAPI: Submit Form Data
-    DiscordAPI->>Bot: Interaction Create (ModalSubmit)
-    Bot->>Bot: Validate Inputs
-    alt Valid
-        Bot->>DiscordAPI: Assign "Member" Role
-        Bot->>LogChannel: Send Success Embed
-        Bot->>User: Reply Ephemeral "Success"
-    else Invalid
-        Bot->>User: Reply Ephemeral "Error"
+    User->>DiscordAPI: 「認証する」をクリック
+    DiscordAPI->>Bot: インタラクション受信 (Button)
+    Bot->>DiscordAPI: モーダル表示 (Form)
+    User->>DiscordAPI: フォーム送信
+    DiscordAPI->>Bot: インタラクション受信 (ModalSubmit)
+    Bot->>Bot: 入力検証
+    alt 成功 (Valid)
+        Bot->>DiscordAPI: 「Member」ロール付与
+        Bot->>LogChannel: 成功Embed送信
+        Bot->>User: Ephemeral応答 "成功"
+    else 失敗 (Invalid)
+        Bot->>User: Ephemeral応答 "エラー"
     end
 `
     }

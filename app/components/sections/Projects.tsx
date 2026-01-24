@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -8,10 +8,18 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
+
 import { projectsData } from "../../data/projects";
+
 
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
+  const router = useRouter();
+
+  const handleNavigation = (e: React.MouseEvent, url: string) => {
+    e.preventDefault();
+    router.push(url);
+  };
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -61,9 +69,9 @@ export default function Projects() {
           {projectsData.map((project) => (
             <MagneticButton key={project.slug} className="h-full" strength={0.2}>
               <TiltCard className="h-full" rotationIntensity={5}>
-                <Link
-                  href={`/projects/${project.slug}`}
-                  className="project-card group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 transition-all hover:border-zinc-600 hover:bg-zinc-900/50 h-full"
+                <div
+                  onClick={(e) => handleNavigation(e, `/projects/${project.slug}`)}
+                  className="project-card group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 transition-all hover:border-zinc-600 hover:bg-zinc-900/50 h-full cursor-pointer"
                 >
                   {/* Image Container */}
                   <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
@@ -101,7 +109,7 @@ export default function Projects() {
                       ))}
                     </div>
                   </div>
-                </Link>
+                </div>
               </TiltCard>
             </MagneticButton>
           ))}

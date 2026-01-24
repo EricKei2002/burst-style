@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-4xl bg-black/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 shadow-2xl">
         
         {/* Navigation */}
         <div className="mb-8">
