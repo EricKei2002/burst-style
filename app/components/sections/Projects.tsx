@@ -10,40 +10,61 @@ import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../data/projects";
+import { useTransitionStore } from "../../store/transition-store";
 
 
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
+  const { setPhase, phase } = useTransitionStore();
 
   const handleNavigation = (e: React.MouseEvent, url: string) => {
     e.preventDefault();
-    router.push(url);
+    setPhase('closing');
+    
+    // Wait for doors to close (CSS duration is 700ms)
+    setTimeout(() => {
+        setPhase('closed');
+        router.push(url);
+    }, 900);
   };
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
+    // If we are currently in 'opening' phase (returning from project),, skip entrance animation
+    // When returning, the HangarDoorTransition immediately sets phase to 'opening' (or keeps it 'closed' for 300ms then opening)
+    // So 'phase' will likely be non-idle.
+    const shouldAnimate = phase === 'idle'; 
+
     const ctx = gsap.context(() => {
-      gsap.fromTo(".project-card",
-        { y: 50, opacity: 0, scale: 0.95 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          stagger: 0.2,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          }
-        }
-      );
+      // If we should animate, do the fromTo.
+      // If not, just set them to visible immediately.
+      
+      if (shouldAnimate) {
+          gsap.fromTo(".project-card",
+            { y: 50, opacity: 0, scale: 0.95 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 1.2,
+              ease: "power3.out",
+              stagger: 0.2,
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 75%",
+              }
+            }
+          );
+      } else {
+          // Immediately visible
+          gsap.set(".project-card", { y: 0, opacity: 1, scale: 1 });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [phase]);
 
   return (
     <section id="projects" ref={sectionRef} className="relative w-full py-24 sm:py-32">
@@ -80,7 +101,9 @@ export default function Projects() {
                       src={project.image}
                       alt={project.title}
                       fill
-                      className="object-cover transition duration-700 ease-out group-hover:scale-105"
+                      className={`transition duration-700 ease-out group-hover:scale-105 ${
+                        project.slug === 'burst-style' ? 'object-contain p-8 bg-black' : 'object-cover'
+                      }`}
                       sizes="(min-width: 768px) 50vw, 100vw"
                     />
                   </div>

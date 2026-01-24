@@ -59,6 +59,16 @@ export default function Hero() {
 
   // Boot Sequence
   useEffect(() => {
+    // Check if we have already booted in this session
+    const hasBooted = sessionStorage.getItem("burst_booted");
+    
+    if (hasBooted) {
+        // Skip sequence
+        gsap.set(".preloader", { display: "none" });
+        mainTlRef.current?.play();
+        return;
+    }
+
     let isMounted = true;
     
     const sequence = async () => {
@@ -101,6 +111,8 @@ export default function Hero() {
                 if (isMounted) {
                     gsap.set(".preloader", { display: "none" });
                     mainTlRef.current?.play();
+                    // Mark as booted
+                    sessionStorage.setItem("burst_booted", "true");
                 }
             }
         });

@@ -128,32 +128,33 @@ export const projectsData: Project[] = [
     slug: "burst-style",
     title: "Burst Style",
     description: "没入型Web体験を追求した自身のポートフォリオサイト。「宇宙船への搭乗」をコンセプトに、Three.jsと映像演出を駆使したSPA。",
-    detailedDescription: "「Burst Style」は、私自身の技術力とデザイン哲学を体現するために構築されたポートフォリオサイトです。「創造性の爆発」と「宇宙への旅」をテーマに、訪問者がサイトを訪れた瞬間から物語の一員となるような体験を目指しました。TopページではThree.jsを用いた星空（WarpStars）を描画し、プロジェクト詳細ページへの遷移時には「ハンガードア」が閉まり、ハイパースペースを経て宇宙船内部（無限ループ映像）へと移動するシームレスな演出を実装しています。Next.js App Routerのパフォーマンスを活かしつつ、リッチなビジュアル表現と快適な操作性を両立させました。",
-    image: "/icon.jpg",
+    detailedDescription: "「Burst Style」は、没入感あふれるビジュアル体験と堅牢なバックエンド設計を融合させたポートフォリオサイトです。「宇宙への旅」をテーマにしたThree.jsによる3D演出やシームレスな遷移アニメーションに加え、実用的な機能面も徹底しました。特にフロントエンドでは、Zustandを用いた軽量な状態管理により「ハンガードア」の開閉とページ遷移を完全に同期。左右非対称（シアン＆パープル）のドアが閉まることでローディングを隠し、シームレスに宇宙船内部へと移動する演出を実現しています。バックエンドでは、Cloudflare Turnstileによるスパム対策やResend APIを用いた自動返信メールなど、見えない部分の体験設計（User Experience）にもこだわっています。",
+    image: "/BURST_logo.jpg",
     siteUrl: "https://burst.style",
     githubUrl: "https://github.com/EricKei2002/burst-style",
     tags: ["Next.js", "Three.js", "Tailwind CSS", "React"],
     techStack: [
       { name: "Framework: Next.js 16 (App Router)" },
       { name: "3D Library: Three.js / @react-three/fiber" },
-      { name: "Animation: GSAP" },
-      { name: "Styling: Tailwind CSS" },
-      { name: "Asset: Video & Generated AI Images" },
-      { name: "Deployment: Vercel" }
+      { name: "State Management: Zustand" },
+      { name: "Backend: Next.js API Routes" },
+      { name: "Security: Cloudflare Turnstile" },
+      { name: "Email: Resend API" },
+      { name: "Asset: Video & Generated AI Images" }
     ],
     challenges: [
       {
+        title: "シームレスな遷移と状態管理",
+        description: "「ドアが閉まってからページが移動し、移動先でドアが開く」という一連のシーケンスを実現するために、Zustandを用いたグローバルな状態管理（`transition-store`）を導入しました。Next.jsの`router.push`による遷移タイミングとCSSアニメーションを厳密に同期させることで、ブラウザのロードを感じさせない没入感のある移動体験を作り出しています。"
+      },
+      {
+        title: "物語性のあるAPI/コンタクト機能",
+        description: "単なる「送信完了」ではなく、物語の一部としてのコンタクト機能を実装しました。Next.jsのサーバーレス関数内で、Turnstile認証（セキュリティ）、Formspree転送（通知）、Resend送信（自動返信）を一連のフローとして処理。特に自動返信メールは宇宙船のコンソールを模したHTMLデザインを採用し、サイトを離れた後も世界観が続くよう設計されています。"
+      },
+      {
         title: "パフォーマンスとビジュアルの両立",
-        description: "Three.jsによるパーティクル描画（4,000個以上の星）と、高解像度の背景動画を併用するため、ブラウザの描画負荷が課題となりました。コンポーネントの再レンダリング抑制（`useRef`の活用）や、動画ファイルの軽量化・適切な読み込み戦略をとることで、フレームレートを維持しています。"
+        description: "Three.jsによるパーティクル描画と高解像度の背景動画を併用するため、描画負荷が課題となりました。コンポーネントの再レンダリング抑制に加え、初回アクセス時のみ「Boot Sequence」を実行するようセッションストレージで制御することで、リピート訪問時の快適性を向上させています。"
       },
-      {
-        title: "シームレスなページ遷移演出",
-        description: "通常の画面遷移ではなく、「ドアが閉まってから移動し、新しい場所でドアが開く」という一連のアニメーションを実装するために、Next.jsの標準ルーターと独自の状態管理ロジックを組み合わせる必要がありました。最終的には過度なJavaScript制御（Hooks地獄）を避け、CSSアニメーションとシンプルなルーティング制御に落とし込むことで、堅牢性とメンテナンス性を高めました。"
-      },
-      {
-        title: "可読性の確保",
-        description: "リッチな映像背景の上にテキストを表示するため、視認性が低下する懸念がありました。これに対し、コンテンツエリアに「グラスモーフィズム」風の半透明バックドロップとぼかし効果を適用し、背景の美しさを損なわずに情報を明確に伝えるデザイン解を導き出しました。"
-      }
     ],
     improvements: [
       {
@@ -167,14 +168,23 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    User[Visitor] -->|Access| Vercel[Vercel Edge Network]
-    Vercel -->|Serve| Next[Next.js App Router]
-    Next -->|Render UI| React[React Server Components]
-    Next -->|Hydrate| Client[Client Components]
-    Client -->|Render 3D| Three[Three.js Canvas]
-    Client -->|Play Video| Video[Video Background]
-    Three -->|Warp Effect| Stars[Star Particles]
-    Video -->|Asset| Public["Static Assets (.mp4)"]
+    User[ユーザー] -->|アクセス| Vercel[Vercel Edge Network]
+    Vercel -->|配信| Next[Next.js App Router]
+    Next -->|UIレンダリング| React[React Server Components]
+    Next -->|ハイドレーション| Client[Client Components]
+    
+    Client -->|状態管理| Store[Zustand Store]
+    Store -->|開閉制御| Door[Hangar Door Transition]
+    Door -->|演出同期| Router[Next.js Router]
+    
+    Client -->|3D描画| Three[Three.js Canvas]
+    Client -->|動画再生| Video[Video Background]
+    Video -->|アセット読込| Public["動画ファイル (.mp4)"]
+    
+    User -->|フォーム送信| Contact[Contact API Route]
+    Contact -->|Bot認証| Turnstile[Cloudflare Turnstile]
+    Contact -->|管理者通知| Formspree[Formspree]
+    Contact -->|自動返信メール| Resend[Resend Email API]
 `
     }
   }

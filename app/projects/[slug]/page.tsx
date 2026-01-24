@@ -1,9 +1,9 @@
 import { projectsData } from "../../data/projects";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import DecryptedText from "../../components/ui/DecryptedText";
 import ProjectDocs from "../../components/ui/ProjectDocs";
+import BackButton from "../../components/ui/BackButton";
 
 // Ensure static params are generated for static export
 export function generateStaticParams() {
@@ -22,14 +22,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
   return (
     <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl bg-black/40 backdrop-blur-sm p-8 rounded-3xl border border-white/5 shadow-2xl">
+      <div className="mx-auto max-w-4xl">
         
         {/* Navigation */}
-        <div className="mb-8">
-            <Link href="/#projects" className="text-sm font-mono text-zinc-500 hover:text-fuchsia-400 transition-colors flex items-center gap-2 w-fit">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                Back to Projects
-            </Link>
+        <div className="mb-0">
+            <BackButton />
         </div>
 
         {/* Header Section */}
@@ -40,7 +37,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                         src={project.image}
                         alt={project.title}
                         fill
-                        className="object-cover"
+                        className={project.slug === 'burst-style' ? "object-contain bg-black p-4" : "object-cover"}
                         priority
                     />
                  </div>
@@ -105,21 +102,19 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     </h2>
                     <ul className="space-y-4">
                         {project.improvements.map((item, idx) => (
-                             <li key={idx} className="flex gap-4">
+                             <li key={idx} className="flex gap-4 bg-black/40 backdrop-blur-sm p-4 rounded-xl border border-white/5">
                                 <div className="flex flex-col items-center">
                                     <div className="h-2 w-2 rounded-full bg-zinc-700 mt-2"></div>
                                     <div className="w-px h-full bg-zinc-800 my-1"></div>
                                 </div>
-                                <div className="pb-4">
+                                <div className="pb-0">
                                     <h4 className="text-zinc-200 font-medium mb-1">{item.title}</h4>
-                                    <p className="text-zinc-400 text-sm leading-relaxed">{item.description}</p>
+                                    <p className="text-zinc-300 text-sm leading-relaxed">{item.description}</p>
                                 </div>
                              </li>
                         ))}
                     </ul>
                 </section>
-
-
 
             </div>
 

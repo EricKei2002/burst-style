@@ -7,6 +7,7 @@ const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mon
 import SmoothScroll from "./components/utils/SmoothScroll";
 import StarBackground from "./components/visuals/StarBackground";
 import MouseTrail from "./components/visuals/MouseTrail";
+import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
 
 import CustomCursor from "./components/visuals/CustomCursor";
 
@@ -47,6 +48,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={`min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased ${jetbrainsMono.variable} font-mono`}>
         <CustomCursor />
+        <HangarDoorTransition />
         <MouseTrail />
         <SmoothScroll>
           <StarBackground />
