@@ -14,10 +14,14 @@ Next.js 16 (App Router) のパフォーマンスと、Three.js / GSAP による�
 - **StarBackground (トップページ)**: Three.js を使用し、無数の星が流れるワープ空間（WarpStars）を描画。
 - **Spaceship Interior (プロジェクト詳細)**: プロジェクトページへ移動すると、背景が「無限に続く宇宙船の通路（Infinite Video Loop）」へとシームレスに切り替わります。
 
-### 2. シームレスな遷移 (Seamless Transition)
+### 2. シームレスな遷移 (Hangar Door Transition)
 
-- ページ遷移時に標準のローディングではなく、世界観を維持した演出を実装。
-- ユーザーのアクション（プロジェクト選択）に対し、宇宙船に搭乗して次のエリアへ移動するようなストーリー性を持たせています。
+- **Hangar Door Effect**: ページ遷移時に左右から異なるカラー（左: Cyan, 右: Purple）の重厚なドアが閉まり、ローディング時間を隠蔽。
+- **Seamless Navigation**: `Zustand` による状態管理でルーティングとドアのアニメーションを完全同期。宇宙船のハッチを開けて内部へ入るような一貫した体験を提供します。
+
+### 3. パフォーマンス最適化 (Smart Boot Sequence)
+
+- **Session Awareness**: 初回訪問時の「Boot Sequence（起動演出）」をセッションストレージで管理。2回目以降のアクセスや戻る操作時は演出をスキップし、即座にコンテンツを表示するストレスフリーな設計です。
 
 ### 3. ダイナミックなドキュメント (Dynamic Documentation)
 
@@ -36,6 +40,7 @@ Next.js 16 (App Router) のパフォーマンスと、Three.js / GSAP による�
 
 - **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
 - **UI Library**: [React 19](https://react.dev/)
 
 ### Visuals & Animation
@@ -114,9 +119,10 @@ app/
 ├── api/             # API Routes (Next.js server functions)
 ├── components/
 │   ├── sections/    # Hero, About, Projects, Contact sections
-│   ├── visuals/     # Three.js Canvas, StarBackground, SpaceshipInterior
-│   └── ui/          # Reusable UI components (MagneticButton, ProjectDocs, etc.)
+│   ├── visuals/     # Three.js Canvas, HangarDoorTransition, SpaceshipInterior
+│   └── ui/          # Reusable UI components (MagneticButton, BackButton, etc.)
 ├── data/            # Static data (projects list, timelines)
+├── store/           # Global state management (Zustand)
 ├── projects/        # Project detail dynamic routes
 └── layout.tsx       # Root layout (Fonts, Meta, SmoothScroll)
 ```
