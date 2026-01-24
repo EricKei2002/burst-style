@@ -123,5 +123,59 @@ export const projectsData: Project[] = [
     end
 `
     }
+  },
+  {
+    slug: "burst-style",
+    title: "Burst Style",
+    description: "没入型Web体験を追求した自身のポートフォリオサイト。「宇宙船への搭乗」をコンセプトに、Three.jsと映像演出を駆使したSPA。",
+    detailedDescription: "「Burst Style」は、私自身の技術力とデザイン哲学を体現するために構築されたポートフォリオサイトです。「創造性の爆発」と「宇宙への旅」をテーマに、訪問者がサイトを訪れた瞬間から物語の一員となるような体験を目指しました。TopページではThree.jsを用いた星空（WarpStars）を描画し、プロジェクト詳細ページへの遷移時には「ハンガードア」が閉まり、ハイパースペースを経て宇宙船内部（無限ループ映像）へと移動するシームレスな演出を実装しています。Next.js App Routerのパフォーマンスを活かしつつ、リッチなビジュアル表現と快適な操作性を両立させました。",
+    image: "/icon.jpg",
+    siteUrl: "https://burst.style",
+    githubUrl: "https://github.com/EricKei2002/burst-style",
+    tags: ["Next.js", "Three.js", "Tailwind CSS", "React"],
+    techStack: [
+      { name: "Framework: Next.js 16 (App Router)" },
+      { name: "3D Library: Three.js / @react-three/fiber" },
+      { name: "Animation: GSAP" },
+      { name: "Styling: Tailwind CSS" },
+      { name: "Asset: Video & Generated AI Images" },
+      { name: "Deployment: Vercel" }
+    ],
+    challenges: [
+      {
+        title: "パフォーマンスとビジュアルの両立",
+        description: "Three.jsによるパーティクル描画（4,000個以上の星）と、高解像度の背景動画を併用するため、ブラウザの描画負荷が課題となりました。コンポーネントの再レンダリング抑制（`useRef`の活用）や、動画ファイルの軽量化・適切な読み込み戦略をとることで、フレームレートを維持しています。"
+      },
+      {
+        title: "シームレスなページ遷移演出",
+        description: "通常の画面遷移ではなく、「ドアが閉まってから移動し、新しい場所でドアが開く」という一連のアニメーションを実装するために、Next.jsの標準ルーターと独自の状態管理ロジックを組み合わせる必要がありました。最終的には過度なJavaScript制御（Hooks地獄）を避け、CSSアニメーションとシンプルなルーティング制御に落とし込むことで、堅牢性とメンテナンス性を高めました。"
+      },
+      {
+        title: "可読性の確保",
+        description: "リッチな映像背景の上にテキストを表示するため、視認性が低下する懸念がありました。これに対し、コンテンツエリアに「グラスモーフィズム」風の半透明バックドロップとぼかし効果を適用し、背景の美しさを損なわずに情報を明確に伝えるデザイン解を導き出しました。"
+      }
+    ],
+    improvements: [
+      {
+        title: "インタラクティブ性の向上",
+        description: "現在は背景演出がメインですが、ユーザーのマウス操作やスクロールに合わせて3D空間がよりダイナミックに反応するようなインタラクションの追加を検討しています。"
+      },
+      {
+        title: "国際化（i18n）対応",
+        description: "海外のビジターにもポートフォリオを見てもらえるよう、英語対応を含めた多言語化サポートの実装を計画しています。"
+      }
+    ],
+    documentation: {
+      architectureMermaid: `graph TD
+    User[Visitor] -->|Access| Vercel[Vercel Edge Network]
+    Vercel -->|Serve| Next[Next.js App Router]
+    Next -->|Render UI| React[React Server Components]
+    Next -->|Hydrate| Client[Client Components]
+    Client -->|Render 3D| Three[Three.js Canvas]
+    Client -->|Play Video| Video[Video Background]
+    Three -->|Warp Effect| Stars[Star Particles]
+    Video -->|Asset| Public["Static Assets (.mp4)"]
+`
+    }
   }
 ];
