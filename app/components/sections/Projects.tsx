@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
@@ -7,23 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
-
-const projects = [
-  {
-    title: "Cutting Works",
-    description: "多彩なカッティングステッカー・デザインサイト制作。ユーザーが直感的にデザインを選べるUIと、制作実績のギャラリー機能を実装。",
-    image: "/projects/bg cwb.jpeg",
-    url: "https://cuttingworks.burst.style",
-    tags: ["Next.js", "MicroCMS", "Tailwind CSS"]
-  },
-  {
-    title: "Discord 自己紹介認証Bot",
-    description: "コミュニティ運営を効率化する自己紹介認証Discord Bot。自宅サーバー × CI/CD による実運用経験",
-    image: "/discord.png",
-    url: "https://github.com/EricKei2002/role-bot-ts",
-    tags: ["Node.js", "Discord.js", "TypeScript"]
-  },
-];
+import { projectsData } from "../../data/projects";
 
 export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -73,11 +58,11 @@ export default function Projects() {
 
         {/* Projects Grid */}
         <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-          {projects.map((project) => (
-            <MagneticButton key={project.title} className="h-full" strength={0.2}>
+          {projectsData.map((project) => (
+            <MagneticButton key={project.slug} className="h-full" strength={0.2}>
               <TiltCard className="h-full" rotationIntensity={5}>
-                <a
-                  href={project.url}
+                <Link
+                  href={`/projects/${project.slug}`}
                   className="project-card group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 transition-all hover:border-zinc-600 hover:bg-zinc-900/50 h-full"
                 >
                   {/* Image Container */}
@@ -100,7 +85,7 @@ export default function Projects() {
                           <DecryptedText text={project.title} animateOnHover speed={40} />
                         </h3>
                         <span className="rounded-full border border-zinc-700 bg-zinc-800 p-2 text-zinc-400 transition group-hover:border-fuchsia-500/50 group-hover:text-fuchsia-400">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </span>
                       </div>
                       <p className="mt-4 text-sm leading-relaxed text-zinc-400">
@@ -116,7 +101,7 @@ export default function Projects() {
                       ))}
                     </div>
                   </div>
-                </a>
+                </Link>
               </TiltCard>
             </MagneticButton>
           ))}

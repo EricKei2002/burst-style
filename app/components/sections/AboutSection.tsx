@@ -20,7 +20,7 @@ interface TimelineItem {
   images?: string[];
   videos?: string[];
   githubUrl?: string;
-  extraComponent?: ReactNode;
+  extraComponent?: ReactNode | ((isProfessional: boolean) => ReactNode);
 }
 
 const ServerSpecs = () => (
@@ -445,11 +445,15 @@ const timeline: TimelineItem[] = [
       </div>
     ),
     tags: ["Open to Work", "Job Seeker", "Frontend Engineer", "Creative"],
-    extraComponent: (
+    extraComponent: (isProfessional: boolean) => (
       <div className="mt-4">
         <a 
           href="#contact" 
-          className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-fuchsia-600 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 hover:from-fuchsia-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:ring-offset-2 focus:ring-offset-black"
+          className={`inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
+            isProfessional 
+              ? "bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 focus:ring-blue-500"
+              : "bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 focus:ring-fuchsia-500"
+          }`}
         >
           <span>Contact Me</span>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -529,7 +533,7 @@ export default function AboutSection() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 max-w-2xl">
-          <div className="flex items-center gap-2 text-fuchsia-400 mb-4">
+          <div className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}>
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
           </div>
@@ -597,12 +601,12 @@ export default function AboutSection() {
               <div key={index} className="relative pl-12 sm:pl-16">
                 {/* Dot */}
                 <div className="absolute left-[13px] top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#0a0a0a] ring-1 ring-zinc-700 sm:left-[29px]">
-                  <div className="h-1.5 w-1.5 rounded-full bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]" />
+                  <div className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${isProfessional ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" : "bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"}`} />
                 </div>
 
                 <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/50">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                    <h3 className="text-lg font-semibold text-zinc-200 group-hover:text-fuchsia-400 transition-colors">
+                    <h3 className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-fuchsia-400"}`}>
                       {item.title}
                     </h3>
                     <span className="font-mono text-base text-zinc-400">{item.year}</span>
@@ -637,7 +641,10 @@ export default function AboutSection() {
 
                   {item.extraComponent && (
                     <div className="mt-6 w-full flex justify-center sm:justify-start">
-                      {item.extraComponent}
+                      {typeof item.extraComponent === "function" 
+                        ? item.extraComponent(isProfessional)
+                        : item.extraComponent
+                      }
                     </div>
                   )}
 
@@ -683,7 +690,7 @@ export default function AboutSection() {
                         href={item.githubUrl} 
                         target="_blank" 
                         rel="noopener noreferrer" 
-                        className="flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-[10px] font-medium text-fuchsia-400 hover:bg-zinc-800 transition-colors"
+                        className={`flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-[10px] font-medium transition-colors hover:bg-zinc-800 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
                       >
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                           <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
