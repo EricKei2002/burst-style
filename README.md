@@ -1,6 +1,6 @@
 # Burst Style - Immersive Portfolio Website
 
-![Project Banner](/opengraph-image.png)
+![Project Banner](public/BURST_logo.jpg)
 
 「Burst Style」は、没入感と物語性を重視した、私 (Eric Kei) のポートフォリオサイトです。
 ウェブサイトを単なる情報の羅列ではなく、一つの「体験」として捉え、訪問者を宇宙への旅（創造性の探求）へと誘います。
