@@ -1,4 +1,4 @@
-# Burst Style - Immersive Portfolio Website
+# Burst Style - Portfolio Website
 
 ![Project Banner](public/BURST_logo.jpg)
 
