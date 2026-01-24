@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import DecryptedText from "./DecryptedText";
-import MagneticButton from "./MagneticButton";
-import TiltCard from "./TiltCard";
+import DecryptedText from "../ui/DecryptedText";
+import MagneticButton from "../ui/MagneticButton";
+import TiltCard from "../ui/TiltCard";
 import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function ContactSection() {

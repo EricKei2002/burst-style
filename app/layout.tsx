@@ -4,11 +4,11 @@ import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
-import SmoothScroll from "./components/SmoothScroll";
-import StarBackground from "./components/StarBackground";
-import MouseTrail from "./components/MouseTrail";
+import SmoothScroll from "./components/utils/SmoothScroll";
+import StarBackground from "./components/visuals/StarBackground";
+import MouseTrail from "./components/visuals/MouseTrail";
 
-import CustomCursor from "./components/CustomCursor";
+import CustomCursor from "./components/visuals/CustomCursor";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://burst.style"),

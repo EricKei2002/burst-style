@@ -5,10 +5,10 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ReactNode } from "react";
-import ProfileCard from "./ProfileCard";
-import DecryptedText from "./DecryptedText";
-import CsharpCalculator from "./CsharpCalculator";
-import TodoAppDemo from "./TodoAppDemo";
+import ProfileCard from "../ui/ProfileCard";
+import DecryptedText from "../ui/DecryptedText";
+import CsharpCalculator from "../demos/CsharpCalculator";
+import TodoAppDemo from "../demos/TodoAppDemo";
 
 interface TimelineItem {
   year: string;

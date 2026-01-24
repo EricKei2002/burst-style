@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import MagneticButton from "./MagneticButton";
-import DecryptedText from "./DecryptedText";
-import TiltCard from "./TiltCard";
+import MagneticButton from "../ui/MagneticButton";
+import DecryptedText from "../ui/DecryptedText";
+import TiltCard from "../ui/TiltCard";
 
 const projects = [
   {

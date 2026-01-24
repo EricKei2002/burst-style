@@ -4,10 +4,10 @@ import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import TechCarousel from "./TechCarousel";
-import DecryptedText from "./DecryptedText";
-import GlitchText from "./GlitchText";
-import MagneticButton from "./MagneticButton";
+import TechCarousel from "../ui/TechCarousel";
+import DecryptedText from "../ui/DecryptedText";
+import GlitchText from "../ui/GlitchText";
+import MagneticButton from "../ui/MagneticButton";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);

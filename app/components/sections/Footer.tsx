@@ -2,8 +2,8 @@
 
 import { FaGithub } from "react-icons/fa";
 
-import MagneticButton from "./MagneticButton";
-import DecryptedText from "./DecryptedText";
+import MagneticButton from "../ui/MagneticButton";
+import DecryptedText from "../ui/DecryptedText";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

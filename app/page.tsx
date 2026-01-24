@@ -1,8 +1,8 @@
-import AboutSection from "./components/AboutSection";
-import Hero from "./components/Hero";
-import Projects from "./components/Projects";
-import ContactSection from "./components/ContactSection";
-import Footer from "./components/Footer";
+import AboutSection from "./components/sections/AboutSection";
+import Hero from "./components/sections/Hero";
+import Projects from "./components/sections/Projects";
+import ContactSection from "./components/sections/ContactSection";
+import Footer from "./components/sections/Footer";
 
 export default function Home() {
   return (
