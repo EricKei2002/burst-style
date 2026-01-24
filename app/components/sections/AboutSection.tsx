@@ -375,19 +375,8 @@ const timeline: TimelineItem[] = [
     tags: ["Web Development", "TypeScript", "Frontend", "Study"],
     githubUrl: "https://github.com/EricKei2002/Todo-with-Typescript",
     extraComponent: (
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+      <div className="w-full">
         <TodoAppDemo />
-        <div className="flex-1 space-y-4 pt-2">
-           <div>
-             <h4 className="text-sm font-medium text-zinc-200 mb-2">AI-Assisted Learning</h4>
-             <p className="text-sm text-zinc-400 leading-relaxed">
-               学習中に直面したエラーや疑問点は、AIと対話しながら解決。
-               単に答えを求めるだけでなく、コードの背景にある仕組みやベストプラクティスについて深掘りすることで、
-               実務で通用する知識を効率的に吸収しました。
-               左記のTODOアプリも、そのようなプロセスを経て完成させた成果物の一つです。
-             </p>
-           </div>
-        </div>
       </div>
     ),
   },

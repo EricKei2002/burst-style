@@ -1,80 +1,161 @@
 "use client";
 
 import { useState } from "react";
-import { FiTrash2, FiPlus, FiCheck } from "react-icons/fi";
-
-type Todo = {
-  id: number;
-  text: string;
-  completed: boolean;
-};
 
 export default function TodoAppDemo() {
-  const [todos, setTodos] = useState<Todo[]>([
-    { id: 1, text: "Learn TypeScript", completed: true },
-    { id: 2, text: "Build a Portfolio", completed: false },
-    { id: 3, text: "Master Next.js", completed: false },
-  ]);
-  const [inputText, setInputText] = useState("");
+  // --- Start of Ported Logic from GitHub ---
+  type Todo = {
+    inputValue: string;
+    id: number;
+    checked: boolean;
+  };
+
+  const [inputValue, setInputValue] = useState("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newTodo: Todo = {
+      inputValue: inputValue,
+      id: todos.length,
+      checked: false,
+    };
+
+    setTodos([newTodo, ...todos]);
+    setInputValue("");
+  };
+
+  const handleEdit = (id: number, inputValue: string) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        todo.inputValue = inputValue;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
+  const handleChecked = (id: number, checked: boolean) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        todo.checked = !checked;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
+  const handleDelete = (id: number) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
+  };
+  // --- End of Ported Logic ---
+
+  // Presentation State for the Demo Container
   const [viewMode, setViewMode] = useState<"design" | "source">("design");
 
-  const addTodo = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
-    setTodos([...todos, { id: Date.now(), text: inputText, completed: false }]);
-    setInputText("");
-  };
+  // The source code string to display in "Source" mode
+  // Using the exact content fetched from the GitHub repository
+  const tsCode = `import React, { useState } from 'react';
+import './App.css';
 
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  };
-
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter(t => t.id !== id));
-  };
-
-  // TypeScript Code Display
-  const tsCode = `interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
-
-const TodoApp = () => {
+function App() {
+  const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [input, setInput] = useState("");
 
-  const addTodo = () => {
-    if (!input) return;
-    const newTodo = {
-      id: Date.now(),
-      text: input,
-      completed: false
-    };
-    setTodos([...todos, newTodo]);
-    setInput("");
+  type Todo = {
+    inputValue: string;
+    id: number;
+    checked: boolean;
   };
 
-  const toggle = (id: number) => {
-    setTodos(todos.map(t => 
-      t.id === id ? {...t, completed: !t.completed} : t
-    ));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const newTodo: Todo = {
+      inputValue: inputValue,
+      id: todos.length,
+      checked: false,
+    };
+
+    setTodos([newTodo, ...todos]);
+    setInputValue("");
+  };
+
+  const handleEdit = (id: number, inputValue: string) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        todo.inputValue = inputValue;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
+  const handleChecked = (id: number, checked: Boolean) => {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        todo.checked = !checked;
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  };
+
+  const handleDelete = (id: number) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(newTodos);
   };
 
   return (
-    <div className="todo-container">
-      {/* ... UI Implementation ... */}
+    <div className="App">
+      <div>
+        <h2>Todoリスト with Typescript</h2>
+        <form onSubmit={(e) => handleSubmit(e)}>
+          <input type="text" onChange={(e) => handleChange(e)} className="inputText" />
+          <input type="submit" value="作成" className="submitButton" />
+        </form>
+        <ul className="todoList">
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <input
+                type="text"
+                onChange={(e) => handleEdit(todo.id, e.target.value)}
+                className="inputText"
+                value={todo.inputValue}
+                disabled={todo.checked}
+              />
+              <input
+                type="checkbox"
+                onChange={(e) => handleChecked(todo.id, todo.checked)}
+              />
+              <button onClick={() => handleDelete(todo.id)}>消</button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
-};`;
+}
+
+export default App;`;
 
   return (
-    <div className="w-full max-w-[320px] overflow-hidden rounded-xl border border-zinc-700 bg-[#1e1e1e] font-mono shadow-2xl flex flex-col">
+    <div className="w-full overflow-hidden rounded-xl border border-zinc-700 bg-[#1e1e1e] font-mono shadow-2xl flex flex-col h-[400px]">
       {/* Title Bar & Tabs */}
       <div className="flex h-8 items-center justify-between bg-zinc-800 px-3 shrink-0">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 rounded-full bg-blue-500/20 text-[8px] flex items-center justify-center text-blue-500">TS</div>
-          <span className="text-xs text-zinc-400">TodoApp.tsx</span>
+          <span className="text-xs text-zinc-400">App.tsx</span>
         </div>
         <div className="flex gap-2">
            <button 
@@ -92,58 +173,61 @@ const TodoApp = () => {
         </div>
       </div>
 
-      <div className="relative h-[300px]">
-        {/* Design View - Interactive Demo */}
-        <div className={`absolute inset-0 p-4 flex flex-col transition-opacity duration-300 ${viewMode === "design" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
+      <div className="relative flex-1 overflow-hidden">
+        {/* Design View - Ported App Logic with styled approximation */}
+        <div className={`absolute inset-0 p-4 overflow-auto transition-opacity duration-300 flex flex-col items-center justify-start ${viewMode === "design" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
           
-          <form onSubmit={addTodo} className="mb-4 flex gap-2">
-            <input 
-              type="text" 
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Add new task..."
-              className="flex-1 rounded bg-zinc-900 px-3 py-1.5 text-xs text-zinc-200 border border-zinc-700 focus:border-blue-500 focus:outline-none placeholder:text-zinc-600"
-            />
-            <button 
-              type="submit"
-              className="flex h-full items-center justify-center rounded bg-blue-600 px-3 text-white hover:bg-blue-500 transition-colors"
-            >
-              <FiPlus size={14} />
-            </button>
-          </form>
+          {/* Equivalent to <div className="App"> */}
+          <div className="w-full text-center">
+            
+            <h2 className="text-lg mb-4 text-zinc-100 font-bold">Todoリスト with Typescript</h2>
+            
+            <form onSubmit={handleSubmit} className="mb-6 flex gap-2 justify-center">
+              <input 
+                type="text" 
+                onChange={handleChange} 
+                className="p-2 rounded bg-zinc-800 border border-zinc-600 text-zinc-200 text-sm focus:outline-none focus:border-blue-500" 
+                value={inputValue}
+                placeholder="新しいタスク"
+              />
+              <input 
+                type="submit" 
+                value="作成" 
+                className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-pointer hover:bg-blue-500 transition-colors" 
+              />
+            </form>
 
-          <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-zinc-700 pr-1 space-y-2">
-            {todos.length === 0 && (
-              <div className="text-center text-zinc-600 text-xs py-8">No tasks yet.</div>
-            )}
-            {todos.map(todo => (
-              <div 
-                key={todo.id} 
-                className="group flex items-center justify-between rounded bg-zinc-900/50 p-2 border border-zinc-800 hover:border-zinc-700 transition"
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
+            <ul className="w-full flex flex-col gap-2 p-0 list-none">
+              {todos.map((todo) => (
+                <li key={todo.id} className="flex items-center gap-2 w-full bg-zinc-900/50 p-2 rounded border border-zinc-800">
+                  <input
+                    type="text"
+                    onChange={(e) => handleEdit(todo.id, e.target.value)}
+                    className="flex-1 p-1 bg-transparent border-b border-transparent focus:border-zinc-500 text-zinc-200 text-sm outline-none disabled:text-zinc-500 disabled:line-through"
+                    value={todo.inputValue}
+                    disabled={todo.checked}
+                  />
+                  <input
+                    type="checkbox"
+                    onChange={() => handleChecked(todo.id, todo.checked)}
+                    checked={todo.checked}
+                    className="cursor-pointer"
+                  />
                   <button 
-                    onClick={() => toggleTodo(todo.id)}
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${todo.completed ? "bg-blue-500/20 border-blue-500 text-blue-500" : "border-zinc-600 hover:border-zinc-500"} transition`}
+                    onClick={() => handleDelete(todo.id)}
+                    className="px-2 py-1 bg-red-500/10 text-red-400 text-xs rounded hover:bg-red-500/20 transition-colors"
                   >
-                    {todo.completed && <FiCheck size={10} />}
+                    消
                   </button>
-                  <span className={`text-xs truncate ${todo.completed ? "text-zinc-500 line-through" : "text-zinc-300"}`}>
-                    {todo.text}
-                  </span>
-                </div>
-                <button 
-                  onClick={() => deleteTodo(todo.id)}
-                  className="text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity px-1"
-                >
-                  <FiTrash2 size={12} />
-                </button>
-              </div>
-            ))}
+                </li>
+              ))}
+            </ul>
+
           </div>
+
         </div>
         
-        {/* Source View - TypeScript Code */}
+        {/* Source View - Exact Source Code */}
         <div className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
             <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
               {tsCode.split('\n').map((line, i) => (
@@ -152,10 +236,10 @@ const TodoApp = () => {
                   <span>
                     {line.split(/("(?:[^"\\]|\\.)*")|\b(interface|const|let|var|return|function|if|else|import|from|export|default|type)\b|\b(string|number|boolean|void|any)\b|(\s+)|([^"\s\w]+)|(\w+)/g).filter(Boolean).map((token, j) => {
                        if (!token) return null;
-                       if (token.startsWith('"')) return <span key={j} className="text-orange-400">{token}</span>;
+                       if (token.startsWith('"') || token.startsWith("'")) return <span key={j} className="text-orange-400">{token}</span>;
                        if (/^(interface|const|let|var|return|function|if|else|import|from|export|default|type)$/.test(token)) return <span key={j} className="text-pink-400">{token}</span>;
-                       if (/^(string|number|boolean|void|any)$/.test(token)) return <span key={j} className="text-blue-400">{token}</span>;
-                       if (/^[A-Z]/.test(token)) return <span key={j} className="text-yellow-300">{token}</span>; // Heuristic for types/components
+                       if (/^(string|number|boolean|void|any|Boolean)$/.test(token)) return <span key={j} className="text-blue-400">{token}</span>;
+                       if (/^[A-Z]/.test(token)) return <span key={j} className="text-yellow-300">{token}</span>;
                        return <span key={j}>{token}</span>;
                     })}
                   </span>
