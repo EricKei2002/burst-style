@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransitionStore } from "../../store/transition-store";
+import { useTransitionStore } from "../../lib/store";
 
 export default function BackButton() {
   const router = useRouter();

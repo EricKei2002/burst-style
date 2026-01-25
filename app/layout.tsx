@@ -4,7 +4,7 @@ import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
-import SmoothScroll from "./components/utils/SmoothScroll";
+import SmoothScroll from "./components/SmoothScroll";
 import StarBackground from "./components/visuals/StarBackground";
 import MouseTrail from "./components/visuals/MouseTrail";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";

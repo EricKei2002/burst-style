@@ -9,8 +9,8 @@ import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
 
-import { projectsData } from "../../data/projects";
-import { useTransitionStore } from "../../store/transition-store";
+import { projectsData } from "../../lib/data";
+import { useTransitionStore } from "../../lib/store";
 
 
 export default function Projects() {

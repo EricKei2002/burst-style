@@ -114,17 +114,19 @@ npm run dev
 
 ## 📂 プロジェクト構造 (Project Structure)
 
-```
+```text
 app/
-├── api/             # API Routes (Next.js server functions)
-├── components/
-│   ├── sections/    # Hero, About, Projects, Contact sections
-│   ├── visuals/     # Three.js Canvas, HangarDoorTransition, SpaceshipInterior
-│   └── ui/          # Reusable UI components (MagneticButton, BackButton, etc.)
-├── data/            # Static data (projects list, timelines)
-├── store/           # Global state management (Zustand)
-├── projects/        # Project detail dynamic routes
-└── layout.tsx       # Root layout (Fonts, Meta, SmoothScroll)
+├── api/                  # バックエンド API ルート
+│   └── contact/          # お問い合わせフォーム用エンドポイント (Resend + Turnstile)
+├── components/           # React コンポーネント
+│   ├── demos/            # プロジェクト詳細ページ用のインタラクティブデモ
+│   ├── sections/         # 主要なページセクション (Hero, About, Projects, Contact)
+│   ├── ui/               # 再利用可能なUIパーツ (ボタン, カード, テキストエフェクト)
+│   ├── visuals/          # 3D/Canvas コンポーネント (Three.js, Stars, HangarDoor)
+│   └── SmoothScroll.tsx  # スムーススクロール用コンポーネント
+├── lib/                  # 共有ロジック・データ (Data, Store)
+├── projects/             # プロジェクト詳細ページ (動的ルーティング: /projects/[slug])
+└── layout.tsx            # ルートレイアウト (フォント, メタデータ, CSS注入)
 ```
 
 ---

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { useTransitionStore } from "../../store/transition-store";
+import { useTransitionStore } from "../../lib/store";
 
 export default function HangarDoorTransition() {
   const { phase, setPhase } = useTransitionStore();
