@@ -16,7 +16,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
-    // Function to render mermaid
+    // Mermaidをレンダリングする関数
     const render = async (ref: React.RefObject<HTMLDivElement | null>, idSuffix: string) => {
         if (ref.current) {
             try {
@@ -48,7 +48,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
 
     render(mermaidRef, 'thumb');
     if (isExpanded) {
-        // Slight delay to allow modal to render
+        // モーダルがレンダリングされるのを少し遅延させる
         setTimeout(() => render(modalRef, 'modal'), 100);
     }
   }, [documentation.architectureMermaid, isExpanded]);
@@ -75,7 +75,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
           </div>
         </div>
 
-        {/* Modal for Expanded View */}
+        {/* 拡大表示用のモーダル */}
         {isExpanded && (
             <div 
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"

@@ -4,10 +4,13 @@ import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTransitionStore } from "../../lib/store";
 import TechCarousel from "../ui/TechCarousel";
 import DecryptedText from "../ui/DecryptedText";
 import GlitchText from "../ui/GlitchText";
 import MagneticButton from "../ui/MagneticButton";
+import WarpStars from "../visuals/WarpStars";
+import { Canvas } from "@react-three/fiber";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -33,8 +36,22 @@ export default function Hero() {
 
   const flashRef = useRef<HTMLDivElement>(null);
 
+  // グローバルストアのワープ状態を使用
+  const { isWarping, setIsWarping } = useTransitionStore();
+
+  // ページ遷移（戻る）で戻ってきた場合、ワープ状態を解除する（着陸エフェクト）
+  useEffect(() => {
+    if (isWarping) {
+        // 少し遅延させてからワープを解除し、減速して着陸するような演出にする
+        const timer = setTimeout(() => {
+            setIsWarping(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }
+  }, [isWarping, setIsWarping]);
+  
   const { contextSafe } = useGSAP(() => {
-    // Main Content Animation Timeline (Paused initially)
+    // メインコンテンツのアニメーションタイムライン（最初は一時停止）
     const tl = gsap.timeline({ paused: true });
     
     tl.to(".title-char", {
@@ -57,13 +74,13 @@ export default function Hero() {
 
   }, { scope: containerRef });
 
-  // Boot Sequence
+  // ブートシーケンス
   useEffect(() => {
-    // Check if we have already booted in this session
+    // このセッションですでにブートしているか確認
     const hasBooted = sessionStorage.getItem("burst_booted");
     
     if (hasBooted) {
-        // Skip sequence
+        // シーケンスをスキップ
         gsap.set(".preloader", { display: "none" });
         mainTlRef.current?.play();
         return;
@@ -72,36 +89,42 @@ export default function Hero() {
     let isMounted = true;
     
     const sequence = async () => {
-        // Step 1: Initializing (Already set)
+        // ステップ 1: 初期化中（設定済み）
         await new Promise(r => setTimeout(r, 1200));
         if (!isMounted) return;
 
-        // Step 2: Loading Modules
+        // ステップ 2: モジュールの読み込み
         setLoaderText("LOADING MODULES...");
         await new Promise(r => setTimeout(r, 1200));
         if (!isMounted) return;
 
-        // Step 3: Access Granted
+        // ステップ 3: アクセス許可
         setLoaderText("BURST SYSTEM ONLINE");
-        // Trigger Burst Effect right when text appears
-        if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(200);
-        }
+        
         
         await new Promise(r => setTimeout(r, 2000));
         if (!isMounted) return;
 
-        // Step 4: Fade out and Start Main
+        // ステップ 4: フェードアウトしてメインを開始
         const flash = flashRef.current;
         if (flash) {
-            gsap.to(flash, { opacity: 1, duration: 0.1, yoyo: true, repeat: 1 });
+            gsap.to(flash, { 
+                opacity: 1, 
+                duration: 0.1, 
+                yoyo: true, 
+                repeat: 1,
+                onStart: () => {
+                     // フラッシュ開始時にワープ開始
+                     if(isMounted) setIsWarping(true);
+                },
+                onComplete: () => {
+                    // フラッシュ終了後、少し待ってからワープ停止（残光効果）
+                     setTimeout(() => {
+                        if(isMounted) setIsWarping(false);
+                     }, 1000); 
+                }
+            });
         }
-        
-        // Shake effect on container
-        gsap.fromTo(containerRef.current, 
-            { x: -10 },
-            { x: 10, duration: 0.05, repeat: 5, yoyo: true, clearProps: "x" }
-        );
 
         gsap.to(".preloader", {
             opacity: 0,
@@ -111,7 +134,7 @@ export default function Hero() {
                 if (isMounted) {
                     gsap.set(".preloader", { display: "none" });
                     mainTlRef.current?.play();
-                    // Mark as booted
+                    // ブート済みとしてマーク
                     sessionStorage.setItem("burst_booted", "true");
                 }
             }
@@ -121,7 +144,7 @@ export default function Hero() {
     sequence();
     
     return () => { isMounted = false; };
-  }, []);
+  }, [setIsWarping]);
 
   const showDescription = contextSafe(() => {
     const tl = gsap.timeline();
@@ -133,14 +156,14 @@ export default function Hero() {
       ease: "none",
     })
     
-    // Stop blinking and change style to indicate active state
+    // 点滅を停止し、アクティブ状態を示すようにスタイルを変更
     .to(".trigger-btn", { 
       opacity: 0.5, 
       pointerEvents: "none",
       className: "trigger-btn font-mono text-xs opacity-50 cursor-default" 
     }, "<")
 
-    // Command Prompt Sequence
+    // コマンドプロンプトシーケンス
     .to(".command-prompt", {
       opacity: 1,
       duration: 0.1,
@@ -172,12 +195,21 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
+      
+      {/* 背景の星 */}
+      <div className="absolute inset-0 z-0">
+         <Canvas camera={{ position: [0, 0, 50], fov: 75 }} gl={{ antialias: false }}>
+            <fog attach="fog" args={['#000', 0, 100]} />
+            <WarpStars isWarping={isWarping} />
+         </Canvas>
+      </div>
+
       <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
       
-      {/* Preloader Overlay (System Boot) */}
+      {/* プリローダーオーバーレイ（システムブート） */}
       <div className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait">
         <div className="flex flex-col items-center gap-4">
-             {/* Spinning/Pulse Icon */}
+             {/* 回転/パルスアイコン */}
             <div className="h-12 w-12 rounded-full border-2 border-green-500/20 border-t-green-500 animate-spin"></div>
             
             <div className="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-green-500 tracking-wider text-center min-w-[300px]">
@@ -197,7 +229,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Foreground Text Content */}
+      {/* 前景のテキストコンテンツ */}
       <div className="container relative z-10 mx-auto px-6">
         <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
           
@@ -228,7 +260,7 @@ export default function Hero() {
               <SplitText charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
             </p>
 
-            {/* Command Prompt Area */}
+            {/* コマンドプロンプトエリア */}
             <div className="font-mono text-green-500 text-sm sm:text-base">
               <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
                 <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-500">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-500">~ &gt;</span></span>
@@ -257,7 +289,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Tech Carousel (Full Width) */}
+      {/* テックカルーセル（全幅） */}
       <div className="w-full mt-16 relative z-10">
         <h2 className="text-center font-mono text-xl md:text-2xl text-green-500 mb-8 opacity-0 tech-carousel-title">
           &gt; My Skills

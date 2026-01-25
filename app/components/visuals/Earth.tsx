@@ -8,14 +8,14 @@ import { TextureLoader } from "three";
 export default function Earth() {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Using local texture
+  // ローカルテクスチャを使用
   const texture = useLoader(TextureLoader, '/earth.jpg');
 
   useFrame((state) => {
     if (meshRef.current) {
-      // Orbit logic: Synced with Sun/Moon but distinct position
-      const t = state.clock.elapsedTime * 0.2 + Math.PI * 1.5; // 270 degrees phase (Sun=0, Moon=180)
-      const radius = 35; // Same radius as others for symmetry
+      // 軌道ロジック: 太陽/月と同期しているが、異なる位置
+      const t = state.clock.elapsedTime * 0.2 + Math.PI * 1.5; // 270度の位相 (太陽=0, 月=180)
+      const radius = 35; // 対称性のために他と同じ半径
       
       meshRef.current.position.x = Math.sin(t) * radius;
       meshRef.current.position.y = Math.cos(t * 0.5) * 15 - 5;
@@ -34,11 +34,11 @@ export default function Earth() {
         color="#ffffff"
         roughness={0.5}
         metalness={0.6} 
-        emissive="#eeeeff" // Neutral white to let land colors (green) glow
+        emissive="#eeeeff" // 陸地の色（緑）を輝かせるためのニュートラルホワイト
         emissiveIntensity={1.2} 
       />
       <pointLight intensity={0.8} distance={40} color="#ccddff" decay={2} />
-      {/* Earth reflects light but isn't a strong light source itself, usually */}
+      {/* 地球は光を反射しますが、通常それ自体は強い光源ではありません */}
     </mesh>
   );
 }

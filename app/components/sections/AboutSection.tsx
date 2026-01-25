@@ -25,7 +25,7 @@ interface TimelineItem {
 
 const ServerSpecs = () => (
   <div className="grid grid-cols-2 gap-3 w-full">
-    {/* Image */}
+    {/* 画像 */}
     <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
       <Image
         src="/images/server/pi.jpg"
@@ -36,7 +36,7 @@ const ServerSpecs = () => (
       />
     </div>
 
-    {/* Specs */}
+    {/* スペック */}
     <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 font-mono text-xs sm:text-sm text-zinc-300 flex flex-col justify-center gap-3">
        
        <div>
@@ -63,7 +63,7 @@ const ServerSpecs = () => (
        </div>
     </div>
 
-    {/* Terminal */}
+    {/* ターミナル */}
     <div className="col-span-2 relative aspect-video w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
        <Image 
          src="/images/server/terminal.jpeg" 
@@ -473,7 +473,7 @@ export default function AboutSection() {
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
-      // Background Parallax
+      // 背景パララックス
       gsap.to(".bg-grid", {
         yPercent: 30,
         ease: "none",
@@ -485,7 +485,7 @@ export default function AboutSection() {
         }
       });
 
-      // Content Reveal
+      // コンテンツの表示
       gsap.fromTo(".about-card",
         { y: 50, opacity: 0 },
         {
@@ -500,10 +500,9 @@ export default function AboutSection() {
           }
         }
       );
-      // Profile Growth Transition
-      // Profile Growth Transition
-      // Transition: Childhood -> Mid -> Current
-      // Desktop only: Animate. Mobile: handled via CSS to show final state.
+      // プロフィールの成長トランジション
+      // 遷移: 幼少期 -> 中期 -> 現在
+      // デスクトップのみ: アニメーション。モバイル: CSSで処理し最終状態を表示。
       
       const mm = gsap.matchMedia();
 
@@ -531,7 +530,7 @@ export default function AboutSection() {
       <div className="bg-grid absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header */}
+        {/* ヘッダー */}
         <div className="mb-16 max-w-2xl">
           <div className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}>
             <span className="h-px w-8 bg-current"></span>
@@ -542,7 +541,7 @@ export default function AboutSection() {
               <DecryptedText text="About Me" animateOnHover speed={30} />
             </h2>
 
-            {/* View Mode Toggle */}
+            {/* ビューモード切り替え */}
             <div className="flex items-center gap-3 bg-black/40 p-1.5 rounded-full border border-zinc-800 self-start sm:self-auto">
               <button
                 onClick={() => setIsProfessional(false)}
@@ -570,10 +569,10 @@ export default function AboutSection() {
 
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
 
-          {/* Left Column: Profile Card & Skills */}
+          {/* 左カラム: プロフィールカード & スキル */}
           <div className="about-card space-y-12 lg:sticky lg:top-32 lg:self-start">
             
-            {/* Profile Card */}
+            {/* プロフィールカード */}
             <div className="flex justify-center lg:justify-start">
               <ProfileCard 
                 name="Eric Kei" 
@@ -591,15 +590,15 @@ export default function AboutSection() {
 
           </div>
 
-          {/* Right Column: Timeline */}
+          {/* 右カラム: タイムライン */}
           <div className="about-card relative space-y-12 pl-4 sm:pl-0">
-            {/* Timeline Line */}
+            {/* タイムラインの線 */}
             <div className="absolute left-4 top-2 h-full w-px bg-zinc-800 sm:left-8" />
             <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none" />
 
             {timeline.map((item, index) => (
               <div key={index} className="relative pl-12 sm:pl-16">
-                {/* Dot */}
+                {/* ドット */}
                 <div className="absolute left-[13px] top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#0a0a0a] ring-1 ring-zinc-700 sm:left-[29px]">
                   <div className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${isProfessional ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" : "bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"}`} />
                 </div>
@@ -613,7 +612,7 @@ export default function AboutSection() {
                   </div>
                   
                   <div className="mt-4 text-base leading-relaxed text-zinc-300">
-                    {/* Animated Content Switch */}
+                    {/* アニメーションコンテンツ切り替え */}
                     <div className="relative min-h-[60px]">
                       {isProfessional && item.professionalDescription ? (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">

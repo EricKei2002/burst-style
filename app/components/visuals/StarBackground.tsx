@@ -16,18 +16,18 @@ import SpaceshipInterior from "./SpaceshipInterior";
 function WarpStars() {
   const starsRef = useRef<THREE.Points>(null);
   
-  // Increase star count for dense hyperspace effect
+  // 超空間効果を高めるために星の数を増やす
   const starsCount = 4000;
   
-  // Initialize stars in a tunnel/cylinder shape along Z axis
+  // Z軸に沿ってトンネル/シリンダー状に星を初期化
   const [positions] = useState(() => {
     const pos = new Float32Array(starsCount * 3);
     for(let i = 0; i < starsCount; i++) {
         const i3 = i * 3;
-        // Spread X and Y wider for immersion
+        // 没入感を高めるためにXとYを広げる
         const x = (Math.random() - 0.5) * 200;
         const y = (Math.random() - 0.5) * 200; 
-        // Spawn ahead [0, -200]
+        // 前方にスポーン [0, -200]
         const z = (Math.random() - 0.5) * 200;
         
         pos[i3] = x;
@@ -37,7 +37,7 @@ function WarpStars() {
     return pos;
   });
 
-  // Refs for smooth animation values
+  // スムーズなアニメーション値のためのRefs
   const currentSpeed = useRef(0.05);
   const currentStretch = useRef(1);
   
@@ -46,12 +46,12 @@ function WarpStars() {
     
     const positions = starsRef.current.geometry.attributes.position.array as Float32Array;
     
-    // Standard movement
+    // 標準的な動き
     const targetSpeed = 0.05; 
     const targetStretch = 1; 
     
-    // Smooth interpolation (Lerp)
-    // Adjust factor (e.g., 3 * delta) for acceleration speed
+    // スムーズな補間 (Lerp)
+    // 加速速度のための調整係数 (例: 3 * delta)
     currentSpeed.current += (targetSpeed - currentSpeed.current) * Math.min(delta * 2, 1);
     currentStretch.current += (targetStretch - currentStretch.current) * Math.min(delta * 2, 1);
 
@@ -61,22 +61,22 @@ function WarpStars() {
          const i3 = i * 3;
          positions[i3 + 2] += speed;
          
-         // Reset star if it passes camera (z > 20)
+         // カメラを通過したら星をリセット (z > 20)
          if (positions[i3 + 2] > 50) {
-           positions[i3 + 2] = -150; // Reset far back
+           positions[i3 + 2] = -150; // 遠く後方にリセット
            
-           // Reshuffle X/Y to prevent distinct patterns from forming
+           // 明確なパターンが形成されるのを防ぐためにX/Yをシャッフル
            positions[i3] = (Math.random() - 0.5) * 200;
            positions[i3 + 1] = (Math.random() - 0.5) * 200;
          }
     }
     starsRef.current.geometry.attributes.position.needsUpdate = true;
     
-    // Apply stretch effect
+    // ストレッチ効果を適用
     starsRef.current.scale.z = currentStretch.current;
     
-    // Optional: Fade opacity based on warping?
-    // Not needed if white streaks look good.
+    // オプション: ワープに基づいて不透明度をフェードさせる？
+    // 白い筋が見栄え良ければ不要。
   });
 
   return (

@@ -18,7 +18,7 @@ interface ProfileCardProps {
   backgroundImageUrl?: string;
 }
 
-// Utility functions
+// ユーティリティ関数
 const clamp = (v: number, min = 0, max = 100) => Math.min(Math.max(v, min), max);
 const round = (v: number, precision = 3) => parseFloat(v.toFixed(precision));
 const adjust = (v: number, fMin: number, fMax: number, tMin: number, tMax: number) => 
@@ -31,7 +31,7 @@ export default function ProfileCard({
   className = '',
   enableTilt = true,
   innerGradient = DEFAULT_INNER_GRADIENT,
-  behindGlowColor = 'rgba(232, 121, 249, 0.4)', // Fuchsia tint
+  behindGlowColor = 'rgba(232, 121, 249, 0.4)', // フクシア色の色合い
   backgroundImageUrl,
   growthImages = [],
 }: ProfileCardProps & { growthImages?: string[] }) {
@@ -48,7 +48,7 @@ export default function ProfileCard({
     let targetX = 0;
     let targetY = 0;
     
-    // Constants for physics
+    // 物理演算用の定数
     const DEFAULT_TAU = 0.14;
     
     const setVarsFromXY = (x: number, y: number) => {
@@ -64,13 +64,13 @@ export default function ProfileCard({
       const centerX = percentX - 50;
       const centerY = percentY - 50;
 
-      // CSS Variables mapping
+      // CSS変数のマッピング
       const cssVars: Record<string, string> = {
         '--pointer-x': `${percentX}%`,
         '--pointer-y': `${percentY}%`,
         '--background-x': `${adjust(percentX, 0, 100, 35, 65)}%`,
         '--background-y': `${adjust(percentY, 0, 100, 35, 65)}%`,
-        '--rotate-x': `${round(-(centerX / 15))}deg`, // Adjusted sensitivity
+        '--rotate-x': `${round(-(centerX / 15))}deg`, // 感度を調整
         '--rotate-y': `${round(centerY / 10)}deg`
       };
 
@@ -85,7 +85,7 @@ export default function ProfileCard({
       const dt = (ts - lastTs) / 1000;
       lastTs = ts;
       
-      // Smooth interpolation
+      // スムーズな補間
       const k = 1 - Math.exp(-dt / DEFAULT_TAU);
       currentX += (targetX - currentX) * k;
       currentY += (targetY - currentY) * k;
@@ -145,11 +145,11 @@ export default function ProfileCard({
 
     const handleLeave = () => {
       const el = wrap.getBoundingClientRect();
-      // Reset to center
+      // 中心にリセット
       tiltEngine.setTarget(el.width / 2, el.height / 2);
     };
 
-    // Initial center position
+    // 初期の中心位置
     const el = wrap.getBoundingClientRect();
     tiltEngine.setTarget(el.width / 2, el.height / 2);
 
@@ -187,7 +187,7 @@ export default function ProfileCard({
       <div ref={shellRef} className={styles.shell}>
         <div className={styles.card}>
           <div className={styles.inside}>
-            {/* Base Image */}
+            {/* ベース画像 */}
             {backgroundImageUrl && (
               <Image 
                 src={backgroundImageUrl} 
@@ -200,13 +200,13 @@ export default function ProfileCard({
               />
             )}
 
-            {/* Growth Images (Stacked) */}
+            {/* 成長画像（積み重ね） */}
             {growthImages.map((src, index) => {
                const isLast = index === growthImages.length - 1;
-               // On mobile (default), if it's the last image, make it visible. 
-               // On desktop (lg), initially hidden (opacity-0) and animated by GSAP.
-               // We use 'lg:opacity-0' to ensure desktop starts hidden. 
-               // For non-last images, they remain hidden by default and animated on desktop.
+               // モバイル（デフォルト）では、最後の画像であれば表示します。
+               // デスクトップ（lg）では、最初は非表示（opacity-0）で、GSAPによってアニメーションされます。
+               // デスクトップで最初は非表示にするために 'lg:opacity-0' を使用します。
+               // 最後以外の画像は、デフォルトで非表示のままで、デスクトップ上でアニメーションされます。
                
                const mobileClass = isLast ? "opacity-100 lg:opacity-0" : "opacity-0";
 

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-// Initialize Resend with API key
+// APIキーでResendを初期化
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const message = formData.get('message') as string;
     const turnstileToken = formData.get('cf-turnstile-response') as string;
 
-    // 0. Verify Turnstile Token
+    // 0. Turnstileトークンの検証
     if (process.env.TURNSTILE_SECRET_KEY) {
         const verifyFormData = new FormData();
         verifyFormData.append('secret', process.env.TURNSTILE_SECRET_KEY);
@@ -31,12 +31,12 @@ export async function POST(request: Request) {
         }
     }
 
-    // 1. Forward to Formspree (Admin Notification)
-    // We forward the form data exactly as received
+    // 1. Formspreeへ転送 (管理者通知)
+    // 受信したフォームデータをそのまま転送
     const formspreeEndpoint = process.env.FORMSPREE_ENDPOINT;
     
     if (formspreeEndpoint) {
-        // Send to Formspree, but don't fail the whole request if it fails (optional strategy, but safer to try both)
+        // Formspreeに送信しますが、失敗してもリクエスト全体を失敗させません (オプションの戦略ですが、両方を試す方が安全です)
         await fetch(formspreeEndpoint, {
             method: 'POST',
             body: formData,
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         }).catch(err => console.error("Formspree error:", err));
     }
 
-    // 2. Send Auto-reply via Resend
+    // 2. Resend経由で自動返信を送信
     if (process.env.RESEND_API_KEY) {
         await resend.emails.send({
             from: 'Eric Kei <Contact@burst.style>',
@@ -57,18 +57,18 @@ export async function POST(request: Request) {
                 <!DOCTYPE html>
                 <html>
                 <body style="margin: 0; padding: 0; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; color: #e4e4e7; background-color: #030014;">
-                    <!-- Outer Container with Starry/Space Background -->
+                    <!-- 星空/宇宙の背景を持つ外側コンテナ -->
                     <div style="background: radial-gradient(circle at center, #2e1065 0%, #020617 80%); padding: 40px 20px; text-align: center; min-height: 100vh;">
                         
                         <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ffffff20; border-radius: 16px; overflow: hidden; background-color: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); box-shadow: 0 0 50px rgba(124, 58, 237, 0.3);">
                             
-                            <!-- Header / Icon Area -->
+                            <!-- ヘッダー / アイコンエリア -->
                             <div style="padding: 40px 0 20px 0; background: linear-gradient(to bottom, rgba(124, 58, 237, 0.2), transparent); position: relative;">
                                 <img src="https://burst.style/icon.jpg" alt="Eric Kei" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); object-fit: cover;" />
                             </div>
 
                             <div style="padding: 20px 30px 20px 30px; text-align: left;">
-                                <!-- Terminal Header -->
+                                <!-- ターミナルヘッダー -->
                                 <div style="text-align: center; margin-bottom: 20px;">
                                     <h1 style="color: #22c55e; font-size: 24px; letter-spacing: 1px; margin: 0; text-shadow: 0 0 15px rgba(34, 197, 94, 0.6);">
                                         SYSTEM_BOOT_SEQUENCE<span style="animation: blink 1s infinite;">_</span>
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
                                     <p style="color: #a78bfa; font-size: 14px; margin: 8px 0 0 0; letter-spacing: 2px;">CONNECTION ESTABLISHED</p>
                                 </div>
 
-                                <!-- Greeting -->
+                                <!-- 挨拶 -->
                                 <p style="font-size: 15px; line-height: 1.8; margin-bottom: 20px; color: #e4e4e7; text-align: center;">
                                     Hello <span style="color: #22c55e; font-weight: bold;">${name}</span>,<br>
                                     お問い合わせありがとうございます。<br>
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
                                     Eric Kei より直接ご連絡いたします。
                                 </p>
                                 
-                                <!-- User Message Box (Glass-like Terminal) -->
+                                <!-- ユーザーメッセージボックス (ガラス風ターミナル) -->
                                 <div style="background-color: rgba(0, 0, 0, 0.6); border: 1px solid #333; border-radius: 8px; padding: 25px; margin-bottom: 20px; font-size: 13px; position: relative;">
                                     <div style="color: #888; font-size: 11px; margin-bottom: 15px; border-bottom: 1px solid #ffffff20; padding-bottom: 10px; display: flex; align-items: center;">
                                         <span style="color: #d946ef; margin-right: 10px; font-size: 14px;">➜</span>
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
                                     <p style="margin: 0; white-space: pre-wrap; color: #ccc; line-height: 1.6;">${message}</p>
                                 </div>
 
-                                <!-- Footer -->
+                                <!-- フッター -->
                                 <div style="border-top: 1px solid #ffffff10; padding-top: 20px; margin-top: 20px; text-align: center;">
                                     <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Wait for connection...</p>
                                     

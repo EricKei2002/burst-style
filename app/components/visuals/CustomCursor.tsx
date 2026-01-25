@@ -14,7 +14,7 @@ export default function CustomCursor() {
     const mql = window.matchMedia("(pointer: coarse)");
     const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
     
-    // Set initial value
+    // 初期値を設定
     setTimeout(() => setIsTouch(mql.matches), 0);
     
     mql.addEventListener("change", onChange);
@@ -28,18 +28,18 @@ export default function CustomCursor() {
     
     if (!cursor || !follower) return;
     
-    // Initial position off-screen
+    // 初期位置は画面外
     gsap.set(cursor, { xPercent: -50, yPercent: -50, opacity: 0 });
     gsap.set(follower, { xPercent: -50, yPercent: -50, opacity: 0 });
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Improve initial load opacity
+      // 初期ロード時の不透明度を改善
       gsap.to([cursor, follower], { opacity: 1, duration: 0.2 });
 
-      // Cursor moves instantly
+      // カーソルは即座に移動
       gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0 });
       
-      // Follower moves with delay
+      // フォロワーは遅延して移動
       gsap.to(follower, { x: e.clientX, y: e.clientY, duration: 0.15 });
     };
 
@@ -48,14 +48,14 @@ export default function CustomCursor() {
 
     window.addEventListener("mousemove", handleMouseMove);
     
-    // Add listeners for hover targets
+    // ホバーターゲットのリスナーを追加
     const hoverTargets = document.querySelectorAll("a, button, .trigger-btn, input, textarea");
     hoverTargets.forEach((el) => {
       el.addEventListener("mouseenter", handleHoverStart);
       el.addEventListener("mouseleave", handleHoverEnd);
     });
 
-    // Observer for dynamic elements
+    // 動的要素のオブザーバー
     const observer = new MutationObserver(() => {
         const newTargets = document.querySelectorAll("a, button, .trigger-btn, input, textarea");
         newTargets.forEach((el) => {
@@ -79,7 +79,7 @@ export default function CustomCursor() {
 
   useEffect(() => {
     if (isTouch) return;
-    // Animate cursor scale based on hover state
+    // ホバー状態に基づいてカーソルのスケールをアニメーション
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     

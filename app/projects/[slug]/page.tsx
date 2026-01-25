@@ -5,7 +5,7 @@ import DecryptedText from "../../components/ui/DecryptedText";
 import ProjectDocs from "../../components/ui/ProjectDocs";
 import BackButton from "../../components/ui/BackButton";
 
-// Ensure static params are generated for static export
+// 静的エクスポートのために静的パラメータが生成されることを確認
 export function generateStaticParams() {
   return projectsData.map((project) => ({
     slug: project.slug,
@@ -24,12 +24,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         
-        {/* Navigation */}
-        <div className="mb-0">
-            <BackButton />
-        </div>
-
-        {/* Header Section */}
+        {/* ナビゲーション - 固定配置のためここでは削除、または空のdivを残すことなく配置 */}
+        <BackButton />
+        {/* ヘッダーセクション */}
         <header className="mb-12">
             <div className="flex flex-col gap-6">
                  <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
@@ -57,11 +54,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             </div>
         </header>
 
-        {/* Content Grid */}
+        {/* コンテンツグリッド */}
         <div className="grid gap-12 lg:grid-cols-[2fr_1fr]">
             
             <div className="space-y-12">
-                {/* Description */}
+                {/* 説明 */}
                 <section>
                     <h2 className="text-xl font-bold text-zinc-100 mb-4 flex items-center gap-2">
                         <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"></span>
@@ -74,7 +71,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
                 <ProjectDocs documentation={project.documentation} />
 
-                {/* Challenges */}
+                {/* 課題 */}
                 <section>
                     <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
                         <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
@@ -94,7 +91,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     </div>
                 </section>
 
-                 {/* Improvements */}
+                 {/* 改善点 */}
                  <section>
                     <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
                          <span className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
@@ -118,9 +115,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
             </div>
 
-            {/* Sidebar (Tech Stack & Links) */}
+            {/* サイドバー (テックスタック & リンク) */}
             <div className="space-y-8">
-                {/* Links */}
+                {/* リンク */}
                 <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
                     <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">Links</h3>
                     <div className="flex flex-col gap-3">
@@ -149,7 +146,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     </div>
                 </div>
 
-                {/* Tech Stack */}
+                {/* テックスタック */}
                  <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
                     <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">Tech Stack</h3>
                     <ul className="space-y-2">

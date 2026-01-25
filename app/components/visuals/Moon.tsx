@@ -8,20 +8,20 @@ import { TextureLoader } from "three";
 export default function Moon() {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Using local texture for reliability
+  // 信頼性のためにローカルテクスチャを使用
   const texture = useLoader(TextureLoader, '/moon.jpg');
 
   useFrame((state) => {
     if (meshRef.current) {
-      // Orbit logic: Opposite to Sun (Phase shift of PI)
-      const t = state.clock.elapsedTime * 0.2 + Math.PI; // Same speed, opposite phase
-      const radius = 35; // Same radius
+      // 軌道ロジック: 太陽と反対 (PIの位相シフト)
+      const t = state.clock.elapsedTime * 0.2 + Math.PI; // 同じ速度、反対の位相
+      const radius = 35; // 同じ半径
       
       meshRef.current.position.x = Math.sin(t) * radius;
-      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // Same vertical wave
+      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // 同じ垂直波
       meshRef.current.position.z = Math.cos(t) * radius - 20;
 
-      meshRef.current.rotation.y += 0.005; // Visibly spin
+      meshRef.current.rotation.y += 0.005; // 目に見える回転
     }
   });
 

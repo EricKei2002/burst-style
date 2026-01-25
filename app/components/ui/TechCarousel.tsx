@@ -31,21 +31,21 @@ export default function TechCarousel() {
   return (
     <div className="w-full overflow-hidden py-20 opacity-0 tech-carousel fade-mask">
       <div className="flex w-max gap-24 animate-scroll-left">
-        {/* First Set */}
+        {/* 1つ目のセット */}
         {techStack.map((tech, index) => (
           <div key={`first-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
              <span className="font-mono text-2xl text-zinc-400 group-hover:text-white transition-colors">{tech.name}</span>
           </div>
         ))}
-        {/* Second Set (Duplicate for Loop) */}
+        {/* 2つ目のセット（ループ用の複製） */}
         {techStack.map((tech, index) => (
           <div key={`second-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
              <span className="font-mono text-2xl text-zinc-400 group-hover:text-white transition-colors">{tech.name}</span>
           </div>
         ))}
-        {/* Third Set (Extra safety for wide screens) */}
+        {/* 3つ目のセット（ワイドスクリーン用の予備） */}
         {techStack.map((tech, index) => (
           <div key={`third-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />

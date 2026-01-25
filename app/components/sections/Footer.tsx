@@ -16,7 +16,7 @@ export default function Footer() {
     <footer className="relative w-full border-t border-zinc-900 bg-[#0a0a0a] pt-12 pb-10">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-6 lg:flex-row lg:px-8">
         
-        {/* Left: Copyright & Name */}
+        {/* 左側: コピーライト & 名前 */}
         <div className="flex flex-col items-center gap-2 lg:items-start text-center lg:text-left">
            <div className="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
                 <span className="text-fuchsia-500">&gt;</span>
@@ -27,7 +27,7 @@ export default function Footer() {
            </p>
         </div>
 
-        {/* Center: System Status */}
+        {/* 中央: システムステータス */}
         <div className="hidden md:flex items-center gap-2 rounded-full bg-zinc-900/50 px-4 py-1.5 border border-zinc-800/50">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -36,7 +36,7 @@ export default function Footer() {
             <span className="text-[10px] font-mono text-zinc-400 tracking-wider">SYSTEM STATUS: ONLINE</span>
         </div>
 
-        {/* Right: Social Links & Scroll Top */}
+        {/* 右側: ソーシャルリンク & トップへ戻る */}
         <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
                 <MagneticButton strength={0.2}>

@@ -21,7 +21,7 @@ export default function DecryptedText({
   className = "",
   characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+",
   animateOnHover = false,
-  sequential = false, // If true, reveal one by one. If false, scramble all then settle.
+  sequential = false, // trueの場合、1文字ずつ表示します。falseの場合、全体をスクランブルしてから確定させます。
 }: DecryptedTextProps) {
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const [displayText, setDisplayText] = useState(text);
@@ -29,9 +29,9 @@ export default function DecryptedText({
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Definition of scramble inside useEffect or wrap in useCallback. 
-    // Since it depends on many props, let's keep it here or just suppress the lint for now 
-    // to match the original implementation style but cleaner.
+    // scrambleの定義をuseEffect内で行うか、useCallbackでラップします。
+    // 多くのプロパティに依存しているため、ここではこのままにするか、リントを抑制して
+    // 元の実装スタイルに合わせつつ、よりクリーンにします。
     
     const scramble = () => {
       let iteration = 0;
@@ -69,24 +69,24 @@ export default function DecryptedText({
         scramble();
     }
     
-    // We can expose scramble to mouse handlers if we move it out, 
-    // but for now let's just use the effect for initial load.
-    // To fix the "missing dependency" strictly we should wrap scramble in useCallback.
-    // However, the logic here is slightly complex with refs. 
+    // scrambleを外に出せばマウスハンドラに公開できますが、
+    // 今のところは初期ロードのためにエフェクトを使用するだけにします。
+    // "missing dependency"を厳密に修正するには、scrambleをuseCallbackでラップする必要があります。
+    // しかし、ここのロジックはrefsを使用しており少し複雑です。 
     
     return () => {
         if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [text, animateOnHover, speed, characters, sequential, maxIterations]); 
   
-  // Re-implement hover logic cleanly
+  // ホバーロジックをきれいに再実装
   const handleMouseEnter = () => {
     if (animateOnHover) {
         setIsHovering(true);
-        // Trigger scramble... requires access to scramble function.
-        // Let's force a key update or state change to re-trigger effect? 
-        // Or just copy the logic. For simplicity, I'll copy logic or move it out.
-        // Let's just create a new interval here.
+        // scrambleをトリガー... scramble関数へのアクセスが必要です。
+        // キーの更新や状態変更を強制してエフェクトを再トリガーしますか？
+        // それともロジックをコピーしますか。簡単にするために、ロジックをコピーするか外に出します。
+        // ここでは新しいインターバルを作成することにします。
         
         let iteration = 0;
         if (intervalRef.current) clearInterval(intervalRef.current);
@@ -118,8 +118,8 @@ export default function DecryptedText({
   const handleMouseLeave = () => {
     if (animateOnHover) {
         setIsHovering(false);
-        // Optional: scramble back or just stop? usually just stop or finish.
-        // We let it finish.
+        // オプション: スクランブルして戻すか、ただ停止するか？ 通常はただ停止するか終了させます。
+        // ここでは終了させます。
     }
   };
 

@@ -14,8 +14,8 @@ export default function SpaceshipInterior() {
   return (
     <div className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden">
       {/* 
-        Video Background 
-        Using encodeURI to ensure special characters in filename are handled safely 
+        ビデオ背景
+        ファイル名内の特殊文字を安全に処理するためにencodeURIを使用 
       */}
       <video
         ref={videoRef}
@@ -29,7 +29,7 @@ export default function SpaceshipInterior() {
         Your browser does not support the video tag.
       </video>
       
-      {/* Overlay for cinematic feel and to hide any potential compression artifacts */}
+      {/* 映画のようなフィールと、圧縮アーティファクトを隠すためのオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />
     </div>

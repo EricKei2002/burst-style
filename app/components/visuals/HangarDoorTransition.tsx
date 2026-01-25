@@ -8,21 +8,21 @@ export default function HangarDoorTransition() {
   const { phase, setPhase } = useTransitionStore();
   const pathname = usePathname();
   
-  // Handle opening doors when pathname changes
+  // パス名変更時にドアを開く処理
   const prevPathname = useRef(pathname);
 
   useEffect(() => {
-    // Only trigger opening if pathname HAS CHANGED
+    // パス名が変更された場合のみ開く処理をトリガー
     if (prevPathname.current !== pathname) {
         if (phase === 'closed' || phase === 'closing') {
-            // Keep closed for a brief moment to mask the render, then open
+            // レンダリングを隠すために一瞬閉じたままにし、その後開く
             const timer = setTimeout(() => {
                 setPhase('opening');
                 
                 setTimeout(() => {
                     setPhase('idle');
                 }, 800);
-            }, 300); // 300ms pause on black screen before opening
+            }, 300); // 開く前に黒い画面で300ms一時停止
             
             prevPathname.current = pathname;
             return () => clearTimeout(timer);
@@ -31,7 +31,7 @@ export default function HangarDoorTransition() {
     }
   }, [pathname, phase, setPhase]);
 
-  // Visual state calculation
+  // 視覚状態の計算
   const isClosed = phase === 'closing' || phase === 'closed';
 
   const leftDoorClass = isClosed 
@@ -44,7 +44,7 @@ export default function HangarDoorTransition() {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-100 flex overflow-hidden">
-      {/* Left Door */}
+      {/* 左のドア */}
       <div 
         className={`h-full w-1/2 bg-zinc-900 border-r-4 border-cyan-900 transition-transform duration-700 ease-in-out ${leftDoorClass}`}
         style={{
@@ -57,11 +57,11 @@ export default function HangarDoorTransition() {
             )`
         }}
       >
-        {/* Door detail / handle */}
+        {/* ドアのディテール / ハンドル */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 h-40 w-2 bg-cyan-500 shadow-[0_0_20px_#06b6d4]" />
       </div>
 
-      {/* Right Door */}
+      {/* 右のドア */}
       <div 
         className={`h-full w-1/2 bg-zinc-900 border-l-4 border-fuchsia-900 transition-transform duration-700 ease-in-out ${rightDoorClass}`}
         style={{
@@ -74,14 +74,15 @@ export default function HangarDoorTransition() {
             )`
         }}
       >
-         {/* Door detail / handle */}
+         {/* ドアのディテール / ハンドル */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 h-40 w-2 bg-fuchsia-500 shadow-[0_0_20px_#d946ef]" />
       </div>
       
-       {/* Center Lock Light (Optional enhancement) */}
+       {/* センターロックライト（オプションの拡張） */}
        <div 
          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-64 bg-linear-to-r from-cyan-500 to-fuchsia-500 blur-xl transition-opacity duration-300 ${isClosed ? 'opacity-100' : 'opacity-0'}`} 
        />
     </div>
   );
 }
+

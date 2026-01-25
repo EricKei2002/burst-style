@@ -46,7 +46,7 @@ export default function MouseTrail() {
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
-      // Add a point immediately on move for responsiveness
+      // レスポンス向上のため移動時に即座にポイントを追加
       pointsRef.current.push({
         x: e.clientX,
         y: e.clientY,
@@ -64,29 +64,29 @@ export default function MouseTrail() {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, width, height);
 
-      // Add points continuously if mouse is moving (optional, or just rely on mousemove)
-      // For a trail, we usually just let mousemove add points, but for a "comet" look we might strictly follow.
-      // Let's stick to particles emitted from mouse position.
+      // マウスが動いている間に連続的にポイントを追加します（オプション、またはmousemoveに頼る）。
+      // 軌跡としては、通常mousemoveでポイントを追加するだけで十分ですが、"彗星"のような外観にするなら厳密に追従させるかもしれません。
+      // ここではマウス位置から放出されるパーティクルとします。
 
-      // Update and draw points
-      // Filter out old points
+      // ポイントの更新と描画
+      // 古いポイントを除外
       pointsRef.current = pointsRef.current.filter((p) => p.age < 50);
 
       pointsRef.current.forEach((p) => {
         p.age += 1;
         p.x += p.vx * 0.5;
-        p.y += p.vy * 0.5 + 0.5; // Slight gravity
+        p.y += p.vy * 0.5 + 0.5; // わずかな重力
 
         const alpha = 1 - p.age / 50;
         const size = (1 - p.age / 50) * 3;
         
-        // Color transition: Green to Fuchsia
-        // Green: 34, 197, 94 (approx tw-green-500)
-        // Fuchsia: 217, 70, 239 (approx tw-fuchsia-500)
+        // 色の遷移: 緑からフクシアへ
+        // 緑: 34, 197, 94 (およそ tw-green-500)
+        // フクシア: 217, 70, 239 (およそ tw-fuchsia-500)
         
-        ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`; // Primary Green
+        ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`; // メインの緑
         if (p.age > 20) {
-            ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`; // Fade to Fuchsia
+            ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`; // フクシア色へフェード
         }
 
         ctx.beginPath();

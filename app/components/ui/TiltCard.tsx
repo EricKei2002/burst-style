@@ -24,23 +24,23 @@ export default function TiltCard({
     const el = ref.current;
     if (!el) return;
 
-    // Quick setters for performance
+    // パフォーマンスのためのクイックセッター
     const setX = gsap.quickTo(el, "rotateX", { duration: 0.5, ease: "power2.out" });
     const setY = gsap.quickTo(el, "rotateY", { duration: 0.5, ease: "power2.out" });
     const setScale = gsap.quickTo(el, "scale", { duration: 0.5, ease: "power2.out" });
 
     const handleMouseMove = (e: MouseEvent) => {
       const { left, top, width, height } = el.getBoundingClientRect();
-      const x = (e.clientX - left) / width - 0.5; // -0.5 to 0.5
-      const y = (e.clientY - top) / height - 0.5; // -0.5 to 0.5
+      const x = (e.clientX - left) / width - 0.5; // -0.5 から 0.5
+      const y = (e.clientY - top) / height - 0.5; // -0.5 から 0.5
       
-      // RotateX should be inverted relative to Y position (mouse up -> tilt up/look up -> rotateX positive? No, rotateX negative makes top go back)
-      // Actually standard: mouse top -> tilt top away? or tilt top towards?
-      // "Look at mouse" effect: top part comes closer when mouse is at top? No, usually opposite.
-      // Let's try standard tilt: mouse at top left -> top left corner goes down (away).
+      // RotateXはYの位置に対して反転する必要があります（マウスが上 -> 上向きに傾く/上を見る -> rotateXは正？ いや、rotateXが負だと上が奥に行きます）
+      // 実際には標準：マウスが上 -> 上部が奥へ傾く？ それとも手前に傾く？
+      // "マウスを見る"効果：マウスが上にあるとき、上部が近づく？ いや、通常はその逆です。
+      // 標準的な傾きを試します：マウスが左上 -> 左上隅が下がる（奥へ行く）。
       
-      setY(x * rotationIntensity * 2); // RotateY follows X axis movement
-      setX(-y * rotationIntensity * 2); // RotateX inverse to Y axis movement (mouse down -> rotateX positive -> bottom goes away / top comes close)
+      setY(x * rotationIntensity * 2); // RotateYはX軸の動きに従う
+      setX(-y * rotationIntensity * 2); // RotateXはY軸の動きと逆（マウスダウン -> rotateX正 -> 下が遠ざかる / 上が近づく）
       setScale(scale);
     };
 
@@ -53,7 +53,7 @@ export default function TiltCard({
     el.addEventListener("mousemove", handleMouseMove);
     el.addEventListener("mouseleave", handleMouseLeave);
 
-    // Initial style
+    // 初期スタイル
     gsap.set(el, { transformPerspective: perspective, transformStyle: "preserve-3d" });
 
     return () => {

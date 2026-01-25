@@ -8,17 +8,17 @@ import { TextureLoader } from "three";
 export default function TheSun() {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Using local texture for reliability
+  // 信頼性のためにローカルテクスチャを使用
   const texture = useLoader(TextureLoader, '/sun.jpg');
 
   useFrame((state) => {
     if (meshRef.current) {
-      // Orbit logic: Standardized speed for synchronization
-      const t = state.clock.elapsedTime * 0.2; // Speed
-      const radius = 35; // Orbital radius
+      // 軌道ロジック: 同期のために標準化された速度
+      const t = state.clock.elapsedTime * 0.2; // 速度
+      const radius = 35; // 軌道半径
       
       meshRef.current.position.x = Math.sin(t) * radius;
-      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // Vertical wave
+      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // 垂直波
       meshRef.current.position.z = Math.cos(t) * radius - 20;
       
       meshRef.current.rotation.y += 0.002;

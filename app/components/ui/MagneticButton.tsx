@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 interface MagneticButtonProps {
   children: ReactNode;
   className?: string;
-  strength?: number; // How strong the pull is
+  strength?: number; // 引き寄せる力の強さ
 }
 
 export default function MagneticButton({ children, className = "", strength = 0.5 }: MagneticButtonProps) {
@@ -43,9 +43,9 @@ export default function MagneticButton({ children, className = "", strength = 0.
     };
   }, [strength]);
 
-  // We wrap children in a span/div that gets moved
-  // But wait, usually the button ITSELF moves.
-  // Let's assume the `ref` is the button container.
+  // 子要素をspan/divでラップして動かします
+  // しかし待ってください、通常はボタン *自体* が動きます。
+  // `ref` がボタンコンテナであると仮定しましょう。
   
   return (
     <div ref={ref} className={`inline-block ${className}`}>

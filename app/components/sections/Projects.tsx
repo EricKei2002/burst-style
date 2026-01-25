@@ -22,7 +22,7 @@ export default function Projects() {
     e.preventDefault();
     setPhase('closing');
     
-    // Wait for doors to close (CSS duration is 700ms)
+    // 扉が閉まるのを待ちます（CSSの期間は700ms）
     setTimeout(() => {
         setPhase('closed');
         router.push(url);
@@ -32,14 +32,14 @@ export default function Projects() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // If we are currently in 'opening' phase (returning from project),, skip entrance animation
-    // When returning, the HangarDoorTransition immediately sets phase to 'opening' (or keeps it 'closed' for 300ms then opening)
-    // So 'phase' will likely be non-idle.
+    // 現在 'opening' フェーズ（プロジェクトから戻ってきた場合）にいる場合、エントランスアニメーションをスキップします
+    // 戻る際、HangarDoorTransitionは即座にフェーズを 'opening' に設定します（または300ms間 'closed' のままにしてから開きます）
+    // そのため 'phase' はおそらく非アイドル状態になります。
     const shouldAnimate = phase === 'idle'; 
 
     const ctx = gsap.context(() => {
-      // If we should animate, do the fromTo.
-      // If not, just set them to visible immediately.
+      // アニメーションすべき場合は、fromToを実行します。
+      // そうでない場合は、即座に表示状態にします。
       
       if (shouldAnimate) {
           gsap.fromTo(".project-card",
@@ -58,7 +58,7 @@ export default function Projects() {
             }
           );
       } else {
-          // Immediately visible
+          // 即座に表示
           gsap.set(".project-card", { y: 0, opacity: 1, scale: 1 });
       }
     }, sectionRef);
@@ -70,7 +70,7 @@ export default function Projects() {
     <section id="projects" ref={sectionRef} className="relative w-full py-24 sm:py-32">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 
-        {/* Header */}
+        {/* ヘッダー */}
         <div className="mb-16 max-w-2xl">
           <div className="flex items-center gap-2 text-fuchsia-400 mb-4">
             <span className="h-px w-8 bg-current"></span>
@@ -85,7 +85,7 @@ export default function Projects() {
           </p>
         </div>
 
-        {/* Projects Grid */}
+        {/* プロジェクトグリッド */}
         <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
           {projectsData.map((project) => (
             <MagneticButton key={project.slug} className="h-full" strength={0.2}>
@@ -94,7 +94,7 @@ export default function Projects() {
                   onClick={(e) => handleNavigation(e, `/projects/${project.slug}`)}
                   className="project-card group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 transition-all hover:border-zinc-600 hover:bg-zinc-900/50 h-full cursor-pointer"
                 >
-                  {/* Image Container */}
+                  {/* 画像コンテナ */}
                   <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
                     <div className="absolute inset-0 z-10 bg-zinc-950/20 transition-colors group-hover:bg-transparent" />
                     <Image
@@ -108,7 +108,7 @@ export default function Projects() {
                     />
                   </div>
 
-                  {/* Content */}
+                  {/* コンテンツ */}
                   <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
                     <div>
                       <div className="flex items-center justify-between">
