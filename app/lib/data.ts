@@ -21,49 +21,111 @@ export const projectsData: Project[] = [
     title: "Sontaくん",
     description: "空気を読む、AI日程調整ツール",
     detailedDescription:
-      "「何も言わなくても、良きに計らっておきました」というAIの振る舞いを表現した、日本独特の文化「忖度（そんたく）」から生まれたキャラクタープロジェクト。開発中です。",
+      "「何も言わなくても、良きに計らっておきました」というAIの振る舞いを表現した、日本独特の文化「忖度（そんたく）」から生まれたAI日程調整エージェント。Google Geminiを活用して自然言語の「ふんわりした希望」から制約条件を読み取り、Googleカレンダーの空き状況と照らし合わせて最適な日時を提案します。",
     image: "/sontakun.jpg",
     siteUrl: "https://sontakun.burst.style/",
     githubUrl: "https://github.com/EricKei2002/Sontakun",
     tags: ["Next.js", "AI", "Supabase"],
     techStack: [
-      { name: "Framework: Next.js" },
+      { name: "Framework: Next.js (App Router)" },
+      { name: "Database: Supabase (PostgreSQL)" },
+      { name: "AI: Google Gemini API" },
+      { name: "Integration: Google Calendar / Zoom / Resend" },
       { name: "Styling: Tailwind CSS" },
-      { name: "AI: Context Awareness Logic" },
-      { name: "Status: Under Development" },
     ],
     challenges: [
       {
-        title: "「空気を読む」の定義",
+        title: "自然言語からの曖昧な制約抽出",
         description:
-          "何をもって「空気を読んだ」とするか、その曖昧な基準をアルゴリズムに落とし込むことが最大の挑戦です。文脈解析とユーザーの行動履歴を組み合わせた推論エンジンを設計しています。",
+          "「来週の午後早め」といった曖昧な表現を、Google Gemini APIを用いて具体的な日時範囲（ISO文字列等）に変換する「忖度エンジン」を開発。プロンプトエンジニアリングにより、文脈を汲み取った精度の高い抽出を実現しました。",
       },
       {
-        title: "キャラクターの親しみやすさ",
+        title: "シームレスな外部連携",
         description:
-          "AIの不気味さを消し、頼れる相棒としての「Sontaくん」のビジュアルと口調を作り込んでいます。ユーモアと実用性のバランスを模索中です。",
+          "Google Calendar、Zoom、Resendといった複数の外部サービスをServer Actions内で統合。トークン管理やエラーハンドリングを徹底し、ユーザーが裏側の複雑さを感じることなく、ワンストップで調整が完了する体験を構築しました。",
       },
     ],
     improvements: [
       {
-        title: "マルチモーダル対応",
+        title: "「気遣い」ロジックの強化",
         description:
-          "テキストだけでなく、声のトーンや表情（カメラ入力）からも空気を読めるように進化させる構想があります。",
+          "単なる空き枠ではなく、前後の移動時間や昼休み時間を考慮した「本当に嬉しい提案」ができるよう、アルゴリズムを改良予定です。",
       },
       {
-        title: "学習機能の実装",
+        title: "マルチモーダル・複数人対応",
         description:
-          "ユーザーごとの「好みの計らい方」を学習し、使えば使うほど阿吽の呼吸で動けるパートナーを目指します。",
+          "複数人のカレンダー同期や、チャットボット形式以外でのインターフェース拡充を検討しています。",
       },
     ],
     documentation: {
       architectureMermaid: `graph TD
-    User[ユーザー] -->|曖昧な指示| Sonta[Sontaくん AI]
-    Sonta -->|文脈解析| Context[コンテキストエンジン]
-    Sonta -->|履歴参照| History[行動ログ]
-    Context -->|推論| Action[最適解の提案]
-    Action -->|実行| User
-    style Sonta fill:#0ea5e9,stroke:#0284c7,color:#fff
+    subgraph Client ["クライアントサイド (ブラウザ)"]
+        Browser[ユーザーブラウザ]
+    end
+
+    subgraph Hosting ["Vercel ホスティング"]
+        NextJS["Next.js アプリ (App Router)"]
+        
+        subgraph ServerActions ["サーバーアクション / API"]
+            AuthService["認証サービス"]
+            SontakuEngine["忖度エンジン (空き状況ロジック)"]
+            GeminiClient["Gemini クライアント (制約抽出)"]
+            CalendarService["Google カレンダーサービス"]
+            ZoomService["Zoom サービス"]
+            EmailService["メールサービス (Resend)"]
+        end
+    end
+
+    subgraph Database ["データベース (Supabase)"]
+        SupabaseAuth["Supabase 認証"]
+        Postgres["PostgreSQL データベース"]
+        
+        Tables[("テーブル:
+        - interviews
+        - interview_tokens
+        - availabilities")]
+    end
+
+    subgraph External ["外部サービス"]
+        GoogleGemini["Google Gemini API"]
+        GoogleCal["Google Calendar API"]
+        GoogleMeet["Google Meet API"]
+        ZoomAPI["Zoom API"]
+        ResendAPI["Resend API"]
+    end
+
+    %% フロー
+    Browser -->|HTTPS| NextJS
+    NextJS -->|Server Actions| ServerActions
+    
+    AuthService --> SupabaseAuth
+    
+    SontakuEngine -->|空き状況取得| CalendarService
+    SontakuEngine -->|制約抽出| GeminiClient
+    GeminiClient -->|プロンプト: 自然言語| GoogleGemini
+    GoogleGemini -->|JSON: 制約データ| GeminiClient
+    
+    CalendarService -->|イベント読み書き| GoogleCal
+    GoogleCal -.->|会議リンク生成| GoogleMeet
+    
+    ZoomService -->|ミーティング作成| ZoomAPI
+    EmailService -->|通知送信| ResendAPI
+    
+    ServerActions -->|データ読み書き| Postgres
+    Postgres --- Tables
+
+    %% スタイル定義 (クラス)
+    classDef primary fill:#2563eb,stroke:#1d4ed8,color:#fff;
+    classDef secondary fill:#4b5563,stroke:#374151,color:#fff;
+    classDef external fill:#10b981,stroke:#059669,color:#fff;
+    classDef db fill:#f59e0b,stroke:#d97706,color:#fff;
+
+    class NextJS,SontakuEngine primary;
+    class GeminiClient,CalendarService,ZoomService,EmailService secondary;
+    class GoogleGemini,GoogleCal,GoogleMeet,ZoomAPI,ResendAPI external;
+    class Postgres,SupabaseAuth,Tables db;
+
+
 `,
     },
   },
