@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useMemo } from 'react';
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
+import { SiWantedly } from "react-icons/si";
 import styles from './ProfileCard.module.css';
 
 const DEFAULT_INNER_GRADIENT = 'linear-gradient(145deg, #18181b 0%, #27272a 100%)';
@@ -255,14 +256,26 @@ export default function ProfileCard({
                   <span className="bg-zinc-800/50 px-2 py-1 rounded text-xs text-green-300 border border-green-500/20">Python</span>
                 </div>
                 
-                <a 
-                  href="https://github.com/EricKei2002" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 hover:bg-zinc-800/50 text-zinc-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-zinc-700 w-fit"
-                >
-                  <FaGithub className="text-xl" />
-                </a>
+                <div className="mt-4 flex gap-2">
+                  <a 
+                    href="https://github.com/EricKei2002" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 hover:bg-zinc-800/50 text-zinc-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-zinc-700 w-fit"
+                    aria-label="GitHub"
+                  >
+                    <FaGithub className="text-xl" />
+                  </a>
+                  <a 
+                    href="https://www.wantedly.com/id/eric0216" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 hover:bg-zinc-800/50 text-zinc-400 hover:text-white rounded-lg transition-colors border border-transparent hover:border-zinc-700 w-fit"
+                    aria-label="Wantedly"
+                  >
+                    <SiWantedly className="text-xl" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>

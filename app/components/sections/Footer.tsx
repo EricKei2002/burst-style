@@ -1,6 +1,7 @@
 "use client";
 
 import { FaGithub } from "react-icons/fa";
+import { SiWantedly } from "react-icons/si";
 
 import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
@@ -50,7 +51,18 @@ export default function Footer() {
                         <FaGithub size={20} />
                     </a>
                 </MagneticButton>
-
+                
+                <MagneticButton strength={0.2}>
+                    <a 
+                        href="https://www.wantedly.com/id/eric0216" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-zinc-400 hover:text-white transition-colors p-2"
+                        aria-label="Wantedly"
+                    >
+                        <SiWantedly size={20} />
+                    </a>
+                </MagneticButton>
             </div>
 
             <div className="h-8 w-px bg-zinc-800 mx-2 hidden sm:block"></div>
