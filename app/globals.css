@@ -130,22 +130,8 @@ body {
   );
 }
 
-@keyframes loading-bar {
-  0% {
-    width: 0%;
-  }
-  100% {
-    width: 100%;
-  }
-}
 
-/* LCP改善：モバイルではプリローダーをCSS側で初期非表示（JS実行を待たない）
-   これによりHTML解析時点でプリローダーがLCPの対象外になる
-   同時に .title-char の opacity を1にしてh1テキストを即座に表示 */
 @media (max-width: 767px) {
-  .preloader {
-    display: none !important;
-  }
   /* GSAPのopacity:0アニメーションをバイパスしてLCP改善 */
   .title-char,
   .char,

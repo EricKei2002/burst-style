@@ -36,8 +36,7 @@ export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const mainTlRef = useRef<gsap.core.Timeline | null>(null);
-  const [loaderText, setLoaderText] = useState("INITIALIZING SYSTEM...");
-  const [isPreloaderVisible, setIsPreloaderVisible] = useState(true);
+
 
   const flashRef = useRef<HTMLDivElement>(null);
 
@@ -56,8 +55,8 @@ export default function Hero() {
   }, [isWarping, setIsWarping]);
   
   const { contextSafe } = useGSAP(() => {
-    // メインコンテンツのアニメーションタイムライン（最初は一時停止）
-    const tl = gsap.timeline({ paused: true });
+    // プリローダー削除後：メインアニメーションを即座に再生
+    const tl = gsap.timeline();
     
     tl.to(".title-char", {
       opacity: 1,
@@ -100,96 +99,7 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, []);
 
-  // ブートシーケンス
-  useEffect(() => {
-    // このセッションですでにブートしているか確認
-    const hasBooted = sessionStorage.getItem("burst_booted");
-    
-    if (hasBooted) {
-        // シーケンスをスキップ
-        gsap.set(".preloader", { display: "none" });
-        // setTimeout(0)でsetStateをエフェクトの外に出してカスケードレンダリングを防ぐ
-        setTimeout(() => setIsPreloaderVisible(false), 0);
-        mainTlRef.current?.play();
-        return;
-    }
 
-    let isMounted = true;
-    
-    const sequence = async () => {
-        // ボット検知
-        const isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
-        // モバイルデバイスではプリローダーを完全スキップ→LCP改善
-        const isMobile = window.innerWidth < 768;
-        if (isMobile || isBot) {
-            gsap.set(".preloader", { display: "none" });
-            setTimeout(() => setIsPreloaderVisible(false), 0);
-            mainTlRef.current?.play();
-            sessionStorage.setItem("burst_booted", "true");
-            return;
-        }
-        // デスクトップは演出を維持しつつ短縮（合計500ms → Speed Index改善）
-        const d1 = 150;
-        const d2 = 150;
-        const d3 = 200;
-
-        // ステップ 1: 初期化中（設定済み）
-        await new Promise(r => setTimeout(r, d1));
-        if (!isMounted) return;
-
-        // ステップ 2: モジュールの読み込み
-        setLoaderText("LOADING MODULES...");
-        await new Promise(r => setTimeout(r, d2));
-        if (!isMounted) return;
-
-        // ステップ 3: アクセス許可
-        setLoaderText("BURST SYSTEM ONLINE");
-        
-        
-        await new Promise(r => setTimeout(r, d3));
-        if (!isMounted) return;
-
-        // ステップ 4: フェードアウトしてメインを開始
-        const flash = flashRef.current;
-        if (flash) {
-            gsap.to(flash, { 
-                opacity: 1, 
-                duration: isBot ? 0 : 0.1, 
-                yoyo: true, 
-                repeat: 1,
-                onStart: () => {
-                     // フラッシュ開始時にワープ開始
-                     if(isMounted) setIsWarping(true);
-                },
-                onComplete: () => {
-                    // フラッシュ終了後、少し待ってからワープ停止（残光効果）
-                     setTimeout(() => {
-                        if(isMounted) setIsWarping(false);
-                     }, isBot ? 0 : 1000); 
-                }
-            });
-        }
-
-        gsap.to(".preloader", {
-            opacity: 0,
-            duration: isBot ? 0 : 0.8,
-            ease: "power2.inOut",
-            onComplete: () => {
-                if (isMounted) {
-                    gsap.set(".preloader", { display: "none" });
-                    setIsPreloaderVisible(false);
-                    mainTlRef.current?.play();
-                    // ブート済みとしてマーク
-                    sessionStorage.setItem("burst_booted", "true");
-                }
-            }
-        });
-    };
-
-    sequence();
-    
-    return () => { isMounted = false; };
-  }, [setIsWarping]);
 
   const showDescription = contextSafe(() => {
     const tl = gsap.timeline();
@@ -249,37 +159,6 @@ export default function Hero() {
       </div>
 
       <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
-      
-      {/* プリローダーオーバーレイ（システムブート）
-          モバイル(max-width:767px)ではCSSメディアクエリで初期非表示 — LCP改善
-          （JS実行を待たず、HTML解析時点で非表示になりLCPの対象外になる）
-      */}
-      <div
-        className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait"
-        aria-hidden={!isPreloaderVisible}
-        aria-live="assertive"
-        aria-label="システムを起動中"
-      >
-        <div className="flex flex-col items-center gap-4">
-             {/* 回転/パルスアイコン */}
-            <div className="h-12 w-12 rounded-full border-2 border-green-500/20 border-t-green-500 animate-spin"></div>
-            
-            <div className="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-green-500 tracking-wider text-center min-w-[300px]">
-                <span className="mr-2">&gt;</span>
-                <DecryptedText 
-                    text={loaderText} 
-                    speed={50} 
-                    maxIterations={20}
-                    className="inline-block"
-                />
-                <span className="animate-pulse ml-1">_</span>
-            </div>
-            
-            <div className="mt-8 w-64 h-1 bg-zinc-800 overflow-hidden rounded-full">
-                <div className="h-full bg-green-500 animate-[loading-bar_3s_ease-in-out_forwards] w-0"></div>
-            </div>
-        </div>
-      </div>
 
       {/* 前景のテキストコンテンツ */}
       <div className="container relative z-10 mx-auto px-6">
