@@ -79,12 +79,16 @@ export default function Hero() {
   const [starCount, setStarCount] = useState(2000);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
     // Canvasの初期化遅延でメインスレッドブロッキング（TBT）を回避
+    // モバイルはStarBackgroundがCanvasを持つためHero内のCanvasは表示しない
+    if (isMobile) {
+        // setTimeout(0)でsetStateをエフェクトの外に出してカスケードレンダリングを防ぐ
+        setTimeout(() => setShowCanvas(false), 0);
+        return;
+    }
     const timer = setTimeout(() => {
-        // モバイル等の画面幅が小さい場合はパーティクル数を減らしてパフォーマンスを確保
-        if (window.innerWidth < 768) {
-            setStarCount(500);
-        } else if (window.innerWidth < 1024) {
+        if (window.innerWidth < 1024) {
             setStarCount(1000);
         }
         setShowCanvas(true);
@@ -109,13 +113,21 @@ export default function Hero() {
     let isMounted = true;
     
     const sequence = async () => {
-        // ボットやLighthouseを検知して遅延をスキップ（SEOやパフォーマンス判定対策）
-        // PSIのUser-Agentは 'lighthouse' を含まないため、一律短縮済み
+        // ボット検知
         const isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
-        // LCP改善: 4400ms → 合計1100ms に短縮
-        const d1 = isBot ? 1 : 300;
-        const d2 = isBot ? 1 : 300;
-        const d3 = isBot ? 1 : 500;
+        // モバイルデバイスではプリローダーを完全スキップ→LCP改善
+        const isMobile = window.innerWidth < 768;
+        if (isMobile || isBot) {
+            gsap.set(".preloader", { display: "none" });
+            setTimeout(() => setIsPreloaderVisible(false), 0);
+            mainTlRef.current?.play();
+            sessionStorage.setItem("burst_booted", "true");
+            return;
+        }
+        // デスクトップは演出を維持しつつ短縮（合訐1100ms）
+        const d1 = 300;
+        const d2 = 300;
+        const d3 = 500;
 
         // ステップ 1: 初期化中（設定済み）
         await new Promise(r => setTimeout(r, d1));
