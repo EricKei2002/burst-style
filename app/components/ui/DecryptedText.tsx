@@ -95,9 +95,8 @@ export default function DecryptedText({
       className={className}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      aria-label={ariaLabel ?? text}
-      aria-live="off"
     >
+      <span className="sr-only">{ariaLabel ?? text}</span>
       <span aria-hidden="true">{displayText}</span>
     </span>
   );

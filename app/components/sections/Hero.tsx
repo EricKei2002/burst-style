@@ -195,8 +195,8 @@ export default function Hero() {
   }, [showDescription]);
 
   return (
-    <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
-      <header className="absolute inset-x-0 top-0 z-20">
+    <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col overflow-hidden">
+      <header className="sticky inset-x-0 top-0 z-30 border-b border-white/10 bg-black/75 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
           <a
             href="#top"
@@ -218,90 +218,92 @@ export default function Hero() {
           </nav>
         </div>
       </header>
-      
-      {/* 背景の星 */}
-      <div ref={canvasHostRef} className="absolute inset-0 z-0">
-         {showCanvas && canRender3D && isHeroInView && (
-           <HeroCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
-         )}
-      </div>
 
-      <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
-
-      {/* 前景のテキストコンテンツ */}
-      <div className="container relative z-10 mx-auto px-6">
-        <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
-          
-          <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
-            <div className="flex items-center justify-center">
-              <span className="font-mono text-fuchsia-400 mr-2">&gt;</span>
-              <SplitText charClassName="title-char">Hello, I&apos;m</SplitText>
-            </div>
-            <div className="flex items-center justify-center">
-              <div className="font-mono pb-2 title-char inline-block">
-                <GlitchText text="Eric Kei." />
-              </div>
-              <span className="animate-pulse font-mono text-fuchsia-400 ml-1 pb-2">_</span>
-            </div>
-          </h1>
-          
-          <div className="max-w-3xl w-full px-4 mt-8 text-left">
-            <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
-               &gt; ESTABLISHING CONNECTION...<br />
-               &gt; What is Burst Style ? 
-              <MagneticButton className="ml-2 inline-block">
-                 {/* アクセシビリティのためspanからbuttonに変更 */}
-                 <button
-                   type="button"
-                   onClick={showDescription}
-                   className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block font-mono text-xs"
-                   aria-label="詳細を表示する"
-                 >
-                   /Enter
-                 </button>
-               </MagneticButton>
-            </div>
-            <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
-              <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
-              <br className="hidden sm:block" />
-              <SplitText charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
-            </p>
-
-            {/* コマンドプロンプトエリア */}
-            <div className="font-mono text-green-500 text-sm sm:text-base">
-              <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
-                <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-400">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-400">~ &gt;</span></span>
-                <SplitText charClassName="ls-char">ls</SplitText>
-              </div>
-             <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">
-                 <MagneticButton>
-                    <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
-                        <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />
-                    </a>
-                 </MagneticButton>
-                 <MagneticButton>
-                    <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
-                        <DecryptedText text="/About Me" animateOnHover speed={30} className="font-bold" />
-                    </a>
-                 </MagneticButton>
-                 <MagneticButton>
-                    <a href="#contact" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
-                        <DecryptedText text="/Contact" animateOnHover speed={30} className="font-bold" />
-                    </a>
-                 </MagneticButton>
-              </div>
-            </div>
-          </div>
-
+      <div className="relative flex flex-1 flex-col items-center justify-center">
+        {/* 背景の星 */}
+        <div ref={canvasHostRef} className="absolute inset-0 z-0">
+          {showCanvas && canRender3D && isHeroInView && (
+            <HeroCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
+          )}
         </div>
-      </div>
 
-      {/* テックカルーセル（全幅） */}
-      <div className="w-full mt-16 relative z-10">
-        <h2 className="text-center font-mono text-xl md:text-2xl text-green-500 mb-8 opacity-0 tech-carousel-title">
-          &gt; My Skills
-        </h2>
-        <TechCarousel />
+        <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
+
+        {/* 前景のテキストコンテンツ */}
+        <div className="container relative z-10 mx-auto px-6">
+          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+            
+            <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
+              <div className="flex items-center justify-center">
+                <span className="font-mono text-fuchsia-400 mr-2">&gt;</span>
+                <SplitText charClassName="title-char">Hello, I&apos;m</SplitText>
+              </div>
+              <div className="flex items-center justify-center">
+                <div className="font-mono pb-2 title-char inline-block">
+                  <GlitchText text="Eric Kei." />
+                </div>
+                <span className="animate-pulse font-mono text-fuchsia-400 ml-1 pb-2">_</span>
+              </div>
+            </h1>
+            
+            <div className="max-w-3xl w-full px-4 mt-8 text-left">
+              <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
+                &gt; ESTABLISHING CONNECTION...<br />
+                &gt; What is Burst Style ? 
+                <MagneticButton className="ml-2 inline-block">
+                  {/* アクセシビリティのためspanからbuttonに変更 */}
+                  <button
+                    type="button"
+                    onClick={showDescription}
+                    className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block font-mono text-xs"
+                    aria-label="詳細を表示する"
+                  >
+                    /Enter
+                  </button>
+                </MagneticButton>
+              </div>
+              <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
+                <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
+                <br className="hidden sm:block" />
+                <SplitText charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
+              </p>
+
+              {/* コマンドプロンプトエリア */}
+              <div className="font-mono text-green-500 text-sm sm:text-base">
+                <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
+                  <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-400">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-400">~ &gt;</span></span>
+                  <SplitText charClassName="ls-char">ls</SplitText>
+                </div>
+                <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">
+                  <MagneticButton>
+                      <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                          <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />
+                      </a>
+                  </MagneticButton>
+                  <MagneticButton>
+                      <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                          <DecryptedText text="/About Me" animateOnHover speed={30} className="font-bold" />
+                      </a>
+                  </MagneticButton>
+                  <MagneticButton>
+                      <a href="#contact" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                          <DecryptedText text="/Contact" animateOnHover speed={30} className="font-bold" />
+                      </a>
+                  </MagneticButton>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* テックカルーセル（全幅） */}
+        <div className="w-full mt-16 relative z-10">
+          <h2 className="text-center font-mono text-xl md:text-2xl text-green-500 mb-8 opacity-0 tech-carousel-title">
+            &gt; My Skills
+          </h2>
+          <TechCarousel />
+        </div>
       </div>
 
     </section>
