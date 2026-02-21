@@ -88,13 +88,21 @@ body {
 }
 
 @keyframes scroll-left {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes scroll-right {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .animate-scroll-left {
@@ -106,11 +114,42 @@ body {
 }
 
 .fade-mask {
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
 }
 
 @keyframes loading-bar {
-  0% { width: 0%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* LCP改善：モバイルではプリローダーをCSS側で初期非表示（JS実行を待たない）
+   これによりHTML解析時点でプリローダーがLCPの対象外になる
+   同時に .title-char の opacity を1にしてh1テキストを即座に表示 */
+@media (max-width: 767px) {
+  .preloader {
+    display: none !important;
+  }
+  .title-char {
+    opacity: 1 !important;
+  }
+  .loading-text {
+    opacity: 1 !important;
+  }
 }

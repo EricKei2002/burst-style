@@ -253,7 +253,10 @@ export default function Hero() {
 
       <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
       
-      {/* プリローダーオーバーレイ（システムブート）。表示中は裏コンテンツをスクリーンリーダーから隠す */}
+      {/* プリローダーオーバーレイ（システムブート）
+          モバイル(max-width:767px)ではCSSメディアクエリで初期非表示 — LCP改善
+          （JS実行を待たず、HTML解析時点で非表示になりLCPの対象外になる）
+      */}
       <div
         className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait"
         aria-hidden={!isPreloaderVisible}
