@@ -27,7 +27,7 @@ export default function TheSun() {
 
   return (
     <mesh ref={meshRef} position={[25, 10, -30]}>
-      <sphereGeometry args={[4, 64, 64]} />
+      <sphereGeometry args={[4, 32, 32]} />
       <meshStandardMaterial 
         map={texture}
         emissiveMap={texture}

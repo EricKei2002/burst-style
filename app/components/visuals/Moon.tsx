@@ -27,7 +27,7 @@ export default function Moon() {
 
   return (
     <mesh ref={meshRef} position={[-25, -5, -20]}>
-      <sphereGeometry args={[2.5, 64, 64]} />
+      <sphereGeometry args={[2.5, 32, 32]} />
       <meshStandardMaterial 
         map={texture}
         emissiveMap={texture}

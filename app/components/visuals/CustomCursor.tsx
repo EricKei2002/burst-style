@@ -14,7 +14,6 @@ export default function CustomCursor() {
     const mql = window.matchMedia("(pointer: coarse)");
     const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
     
-    // 初期値を設定
     setTimeout(() => setIsTouch(mql.matches), 0);
     
     mql.addEventListener("change", onChange);
@@ -28,58 +27,43 @@ export default function CustomCursor() {
     
     if (!cursor || !follower) return;
     
-    // 初期位置は画面外
     gsap.set(cursor, { xPercent: -50, yPercent: -50, opacity: 0 });
     gsap.set(follower, { xPercent: -50, yPercent: -50, opacity: 0 });
 
     const handleMouseMove = (e: MouseEvent) => {
-      // 初期ロード時の不透明度を改善
       gsap.to([cursor, follower], { opacity: 1, duration: 0.2 });
-
-      // カーソルは即座に移動
       gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0 });
-      
-      // フォロワーは遅延して移動
       gsap.to(follower, { x: e.clientX, y: e.clientY, duration: 0.15 });
     };
 
-    const handleHoverStart = () => setIsHovering(true);
-    const handleHoverEnd = () => setIsHovering(false);
+    // イベント委譲：MutationObserver + querySelectorAll を除去しパフォーマンス向上
+    // document全体で1つのmouseover/mouseoutリスナーだけで済む
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a, button, .trigger-btn, input, textarea")) {
+        setIsHovering(true);
+      }
+    };
+    const handleMouseOut = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("a, button, .trigger-btn, input, textarea")) {
+        setIsHovering(false);
+      }
+    };
 
     window.addEventListener("mousemove", handleMouseMove);
-    
-    // ホバーターゲットのリスナーを追加
-    const hoverTargets = document.querySelectorAll("a, button, .trigger-btn, input, textarea");
-    hoverTargets.forEach((el) => {
-      el.addEventListener("mouseenter", handleHoverStart);
-      el.addEventListener("mouseleave", handleHoverEnd);
-    });
-
-    // 動的要素のオブザーバー
-    const observer = new MutationObserver(() => {
-        const newTargets = document.querySelectorAll("a, button, .trigger-btn, input, textarea");
-        newTargets.forEach((el) => {
-            el.removeEventListener("mouseenter", handleHoverStart);
-            el.removeEventListener("mouseleave", handleHoverEnd);
-            el.addEventListener("mouseenter", handleHoverStart);
-            el.addEventListener("mouseleave", handleHoverEnd);
-        });
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseout", handleMouseOut);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      hoverTargets.forEach((el) => {
-         el.removeEventListener("mouseenter", handleHoverStart);
-         el.removeEventListener("mouseleave", handleHoverEnd);
-      });
-      observer.disconnect();
+      document.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseout", handleMouseOut);
     };
   }, [isTouch]);
 
   useEffect(() => {
     if (isTouch) return;
-    // ホバー状態に基づいてカーソルのスケールをアニメーション
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     

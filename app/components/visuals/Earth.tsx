@@ -27,7 +27,7 @@ export default function Earth() {
 
   return (
     <mesh ref={meshRef} position={[40, -10, -40]}>
-      <sphereGeometry args={[3, 64, 64]} />
+      <sphereGeometry args={[3, 32, 32]} />
       <meshStandardMaterial 
         map={texture}
         emissiveMap={texture}
