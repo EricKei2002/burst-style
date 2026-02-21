@@ -87,7 +87,8 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
   return (
     <>
       <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-        <sphereGeometry args={[0.1, 8, 8]} />{/* 星用の小さな球体 */}
+        {/* パフォーマンス改善のため、ポリゴン数の多いsphereからoctahedron(8面体)に変更 */}
+        <octahedronGeometry args={[0.1, 0]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.8} />
       </instancedMesh>
     </>

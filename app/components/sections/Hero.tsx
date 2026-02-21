@@ -75,10 +75,19 @@ export default function Hero() {
   }, { scope: containerRef });
 
   const [showCanvas, setShowCanvas] = useState(false);
+  const [starCount, setStarCount] = useState(2000);
 
   useEffect(() => {
     // Canvasの初期化遅延でメインスレッドブロッキング（TBT）を回避
-    const timer = setTimeout(() => setShowCanvas(true), 500);
+    const timer = setTimeout(() => {
+        // モバイル等の画面幅が小さい場合はパーティクル数を減らしてパフォーマンスを確保
+        if (window.innerWidth < 768) {
+            setStarCount(500);
+        } else if (window.innerWidth < 1024) {
+            setStarCount(1000);
+        }
+        setShowCanvas(true);
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -213,9 +222,13 @@ export default function Hero() {
       {/* 背景の星 */}
       <div className="absolute inset-0 z-0">
          {showCanvas && (
-           <Canvas camera={{ position: [0, 0, 50], fov: 75 }} gl={{ antialias: false }}>
+           <Canvas 
+              camera={{ position: [0, 0, 50], fov: 75 }} 
+              gl={{ antialias: false, powerPreference: "high-performance" }}
+              dpr={[1, 1.5]}
+           >
               <fog attach="fog" args={['#000', 0, 100]} />
-              <WarpStars isWarping={isWarping} />
+              <WarpStars isWarping={isWarping} count={starCount} />
            </Canvas>
          )}
       </div>
