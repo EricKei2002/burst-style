@@ -9,8 +9,12 @@ import TechCarousel from "../ui/TechCarousel";
 import DecryptedText from "../ui/DecryptedText";
 import GlitchText from "../ui/GlitchText";
 import MagneticButton from "../ui/MagneticButton";
-import WarpStars from "../visuals/WarpStars";
-import { Canvas } from "@react-three/fiber";
+import dynamic from "next/dynamic";
+
+// Three.jsのバンドルパースを初期ロードから完全に切り離す
+// モバイルではshowCanvas=falseなのでThree.jsが一切読み込まれない
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) as React.ComponentType<{ isWarping: boolean; starCount: number }>;
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -240,14 +244,7 @@ export default function Hero() {
       {/* 背景の星 */}
       <div className="absolute inset-0 z-0">
          {showCanvas && (
-           <Canvas 
-              camera={{ position: [0, 0, 50], fov: 75 }} 
-              gl={{ antialias: false, powerPreference: "high-performance" }}
-              dpr={[1, 1.5]}
-           >
-              <fog attach="fog" args={['#000', 0, 100]} />
-              <WarpStars isWarping={isWarping} count={starCount} />
-           </Canvas>
+           <HeroCanvas isWarping={isWarping} starCount={starCount} />
          )}
       </div>
 

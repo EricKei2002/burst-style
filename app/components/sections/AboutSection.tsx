@@ -672,7 +672,9 @@ export default function AboutSection() {
                             muted
                             playsInline
                             className="h-full w-full object-contain"
-                          />
+                          >
+                            <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
+                          </video>
                         </div>
                       ))}
                     </div>

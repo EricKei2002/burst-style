@@ -46,7 +46,7 @@ export default function Footer() {
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-zinc-400 hover:text-white transition-colors p-2"
-                        aria-label="GitHub"
+                        aria-label="Eric KeiのGitHubプロフィール"
                     >
                         <FaGithub size={20} />
                     </a>
@@ -58,7 +58,7 @@ export default function Footer() {
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-zinc-400 hover:text-white transition-colors p-2"
-                        aria-label="Wantedly"
+                        aria-label="Eric KeiのWantedlyプロフィール"
                     >
                         <SiWantedly size={20} />
                     </a>
