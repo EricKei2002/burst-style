@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useMemo, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,7 +14,11 @@ import dynamic from "next/dynamic";
 // Three.jsのバンドルパースを初期ロードから完全に切り離す
 // モバイルではshowCanvas=falseなのでThree.jsが一切読み込まれない
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) as React.ComponentType<{ isWarping: boolean; starCount: number }>;
+const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) as React.ComponentType<{
+  isWarping: boolean;
+  starCount: number;
+  qualityTier: "high" | "mid" | "low";
+}>;
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -34,6 +38,7 @@ const SplitText = ({ children, className = "", charClassName = "" }: { children:
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
+  const canvasHostRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const mainTlRef = useRef<gsap.core.Timeline | null>(null);
 
@@ -79,25 +84,64 @@ export default function Hero() {
   }, { scope: containerRef });
 
   const [showCanvas, setShowCanvas] = useState(false);
-  const [starCount, setStarCount] = useState(2000);
+  const [isHeroInView, setIsHeroInView] = useState(false);
+  const [deviceProfile] = useState(() => {
+    if (typeof window === "undefined") {
+      return { canRender3D: false, qualityTier: "low" as const };
+    }
+
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.innerWidth < 768;
+    const saveData = connection?.saveData ?? false;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cpuCores = navigator.hardwareConcurrency ?? 8;
+    const lowSpec = deviceMemory <= 4 || cpuCores <= 4;
+    const canRender3D = !(isMobile || reducedMotion || saveData);
+
+    return {
+      canRender3D,
+      qualityTier: canRender3D ? (lowSpec ? "mid" : "high") : ("low" as const),
+    };
+  });
+
+  const canRender3D = deviceProfile.canRender3D;
+  const qualityTier = deviceProfile.qualityTier;
+
+  const starCount = useMemo(() => {
+    if (qualityTier === "high") return 1400;
+    if (qualityTier === "mid") return 900;
+    return 500;
+  }, [qualityTier]);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    // Canvasの初期化遅延でメインスレッドブロッキング（TBT）を回避
-    // モバイルはStarBackgroundがCanvasを持つためHero内のCanvasは表示しない
-    if (isMobile) {
-        // setTimeout(0)でsetStateをエフェクトの外に出してカスケードレンダリングを防ぐ
-        setTimeout(() => setShowCanvas(false), 0);
-        return;
-    }
-    const timer = setTimeout(() => {
-        if (window.innerWidth < 1024) {
-            setStarCount(1000);
-        }
-        setShowCanvas(true);
-    }, 500);
-    return () => clearTimeout(timer);
+    const target = canvasHostRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroInView(entry.isIntersecting);
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (!canRender3D || !isHeroInView || showCanvas) return;
+
+    const activate = () => setShowCanvas(true);
+
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+
+    const timer = window.setTimeout(activate, 900);
+    return () => window.clearTimeout(timer);
+  }, [canRender3D, isHeroInView, showCanvas]);
 
 
 
@@ -140,6 +184,8 @@ export default function Hero() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && ["INPUT", "TEXTAREA", "BUTTON", "SELECT", "A"].includes(target.tagName)) return;
       if (e.key === "Enter") {
         showDescription();
       }
@@ -149,23 +195,24 @@ export default function Hero() {
   }, [showDescription]);
 
   return (
-    <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
+    <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
       <header className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
           <a
-            href="#"
+            href="#top"
+            aria-label="ページトップへ移動"
             className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:text-fuchsia-400"
           >
             Burst Style
           </a>
           <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-wider text-zinc-400">
-            <a href="#projects" className="transition-colors hover:text-fuchsia-400">
+            <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-400">
               Projects
             </a>
-            <a href="#about" className="transition-colors hover:text-fuchsia-400">
+            <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-400">
               About
             </a>
-            <a href="#contact" className="transition-colors hover:text-fuchsia-400">
+            <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-400">
               Contact
             </a>
           </nav>
@@ -173,9 +220,9 @@ export default function Hero() {
       </header>
       
       {/* 背景の星 */}
-      <div className="absolute inset-0 z-0">
-         {showCanvas && (
-           <HeroCanvas isWarping={isWarping} starCount={starCount} />
+      <div ref={canvasHostRef} className="absolute inset-0 z-0">
+         {showCanvas && canRender3D && isHeroInView && (
+           <HeroCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
          )}
       </div>
 

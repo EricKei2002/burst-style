@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -31,19 +31,17 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
   const targetSpeed = useRef(0.05);
 
   // geometry と material を useRef で管理してuseFrame内書き換えのlintを回避
-  const geoRef = useRef<THREE.BufferGeometry | null>(null);
-  const matRef = useRef<THREE.ShaderMaterial | null>(null);
-
-  if (!geoRef.current) {
+  const geometry = useMemo(() => {
     const { positions, speeds } = createStarData(count);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute("aSpeed",   new THREE.BufferAttribute(speeds, 1));
-    geoRef.current = geo;
-  }
+    geo.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+    return geo;
+  }, [count]);
 
-  if (!matRef.current) {
-    matRef.current = new THREE.ShaderMaterial({
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
       uniforms: {
         uOffset:  { value: 0 },   // 累積ベース移動距離（currentSpeedの積分）
         uFrames:  { value: 0 },   // 累積フレーム数（per-particle speedの積分）
@@ -71,13 +69,19 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
         }
       `,
       transparent: true,
-    });
-  }
+    }),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
 
   // 毎フレーム更新するのは3つのuniformと速度補間のみ（O(1)）
   useFrame((_, delta) => {
-    if (!matRef.current) return;
-
     targetSpeed.current = isWarping ? 8.0 : 0.05;
     currentSpeed.current = THREE.MathUtils.lerp(
       currentSpeed.current,
@@ -85,8 +89,9 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
       delta * 2
     );
 
-    const mat = matRef.current;
+    const mat = material;
     // 累積ベース移動距離（フレーム単位換算）
+    // eslint-disable-next-line react-hooks/immutability
     mat.uniforms.uOffset.value  += currentSpeed.current;
     // 累積フレーム数（per-particle speed計算用）
     mat.uniforms.uFrames.value  += 1;
@@ -98,10 +103,5 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
     );
   });
 
-  return (
-    <points
-      geometry={geoRef.current}
-      material={matRef.current}
-    />
-  );
+  return <points geometry={geometry} material={material} />;
 }

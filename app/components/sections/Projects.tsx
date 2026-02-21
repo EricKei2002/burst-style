@@ -18,8 +18,7 @@ export default function Projects() {
   const router = useRouter();
   const { setPhase, phase } = useTransitionStore();
 
-  const handleNavigation = (e: React.MouseEvent, url: string) => {
-    e.preventDefault();
+  const handleNavigation = (url: string) => {
     setPhase('closing');
     
     // 扉が閉まるのを待ちます（CSSの期間は700ms）
@@ -90,9 +89,11 @@ export default function Projects() {
           {projectsData.map((project) => (
             <MagneticButton key={project.slug} className="h-full" strength={0.2}>
               <TiltCard className="h-full" rotationIntensity={5}>
-                <div
-                  onClick={(e) => handleNavigation(e, `/projects/${project.slug}`)}
-                  className="project-card group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 transition-all hover:border-zinc-600 hover:bg-zinc-900/50 h-full cursor-pointer"
+                <button
+                  type="button"
+                  onClick={() => handleNavigation(`/projects/${project.slug}`)}
+                  aria-label={`${project.title} の詳細を見る`}
+                  className="project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none"
                 >
                   {/* 画像コンテナ */}
                   <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
@@ -133,7 +134,7 @@ export default function Projects() {
                       ))}
                     </div>
                   </div>
-                </div>
+                </button>
               </TiltCard>
             </MagneticButton>
           ))}

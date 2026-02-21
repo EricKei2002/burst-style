@@ -32,20 +32,51 @@ export default function ClientVisuals() {
     const isMobile = window.innerWidth < 768;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ?? false;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    const saveData = connection?.saveData ?? false;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cpuCores = navigator.hardwareConcurrency ?? 8;
+    const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const shouldSkipVisuals = reducedMotion || saveData;
+    const allowStars = !isMobile && !shouldSkipVisuals && !isLowSpec;
 
     const handlePointerMove = () => {
       setConfig((prev) => ({ ...prev, showPointerFx: true }));
       window.removeEventListener("pointermove", handlePointerMove);
     };
 
+    const waitInitialInteraction = (callback: () => void) => {
+      const done = () => {
+        window.removeEventListener("pointerdown", done);
+        window.removeEventListener("scroll", done);
+        window.removeEventListener("keydown", done);
+        callback();
+      };
+
+      window.addEventListener("pointerdown", done, { once: true, passive: true });
+      window.addEventListener("scroll", done, { once: true, passive: true });
+      window.addEventListener("keydown", done, { once: true });
+
+      return () => {
+        window.removeEventListener("pointerdown", done);
+        window.removeEventListener("scroll", done);
+        window.removeEventListener("keydown", done);
+      };
+    };
+
+    let cleanupInitialInteraction: (() => void) | null = null;
+
     const activate = () => {
       setConfig({
         ready: true,
-        showStars: !isMobile && !shouldSkipVisuals,
+        showStars: false,
         showPointerFx: false,
       });
+      if (allowStars) {
+        cleanupInitialInteraction = waitInitialInteraction(() => {
+          setConfig((prev) => ({ ...prev, showStars: true }));
+        });
+      }
       if (canHover && !shouldSkipVisuals) {
         window.addEventListener("pointermove", handlePointerMove, { once: true });
       }
@@ -57,6 +88,7 @@ export default function ClientVisuals() {
       return () => {
         window.cancelIdleCallback(id);
         window.removeEventListener("pointermove", handlePointerMove);
+        cleanupInitialInteraction?.();
       };
     }
 
@@ -64,6 +96,7 @@ export default function ClientVisuals() {
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointermove", handlePointerMove);
+      cleanupInitialInteraction?.();
     };
   }, []);
 

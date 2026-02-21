@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "../ui/DecryptedText";
 import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
-import { Turnstile } from '@marsidev/react-turnstile';
+
+const Turnstile = dynamic(
+  () => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile),
+  { ssr: false }
+);
 
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -15,6 +20,7 @@ export default function ContactSection() {
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [isTurnstileReady, setIsTurnstileReady] = useState(false);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -56,10 +62,28 @@ export default function ContactSection() {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const target = sectionRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsTurnstileReady(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!turnstileToken) {
-        setErrorMessage("ERROR: SECURITY CHECK FAILED.");
+        setErrorMessage("SECURITY CHECK NOT READY. CAPTCHAの読み込み完了後に再試行してください。");
         return;
     }
 
@@ -170,14 +194,22 @@ export default function ContactSection() {
                             </div>
 
                             <div className="flex flex-col items-center gap-4 pt-2">
-                                <Turnstile 
-                                    siteKey="0x4AAAAAACMEdoY3D-U7Ag2L"
-                                    onSuccess={setTurnstileToken}
-                                    options={{
-                                        theme: 'dark',
-                                        action: 'contact-form',
-                                    }}
-                                />
+                                {isTurnstileReady ? (
+                                    <Turnstile 
+                                        siteKey="0x4AAAAAACMEdoY3D-U7Ag2L"
+                                        onSuccess={setTurnstileToken}
+                                        onExpire={() => setTurnstileToken(null)}
+                                        onError={() => setTurnstileToken(null)}
+                                        options={{
+                                            theme: "dark",
+                                            action: "contact-form",
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-400">
+                                        SECURITY CHECK LOADING...
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex flex-col items-end gap-4 pt-4">

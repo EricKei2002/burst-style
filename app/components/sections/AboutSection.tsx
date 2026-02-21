@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -75,6 +75,85 @@ const ServerSpecs = () => (
     </div>
   </div>
 );
+
+const VIDEO_POSTERS: Record<string, string> = {
+  "/videos/pc-build.mp4": "/images/hardware/parts.jpg",
+  "/videos/north_america.mp4": "/images/pandemic/us_flag.jpg",
+  "/videos/snowboard.mp4": "/images/resort/hakuba.jpg",
+};
+
+function TimelineVideoCard({
+  src,
+  title,
+  videoKey,
+  isActive,
+  onPlay,
+  onUnmount,
+}: {
+  src: string;
+  title: string;
+  videoKey: string;
+  isActive: boolean;
+  onPlay: (key: string) => void;
+  onUnmount: () => void;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const posterSrc = VIDEO_POSTERS[src] ?? "/icon.jpg";
+
+  useEffect(() => {
+    if (!isActive) return;
+    const target = cardRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) onUnmount();
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [isActive, onUnmount]);
+
+  return (
+    <div ref={cardRef} className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
+      {!isActive ? (
+        <>
+          <Image
+            src={posterSrc}
+            alt={`${title} video poster`}
+            fill
+            className="object-cover opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+            sizes="(max-width: 768px) 50vw, 300px"
+          />
+          <button
+            type="button"
+            onClick={() => onPlay(videoKey)}
+            className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/20 focus-visible:outline-none"
+            aria-label={`${title} の動画を再生`}
+          >
+            <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/60 bg-black/70 px-4 py-2 font-mono text-xs text-fuchsia-300">
+              ▶ Play Video
+            </span>
+          </button>
+        </>
+      ) : (
+        <video
+          src={src}
+          controls
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          className="h-full w-full object-contain"
+        >
+          <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
+        </video>
+      )}
+    </div>
+  );
+}
 
 const timeline: TimelineItem[] = [
   {
@@ -467,7 +546,8 @@ const timeline: TimelineItem[] = [
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [isProfessional, setIsProfessional] = React.useState(false);
+  const [isProfessional, setIsProfessional] = useState(false);
+  const [activeVideoKey, setActiveVideoKey] = useState<string | null>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -681,21 +761,20 @@ export default function AboutSection() {
                           />
                         </div>
                       ))}
-                      {item.videos?.map((src, i) => (
-                        <div key={`vid-${i}`} className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
-                          <video
+                      {item.videos?.map((src, i) => {
+                        const videoKey = `${index}-${i}`;
+                        return (
+                          <TimelineVideoCard
+                            key={`vid-${i}`}
                             src={src}
-                            controls
-                            loop
-                            muted
-                            playsInline
-                            preload="none"
-                            className="h-full w-full object-contain"
-                          >
-                            <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
-                          </video>
-                        </div>
-                      ))}
+                            title={item.title}
+                            videoKey={videoKey}
+                            isActive={activeVideoKey === videoKey}
+                            onPlay={setActiveVideoKey}
+                            onUnmount={() => setActiveVideoKey((prev) => (prev === videoKey ? null : prev))}
+                          />
+                        );
+                      })}
                     </div>
                   )}
 

@@ -1,15 +1,22 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function SpaceshipInterior() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const pathname = usePathname();
+  const isProjectPage = pathname.startsWith("/projects/");
 
   useEffect(() => {
     if (videoRef.current) {
         videoRef.current.playbackRate = 1.0;
     }
   }, []);
+
+  if (!isProjectPage) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden">

@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { usePathname } from "next/navigation";
-import { useState, Suspense } from "react";
 
 // Components
 import TheSun from "./TheSun";
@@ -30,21 +29,17 @@ function createStarData(count: number) {
 // JSループを廃止し、GLSLシェーダーでGPU側でパーティクル位置を計算
 // これにより4000パーティクル分のメインスレッド負荷をほぼゼロにする
 function WarpStars({ count = 4000 }: { count?: number }) {
-  // geometry と material を useRef で管理してuseFrame内書き換えのlintを回避
-  const geoRef = useRef<THREE.BufferGeometry | null>(null);
-  const matRef = useRef<THREE.ShaderMaterial | null>(null);
-  const pointsRef = useRef<THREE.Points>(null);
-
-  if (!geoRef.current) {
+  const geometry = useMemo(() => {
     const { positions, speeds } = createStarData(count);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute("aSpeed",   new THREE.BufferAttribute(speeds, 1));
-    geoRef.current = geo;
-  }
+    geo.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+    return geo;
+  }, [count]);
 
-  if (!matRef.current) {
-    matRef.current = new THREE.ShaderMaterial({
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 } },
       // GPU側で全パーティクルのZ位置を計算（JSループ不要）
       vertexShader: `
@@ -64,29 +59,34 @@ function WarpStars({ count = 4000 }: { count?: number }) {
         }
       `,
       transparent: true,
-    });
-  }
+    }),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
 
   // 毎フレームuTime（累積秒数）をインクリメントするだけ — O(1)
   useFrame((_, delta) => {
-    if (matRef.current) {
-      matRef.current.uniforms.uTime.value += delta;
-    }
+    // eslint-disable-next-line react-hooks/immutability
+    material.uniforms.uTime.value += delta;
   });
 
-  return (
-    <points
-      ref={pointsRef}
-      geometry={geoRef.current}
-      material={matRef.current}
-    />
-  );
+  return <points geometry={geometry} material={material} />;
 }
 
 
 export default function StarBackground() {
   const pathname = usePathname();
   const isProjectPage = pathname.startsWith("/projects/");
+  const observerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasInteraction, setHasInteraction] = useState(false);
 
   // モバイルは非表示: Heroセクションに独自のCanvasがあるため二重稼働を防ぐ
   const [isMobile] = useState(() => {
@@ -96,37 +96,85 @@ export default function StarBackground() {
 
   // パーティクル数をデバイスに応じて調整
   const [starCount] = useState(() => {
-    if (typeof window === "undefined") return 4000;
-    if (window.innerWidth < 1024) return 2000;
-    return 4000;
+    if (typeof window === "undefined") return 1200;
+
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cpuCores = navigator.hardwareConcurrency ?? 8;
+
+    if (deviceMemory <= 2 || cpuCores <= 2) return 0;
+    if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 1200;
+    return 2000;
   });
+
+  useEffect(() => {
+    const target = observerRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const onInteraction = () => setHasInteraction(true);
+
+    window.addEventListener("pointerdown", onInteraction, { once: true, passive: true });
+    window.addEventListener("scroll", onInteraction, { once: true, passive: true });
+    window.addEventListener("keydown", onInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", onInteraction);
+      window.removeEventListener("scroll", onInteraction);
+      window.removeEventListener("keydown", onInteraction);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || !hasInteraction || isMobile || starCount === 0) return;
+
+    const activate = () => setIsReady(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 2500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = window.setTimeout(activate, 1200);
+    return () => window.clearTimeout(timer);
+  }, [hasInteraction, isMobile, isVisible, starCount]);
 
   if (isProjectPage) {
     return <SpaceshipInterior />;
   }
 
   // モバイルは背景Canvasを描画しない（パフォーマンス向上）
-  if (isMobile) {
+  if (isMobile || starCount === 0) {
     return <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true" />;
   }
 
   return (
-    <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true">
-      <Canvas
-        camera={{ position: [0, 0, 1] }}
-        gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
-        dpr={[1, 1.5]}
-      >
-        <ambientLight intensity={0.1} />
-        <Suspense fallback={null}>
-          <TheSun />
-          <Moon />
-          <Earth />
-        </Suspense>
+    <div ref={observerRef} className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true">
+      {isReady && (
+        <Canvas
+          camera={{ position: [0, 0, 1] }}
+          gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
+          dpr={[1, 1.4]}
+        >
+          <ambientLight intensity={0.1} />
+          <Suspense fallback={null}>
+            <TheSun />
+            <Moon />
+            <Earth />
+          </Suspense>
 
-        <WarpStars count={starCount} />
-        <ShootingStars />
-      </Canvas>
+          <WarpStars count={starCount} />
+          <ShootingStars />
+        </Canvas>
+      )}
     </div>
   );
 }
