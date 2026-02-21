@@ -7,7 +7,7 @@ import MagneticButton from "../ui/MagneticButton";
 import dynamic from "next/dynamic";
 
 // Three.jsのバンドルパースを初期ロードから完全に切り離す
-// モバイルではshowCanvas=falseなのでThree.jsが一切読み込まれない
+// モバイルは低負荷条件を満たす端末だけ描画を有効化する
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) as React.ComponentType<{
   isWarping: boolean;
@@ -94,7 +94,7 @@ export default function Hero() {
   const [isHeroInView, setIsHeroInView] = useState(false);
   const [deviceProfile] = useState(() => {
     if (typeof window === "undefined") {
-      return { canRender3D: false, qualityTier: "low" as const };
+      return { canRender3D: false, qualityTier: "low" as const, isMobile3D: false };
     }
 
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -103,23 +103,28 @@ export default function Hero() {
     const saveData = connection?.saveData ?? false;
     const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
-    const lowSpec = deviceMemory <= 4 || cpuCores <= 4;
-    const canRender3D = !(isMobile || reducedMotion || saveData);
+    const veryLowSpec = deviceMemory <= 2 || cpuCores <= 2;
+    const lowSpec = deviceMemory <= 4 || cpuCores <= 4 || isMobile;
+    const isMobile3D = isMobile && !reducedMotion && !saveData && !veryLowSpec;
+    const canRender3D = !reducedMotion && !saveData && !veryLowSpec && (!isMobile || isMobile3D);
 
     return {
       canRender3D,
+      isMobile3D,
       qualityTier: canRender3D ? (lowSpec ? "mid" as const : "high" as const) : ("low" as const),
     };
   });
 
   const canRender3D = deviceProfile.canRender3D;
+  const isMobile3D = deviceProfile.isMobile3D;
   const qualityTier = deviceProfile.qualityTier;
 
   const starCount = useMemo(() => {
+    if (isMobile3D) return 220;
     if (qualityTier === "high") return 1400;
     if (qualityTier === "mid") return 900;
     return 500;
-  }, [qualityTier]);
+  }, [isMobile3D, qualityTier]);
 
   useEffect(() => {
     const target = canvasHostRef.current;
@@ -274,7 +279,11 @@ export default function Hero() {
 
         {/* テックカルーセル（全幅） */}
         <div className="w-full mt-16 relative z-10">
-          <h2 className={`text-center font-mono text-xl md:text-2xl text-green-300 mb-8 tech-carousel-title transition-opacity duration-500 ${skillsVisible ? "opacity-100" : "opacity-0"}`}>
+          <h2
+            className={`mx-auto mb-8 inline-flex rounded-lg border border-green-200/30 bg-black/70 px-4 py-2 text-center font-mono text-xl text-green-100 tech-carousel-title transition-opacity duration-500 md:text-2xl ${
+              skillsVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
             &gt; My Skills
           </h2>
           {showTechCarousel ? <TechCarousel /> : <div className="h-[320px]" aria-hidden="true" />}
