@@ -24,6 +24,13 @@ export default function ContactSection() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (reducedMotion || isMobile) {
+      gsap.set(".contact-header", { y: 0, opacity: 1 });
+      gsap.set(".contact-form", { y: 0, opacity: 1, scale: 1 });
+      return;
+    }
 
     const ctx = gsap.context(() => {
       // ヘッダーアニメーション

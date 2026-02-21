@@ -551,6 +551,14 @@ export default function AboutSection() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (reducedMotion || isMobile) {
+      gsap.set(".about-header", { y: 0, opacity: 1 });
+      gsap.set(".about-card", { y: 0, opacity: 1 });
+      gsap.set(".bg-grid", { yPercent: 0 });
+      return;
+    }
 
     const ctx = gsap.context(() => {
       // 背景パララックス

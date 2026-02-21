@@ -105,6 +105,12 @@ export default function StarBackground() {
     if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 1200;
     return 2000;
   });
+  const [showCelestialBodies] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const cpuCores = navigator.hardwareConcurrency ?? 8;
+    return window.innerWidth >= 1280 && deviceMemory > 4 && cpuCores > 4;
+  });
 
   useEffect(() => {
     const target = observerRef.current;
@@ -165,11 +171,13 @@ export default function StarBackground() {
           dpr={[1, 1.4]}
         >
           <ambientLight intensity={0.1} />
-          <Suspense fallback={null}>
-            <TheSun />
-            <Moon />
-            <Earth />
-          </Suspense>
+          {showCelestialBodies && (
+            <Suspense fallback={null}>
+              <TheSun />
+              <Moon />
+              <Earth />
+            </Suspense>
+          )}
 
           <WarpStars count={starCount} />
           <ShootingStars />

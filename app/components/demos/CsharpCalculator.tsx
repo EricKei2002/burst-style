@@ -102,7 +102,7 @@ export default function CsharpCalculator() {
              onClick={() => setViewMode("design")}
              aria-pressed={viewMode === "design"}
              aria-label="電卓プレビュー表示に切り替え"
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
            >
              Design
            </button>
@@ -111,7 +111,7 @@ export default function CsharpCalculator() {
              onClick={() => setViewMode("source")}
              aria-pressed={viewMode === "source"}
              aria-label="C#ソース表示に切り替え"
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
+             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
            >
              Source
            </button>

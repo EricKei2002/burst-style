@@ -30,6 +30,12 @@ export default function Projects() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    if (reducedMotion || isMobile) {
+      gsap.set(".project-card", { y: 0, opacity: 1, scale: 1 });
+      return;
+    }
 
     // 現在 'opening' フェーズ（プロジェクトから戻ってきた場合）にいる場合、エントランスアニメーションをスキップします
     // 戻る際、HangarDoorTransitionは即座にフェーズを 'opening' に設定します（または300ms間 'closed' のままにしてから開きます）
