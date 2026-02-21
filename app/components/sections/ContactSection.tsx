@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "../ui/DecryptedText";
 import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
@@ -16,6 +14,7 @@ const Turnstile = dynamic(
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,59 +22,18 @@ export default function ContactSection() {
   const [isTurnstileReady, setIsTurnstileReady] = useState(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (reducedMotion || isMobile) {
-      gsap.set(".contact-header", { y: 0, opacity: 1 });
-      gsap.set(".contact-form", { y: 0, opacity: 1, scale: 1 });
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      // ヘッダーアニメーション
-      gsap.fromTo(".contact-header",
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-          }
-        }
-      );
-
-      // フォームアニメーション
-      gsap.fromTo(".contact-form",
-        { y: 50, opacity: 0, scale: 0.95 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 1,
-          ease: "power3.out",
-          delay: 0.2,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%",
-          }
-        }
-      );
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
-
-  useEffect(() => {
     const target = sectionRef.current;
     if (!target) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) {
+      setIsVisible(true);
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          setIsVisible(true);
           setIsTurnstileReady(true);
           observer.disconnect();
         }
@@ -129,7 +87,11 @@ export default function ContactSection() {
        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         
         {/* ヘッダー */}
-        <div className="contact-header mb-16 max-w-2xl">
+        <div
+          className={`mb-16 max-w-2xl transition-all duration-700 ease-out ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
+          }`}
+        >
           <div className="flex items-center gap-2 text-fuchsia-300 mb-4">
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">03. Contact</span>
@@ -137,14 +99,18 @@ export default function ContactSection() {
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             <DecryptedText text="Get In Touch" animateOnHover speed={30} />
           </h2>
-          <p className="text-zinc-300 leading-relaxed">
+          <p className="text-zinc-200 leading-relaxed">
             新しいプロジェクト、コラボレーション、またはカジュアルな挨拶まで。<br />
             『Burst Style』への通信回線は常に開かれています。
           </p>
         </div>
 
         {/* お問い合わせフォームエリア */}
-        <div className="contact-form relative mx-auto max-w-3xl">
+        <div
+          className={`relative mx-auto max-w-3xl transition-all duration-700 ease-out ${
+            isVisible ? "translate-y-0 scale-100 opacity-100" : "translate-y-10 scale-[0.98] opacity-0"
+          }`}
+        >
             <TiltCard rotationIntensity={2} className="w-full">
                 <div className="relative w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 sm:p-12 overflow-hidden backdrop-blur-sm">
                     {/* 背景装飾 */}
@@ -221,7 +187,7 @@ export default function ContactSection() {
 
                             <div className="flex flex-col items-end gap-4 pt-4">
                                 {errorMessage && (
-                                    <p className="font-mono text-xs text-red-500 tracking-wider animate-pulse">
+                                    <p className="font-mono text-xs text-red-300 tracking-wider animate-pulse">
                                         &gt; {errorMessage}
                                     </p>
                                 )}
@@ -247,7 +213,7 @@ export default function ContactSection() {
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                              </div>
                              <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Transmission Complete</h3>
-                             <p className="text-zinc-300 max-w-md leading-relaxed">
+                             <p className="text-zinc-200 max-w-md leading-relaxed">
                                  お問い合わせありがとうございます。<br/>
                                  送信されたデータは正常に受信されました。<br/>
                                  確認次第、折り返しご連絡いたします。

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
 const ContactSection = dynamic(() => import("./ContactSection"), { ssr: false });
@@ -9,34 +9,30 @@ const Footer = dynamic(() => import("./Footer"), { ssr: false });
 
 export default function DeferredHomeSections() {
   const [enabled, setEnabled] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (enabled) return;
+    const target = triggerRef.current;
+    if (!target) return;
 
-    const activate = () => setEnabled(true);
-    const onFirstScroll = () => {
-      window.removeEventListener("scroll", onFirstScroll);
-      activate();
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setEnabled(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "450px 0px 450px 0px", threshold: 0.01 }
+    );
 
-    window.addEventListener("scroll", onFirstScroll, { once: true, passive: true });
-
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 2500 });
-      return () => {
-        window.cancelIdleCallback(id);
-        window.removeEventListener("scroll", onFirstScroll);
-      };
-    }
-
-    const timer = setTimeout(activate, 1800);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", onFirstScroll);
-    };
+    observer.observe(target);
+    return () => observer.disconnect();
   }, [enabled]);
 
-  if (!enabled) return null;
+  if (!enabled) {
+    return <div ref={triggerRef} className="h-px w-full" aria-hidden="true" />;
+  }
 
   return (
     <>

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
-import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../lib/data";
@@ -66,7 +65,7 @@ export default function Projects() {
             <span className="font-mono text-xs font-semibold tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
-            <DecryptedText text="Projects" animateOnHover speed={30} />
+            Projects
           </h2>
           <p className="text-zinc-100 leading-relaxed">
             既成概念を打ち砕き、記憶に残る体験を。<br />
@@ -106,21 +105,21 @@ export default function Projects() {
                     <div>
                       <div className="flex items-center justify-between">
                         <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-300 transition-colors">
-                          <DecryptedText text={project.title} animateOnHover speed={40} />
+                          {project.title}
                         </h3>
                         <span className="rounded-full border border-zinc-700 bg-zinc-800 p-2 text-zinc-200 transition group-hover:border-fuchsia-500/50 group-hover:text-fuchsia-300">
                            {/* 装飾用のsvgはスクリーンリーダーに読ませない */}
                            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </span>
                       </div>
-                      <p className="mt-4 text-sm leading-relaxed text-zinc-300">
-                        <DecryptedText text={project.description} animateOnHover speed={10} maxIterations={5} />
+                      <p className="mt-4 text-sm leading-relaxed text-zinc-200">
+                        {project.description}
                       </p>
                     </div>
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
-                        <span key={tag} className="text-xs font-mono text-fuchsia-300">
+                        <span key={tag} className="text-xs font-mono text-fuchsia-200">
                           #{tag}
                         </span>
                       ))}

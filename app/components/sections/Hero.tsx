@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useEffect, useMemo, useState } from "react";
 import { useTransitionStore } from "../../lib/store";
-import TechCarousel from "../ui/TechCarousel";
 import DecryptedText from "../ui/DecryptedText";
 import MagneticButton from "../ui/MagneticButton";
 import dynamic from "next/dynamic";
@@ -19,6 +18,9 @@ const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) 
 const GlitchText = dynamic(() => import("../ui/GlitchText"), {
   ssr: false,
   loading: () => <span>Eric Kei.</span>,
+});
+const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
+  ssr: false,
 });
 
 const SplitText = ({
@@ -52,6 +54,7 @@ export default function Hero() {
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [promptVisible, setPromptVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
+  const [showTechCarousel, setShowTechCarousel] = useState(false);
 
   // グローバルストアのワープ状態を使用
   const { isWarping, setIsWarping } = useTransitionStore();
@@ -75,6 +78,17 @@ export default function Hero() {
       clearTimeout(t2);
     };
   }, []);
+
+  useEffect(() => {
+    if (!skillsVisible || showTechCarousel) return;
+    const activate = () => setShowTechCarousel(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 2200 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(activate, 900);
+    return () => clearTimeout(timer);
+  }, [showTechCarousel, skillsVisible]);
 
   const [showCanvas, setShowCanvas] = useState(false);
   const [isHeroInView, setIsHeroInView] = useState(false);
@@ -263,7 +277,7 @@ export default function Hero() {
           <h2 className={`text-center font-mono text-xl md:text-2xl text-green-300 mb-8 tech-carousel-title transition-opacity duration-500 ${skillsVisible ? "opacity-100" : "opacity-0"}`}>
             &gt; My Skills
           </h2>
-          <TechCarousel />
+          {showTechCarousel ? <TechCarousel /> : <div className="h-[320px]" aria-hidden="true" />}
         </div>
       </div>
 

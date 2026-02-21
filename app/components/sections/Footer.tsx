@@ -23,7 +23,7 @@ export default function Footer() {
                 <span className="text-fuchsia-500">&gt;</span>
                 <span>ERIC KEI</span>
            </div>
-           <p className="text-xs text-zinc-400 font-mono">
+           <p className="text-xs text-zinc-200 font-mono">
              <DecryptedText text={`© ${currentYear} Burst Style. All rights reserved.`} animateOnHover speed={50} />
            </p>
         </div>
@@ -34,7 +34,7 @@ export default function Footer() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </span>
-            <span className="text-[10px] font-mono text-zinc-400 tracking-wider">SYSTEM STATUS: ONLINE</span>
+            <span className="text-[10px] font-mono text-zinc-200 tracking-wider">SYSTEM STATUS: ONLINE</span>
         </div>
 
         {/* 右側: ソーシャルリンク & トップへ戻る */}
@@ -45,7 +45,7 @@ export default function Footer() {
                         href="https://github.com/EricKei2002" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2"
+                        className="text-zinc-200 hover:text-white transition-colors p-2"
                         aria-label="Eric KeiのGitHubプロフィール"
                     >
                         <FaGithub size={20} />
@@ -57,7 +57,7 @@ export default function Footer() {
                         href="https://www.wantedly.com/id/eric0216" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-white transition-colors p-2"
+                        className="text-zinc-200 hover:text-white transition-colors p-2"
                         aria-label="Eric KeiのWantedlyプロフィール"
                     >
                         <SiWantedly size={20} />
@@ -70,7 +70,7 @@ export default function Footer() {
             <MagneticButton strength={0.2}>
                 <button 
                     onClick={scrollToTop}
-                    className="group flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-fuchsia-400 transition-colors uppercase tracking-wider"
+                    className="group flex items-center gap-2 text-xs font-mono text-zinc-200 hover:text-fuchsia-200 transition-colors uppercase tracking-wider"
                 >
                     Top
                     <svg 
