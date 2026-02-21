@@ -4,13 +4,19 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
 
+// 初期遅延をコンポーネント外で生成（lintルール準拠）
+let nextDelay = 0;
+function getInitialDelay() {
+  return ++nextDelay * 2; // 各インスタンスが時間差でスポーン
+}
+
 // useRefのみ使用し、setStateを完全排除してReactの再レンダリングを防ぐ
 const ShootingStar = () => {
   const meshRef = useRef<THREE.Mesh>(null);
   const activeRef = useRef(false);
   const startPos = useRef(new THREE.Vector3());
   const velocity = useRef(new THREE.Vector3());
-  const delayRef = useRef(Math.random() * 10);
+  const delayRef = useRef(getInitialDelay());
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
