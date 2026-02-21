@@ -2,9 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useRef, useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
 import TiltCard from "../ui/TiltCard";
@@ -17,6 +15,7 @@ export default function Projects() {
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const { setPhase, phase } = useTransitionStore();
+  const [isVisible, setIsVisible] = useState(false);
 
   const handleNavigation = (url: string) => {
     setPhase('closing');
@@ -29,47 +28,32 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const target = sectionRef.current;
+    if (!target) return;
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (reducedMotion || isMobile) {
-      gsap.set(".project-card", { y: 0, opacity: 1, scale: 1 });
+    if (reducedMotion || phase !== "idle") {
+      const timer = setTimeout(() => setIsVisible(true), 0);
+      return () => clearTimeout(timer);
+    }
+
+    if (isVisible) {
       return;
     }
 
-    // 現在 'opening' フェーズ（プロジェクトから戻ってきた場合）にいる場合、エントランスアニメーションをスキップします
-    // 戻る際、HangarDoorTransitionは即座にフェーズを 'opening' に設定します（または300ms間 'closed' のままにしてから開きます）
-    // そのため 'phase' はおそらく非アイドル状態になります。
-    const shouldAnimate = phase === 'idle'; 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
 
-    const ctx = gsap.context(() => {
-      // アニメーションすべき場合は、fromToを実行します。
-      // そうでない場合は、即座に表示状態にします。
-      
-      if (shouldAnimate) {
-          gsap.fromTo(".project-card",
-            { y: 50, opacity: 0, scale: 0.95 },
-            {
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              duration: 1.2,
-              ease: "power3.out",
-              stagger: 0.2,
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: "top 75%",
-              }
-            }
-          );
-      } else {
-          // 即座に表示
-          gsap.set(".project-card", { y: 0, opacity: 1, scale: 1 });
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, [phase]);
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [phase, isVisible]);
 
   return (
     <section id="projects" ref={sectionRef} className="relative w-full py-24 sm:py-32">
@@ -77,14 +61,14 @@ export default function Projects() {
 
         {/* ヘッダー */}
         <div className="mb-16 max-w-2xl">
-          <div className="flex items-center gap-2 text-fuchsia-400 mb-4">
+          <div className="flex items-center gap-2 text-fuchsia-300 mb-4">
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             <DecryptedText text="Projects" animateOnHover speed={30} />
           </h2>
-          <p className="text-zinc-400 leading-relaxed">
+          <p className="text-zinc-300 leading-relaxed">
             既成概念を打ち砕き、記憶に残る体験を。<br />
             デザインと技術を融合した『Burst Style』の実践。
           </p>
@@ -99,7 +83,9 @@ export default function Projects() {
                   type="button"
                   onClick={() => handleNavigation(`/projects/${project.slug}`)}
                   aria-label={`${project.title} の詳細を見る`}
-                  className="project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none"
+                  className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none ${
+                    isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-[0.98]"
+                  }`}
                 >
                   {/* 画像コンテナ */}
                   <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
@@ -119,22 +105,22 @@ export default function Projects() {
                   <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
                     <div>
                       <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-400 transition-colors">
+                        <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-300 transition-colors">
                           <DecryptedText text={project.title} animateOnHover speed={40} />
                         </h3>
-                        <span className="rounded-full border border-zinc-700 bg-zinc-800 p-2 text-zinc-400 transition group-hover:border-fuchsia-500/50 group-hover:text-fuchsia-400">
+                        <span className="rounded-full border border-zinc-700 bg-zinc-800 p-2 text-zinc-200 transition group-hover:border-fuchsia-500/50 group-hover:text-fuchsia-300">
                            {/* 装飾用のsvgはスクリーンリーダーに読ませない */}
                            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </span>
                       </div>
-                      <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                      <p className="mt-4 text-sm leading-relaxed text-zinc-300">
                         <DecryptedText text={project.description} animateOnHover speed={10} maxIterations={5} />
                       </p>
                     </div>
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
-                        <span key={tag} className="text-xs font-mono text-fuchsia-500/80">
+                        <span key={tag} className="text-xs font-mono text-fuchsia-300">
                           #{tag}
                         </span>
                       ))}

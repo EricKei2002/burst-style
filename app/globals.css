@@ -8,8 +8,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,6 +36,14 @@ body {
 
 .text-zinc-600 {
   color: rgb(161 161 170) !important;
+}
+
+.text-green-500 {
+  color: rgb(134 239 172) !important;
+}
+
+.text-fuchsia-400 {
+  color: rgb(240 171 252) !important;
 }
 
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {

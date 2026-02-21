@@ -130,14 +130,14 @@ export default function ContactSection() {
         
         {/* ヘッダー */}
         <div className="contact-header mb-16 max-w-2xl">
-          <div className="flex items-center gap-2 text-fuchsia-400 mb-4">
+          <div className="flex items-center gap-2 text-fuchsia-300 mb-4">
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">03. Contact</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             <DecryptedText text="Get In Touch" animateOnHover speed={30} />
           </h2>
-          <p className="text-zinc-400 leading-relaxed">
+          <p className="text-zinc-300 leading-relaxed">
             新しいプロジェクト、コラボレーション、またはカジュアルな挨拶まで。<br />
             『Burst Style』への通信回線は常に開かれています。
           </p>
@@ -159,7 +159,7 @@ export default function ContactSection() {
                         <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-6">
                             <div className="grid gap-6 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <label htmlFor="name" className="text-xs font-mono text-fuchsia-400 ml-1">
+                                    <label htmlFor="name" className="text-xs font-mono text-fuchsia-300 ml-1">
                                         <DecryptedText text="NAME / お名前" animateOnHover speed={20} />
                                     </label>
                                     <input 
@@ -172,7 +172,7 @@ export default function ContactSection() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="email" className="text-xs font-mono text-fuchsia-400 ml-1">
+                                    <label htmlFor="email" className="text-xs font-mono text-fuchsia-300 ml-1">
                                         <DecryptedText text="EMAIL / メールアドレス" animateOnHover speed={20} />
                                     </label>
                                     <input 
@@ -187,7 +187,7 @@ export default function ContactSection() {
                             </div>
                             
                             <div className="space-y-2">
-                                <label htmlFor="message" className="text-xs font-mono text-fuchsia-400 ml-1">
+                                <label htmlFor="message" className="text-xs font-mono text-fuchsia-300 ml-1">
                                     <DecryptedText text="MESSAGE / 本文" animateOnHover speed={20} />
                                 </label>
                                 <textarea 
@@ -213,7 +213,7 @@ export default function ContactSection() {
                                         }}
                                     />
                                 ) : (
-                                    <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-400">
+                                    <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-200">
                                         SECURITY CHECK LOADING...
                                     </div>
                                 )}
@@ -243,18 +243,18 @@ export default function ContactSection() {
                         </form>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-500">
-                             <div className="w-16 h-16 bg-fuchsia-500/20 text-fuchsia-400 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                             <div className="w-16 h-16 bg-fuchsia-500/30 text-fuchsia-200 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                              </div>
                              <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">Transmission Complete</h3>
-                             <p className="text-zinc-400 max-w-md leading-relaxed">
+                             <p className="text-zinc-300 max-w-md leading-relaxed">
                                  お問い合わせありがとうございます。<br/>
                                  送信されたデータは正常に受信されました。<br/>
                                  確認次第、折り返しご連絡いたします。
                              </p>
                              <button 
                                 onClick={() => setIsSent(false)}
-                                className="mt-8 text-sm text-fuchsia-400 hover:text-fuchsia-300 underline underline-offset-4 font-mono uppercase tracking-wider"
+                                className="mt-8 text-sm text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4 font-mono uppercase tracking-wider"
                              >
                                 &lt; Send another message
                              </button>

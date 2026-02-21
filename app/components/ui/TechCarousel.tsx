@@ -35,21 +35,21 @@ export default function TechCarousel() {
         {techStack.map((tech, index) => (
           <div key={`first-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-400 group-hover:text-white transition-colors">{tech.name}</span>
+             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
           </div>
         ))}
         {/* 2つ目のセット（ループ用の複製） */}
         {techStack.map((tech, index) => (
           <div key={`second-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-400 group-hover:text-white transition-colors">{tech.name}</span>
+             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
           </div>
         ))}
         {/* 3つ目のセット（ワイドスクリーン用の予備） */}
         {techStack.map((tech, index) => (
           <div key={`third-${index}`} className="flex items-center gap-6 group">
              <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-400 group-hover:text-white transition-colors">{tech.name}</span>
+             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
           </div>
         ))}
       </div>

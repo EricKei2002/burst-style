@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
@@ -44,7 +41,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={`min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased ${jetbrainsMono.variable} font-mono`}>
+      <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
         <HangarDoorTransition />
         <SmoothScroll>

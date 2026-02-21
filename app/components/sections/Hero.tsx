@@ -1,13 +1,9 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useState } from "react";
-import { gsap } from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useCallback, useRef, useEffect, useMemo, useState } from "react";
 import { useTransitionStore } from "../../lib/store";
 import TechCarousel from "../ui/TechCarousel";
 import DecryptedText from "../ui/DecryptedText";
-import GlitchText from "../ui/GlitchText";
 import MagneticButton from "../ui/MagneticButton";
 import dynamic from "next/dynamic";
 
@@ -20,15 +16,26 @@ const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) 
   qualityTier: "high" | "mid" | "low";
 }>;
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+const GlitchText = dynamic(() => import("../ui/GlitchText"), {
+  ssr: false,
+  loading: () => <span>Eric Kei.</span>,
+});
 
-const SplitText = ({ children, className = "", charClassName = "" }: { children: string; className?: string; charClassName?: string }) => {
+const SplitText = ({
+  children,
+  className = "",
+  charClassName = "",
+  revealed = false,
+}: {
+  children: string;
+  className?: string;
+  charClassName?: string;
+  revealed?: boolean;
+}) => {
   return (
     <span className={`${className}`}>
       {children.split("").map((char, i) => (
-        <span key={i} className={`char inline-block opacity-0 ${charClassName}`}>
+        <span key={i} className={`char inline-block transition-opacity duration-300 ${revealed ? "opacity-100" : "opacity-0"} ${charClassName}`}>
           {char === " " ? "\u00A0" : char}
         </span>
       ))}
@@ -40,10 +47,11 @@ export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
-  const mainTlRef = useRef<gsap.core.Timeline | null>(null);
-
-
   const flashRef = useRef<HTMLDivElement>(null);
+  const [introVisible, setIntroVisible] = useState(false);
+  const [descriptionVisible, setDescriptionVisible] = useState(false);
+  const [promptVisible, setPromptVisible] = useState(false);
+  const [skillsVisible, setSkillsVisible] = useState(false);
 
   // グローバルストアのワープ状態を使用
   const { isWarping, setIsWarping } = useTransitionStore();
@@ -59,29 +67,14 @@ export default function Hero() {
     }
   }, [isWarping, setIsWarping]);
   
-  const { contextSafe } = useGSAP(() => {
-    // プリローダー削除後：メインアニメーションを即座に再生
-    const tl = gsap.timeline();
-    
-    tl.to(".title-char", {
-      opacity: 1,
-      duration: 0.05,
-      stagger: 0.08,
-      ease: "none",
-    })
-    .to(".loading-text", {
-      opacity: 1,
-      duration: 0.1,
-    })
-    .to([".tech-carousel", ".tech-carousel-title"], {
-       opacity: 1,
-       duration: 0.8,
-       delay: 0.5
-    });
-
-    mainTlRef.current = tl;
-
-  }, { scope: containerRef });
+  useEffect(() => {
+    const t1 = setTimeout(() => setIntroVisible(true), 120);
+    const t2 = setTimeout(() => setSkillsVisible(true), 700);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, []);
 
   const [showCanvas, setShowCanvas] = useState(false);
   const [isHeroInView, setIsHeroInView] = useState(false);
@@ -143,44 +136,10 @@ export default function Hero() {
     return () => clearTimeout(timer);
   }, [canRender3D, isHeroInView, showCanvas]);
 
-
-
-  const showDescription = contextSafe(() => {
-    const tl = gsap.timeline();
-
-    tl.to(".desc-char", {
-      opacity: 1,
-      duration: 0.03,
-      stagger: 0.02,
-      ease: "none",
-    })
-    
-    // 点滅を停止し、アクティブ状態を示すようにスタイルを変更
-    .to(".trigger-btn", { 
-      opacity: 0.5, 
-      pointerEvents: "none",
-      className: "trigger-btn font-mono text-xs opacity-50 cursor-default" 
-    }, "<")
-
-    // コマンドプロンプトシーケンス
-    .to(".command-prompt", {
-      opacity: 1,
-      duration: 0.1,
-      delay: 0.5
-    })
-    .to(".ls-char", {
-      opacity: 1,
-      duration: 0.05,
-      stagger: 0.1,
-      ease: "none",
-    })
-    .to(".ls-result", {
-      opacity: 1,
-      duration: 0.1,
-      stagger: 0.05,
-      delay: 0.2
-    });
-  });
+  const showDescription = useCallback(() => {
+    setDescriptionVisible(true);
+    setTimeout(() => setPromptVisible(true), 350);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -201,18 +160,18 @@ export default function Hero() {
           <a
             href="#top"
             aria-label="ページトップへ移動"
-            className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:text-fuchsia-400"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-100 transition-colors hover:text-fuchsia-300"
           >
             Burst Style
           </a>
-          <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-wider text-zinc-400">
-            <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-400">
+          <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-wider text-zinc-200">
+            <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-300">
               Projects
             </a>
-            <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-400">
+            <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-300">
               About
             </a>
-            <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-400">
+            <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-300">
               Contact
             </a>
           </nav>
@@ -231,23 +190,23 @@ export default function Hero() {
 
         {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto px-6">
-          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/70 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
-              <div className="flex items-center justify-center">
-                <span className="font-mono text-fuchsia-400 mr-2">&gt;</span>
-                <SplitText charClassName="title-char">Hello, I&apos;m</SplitText>
+              <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
+                <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
+                <SplitText revealed={introVisible} charClassName="title-char">Hello, I&apos;m</SplitText>
               </div>
-              <div className="flex items-center justify-center">
-                <div className="font-mono pb-2 title-char inline-block">
+              <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
+                <div className="font-mono pb-2 inline-block">
                   <GlitchText text="Eric Kei." />
                 </div>
-                <span className="animate-pulse font-mono text-fuchsia-400 ml-1 pb-2">_</span>
+                <span className="animate-pulse font-mono text-fuchsia-300 ml-1 pb-2">_</span>
               </div>
             </h1>
             
             <div className="max-w-3xl w-full px-4 mt-8 text-left">
-              <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
+              <div className={`loading-text font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4 transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
                 &gt; ESTABLISHING CONNECTION...<br />
                 &gt; What is Burst Style ? 
                 <MagneticButton className="ml-2 inline-block">
@@ -255,38 +214,40 @@ export default function Hero() {
                   <button
                     type="button"
                     onClick={showDescription}
-                    className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block font-mono text-xs"
+                    className={`trigger-btn px-1 rounded transition-colors inline-block font-mono text-xs ${
+                      descriptionVisible ? "opacity-50 cursor-default pointer-events-none" : "cursor-pointer animate-pulse hover:bg-green-500/20"
+                    }`}
                     aria-label="詳細を表示する"
                   >
                     /Enter
                   </button>
                 </MagneticButton>
               </div>
-              <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">
-                <SplitText charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
+              <p className="text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
+                <SplitText revealed={descriptionVisible} charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
                 <br className="hidden sm:block" />
-                <SplitText charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
+                <SplitText revealed={descriptionVisible} charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
               </p>
 
               {/* コマンドプロンプトエリア */}
-              <div className="font-mono text-green-500 text-sm sm:text-base">
-                <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
-                  <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-400">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-400">~ &gt;</span></span>
-                  <SplitText charClassName="ls-char">ls</SplitText>
+              <div className="font-mono text-green-300 text-sm sm:text-base">
+                <div className={`command-prompt flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap transition-opacity duration-500 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
+                  <span className="text-fuchsia-300">Eric Kei<span className="text-zinc-200">@</span><span className="text-green-300">Burst Style</span> <span className="text-zinc-200">~ &gt;</span></span>
+                  <SplitText revealed={promptVisible} charClassName="ls-char">ls</SplitText>
                 </div>
                 <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">
                   <MagneticButton>
-                      <a href="#projects" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                      <a href="#projects" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
                           <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />
                       </a>
                   </MagneticButton>
                   <MagneticButton>
-                      <a href="#about" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                      <a href="#about" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
                           <DecryptedText text="/About Me" animateOnHover speed={30} className="font-bold" />
                       </a>
                   </MagneticButton>
                   <MagneticButton>
-                      <a href="#contact" className="ls-result opacity-0 hover:text-fuchsia-400 hover:underline decoration-fuchsia-400 decoration-2 underline-offset-4 transition-all block p-2">
+                      <a href="#contact" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
                           <DecryptedText text="/Contact" animateOnHover speed={30} className="font-bold" />
                       </a>
                   </MagneticButton>
@@ -299,7 +260,7 @@ export default function Hero() {
 
         {/* テックカルーセル（全幅） */}
         <div className="w-full mt-16 relative z-10">
-          <h2 className="text-center font-mono text-xl md:text-2xl text-green-500 mb-8 opacity-0 tech-carousel-title">
+          <h2 className={`text-center font-mono text-xl md:text-2xl text-green-300 mb-8 tech-carousel-title transition-opacity duration-500 ${skillsVisible ? "opacity-100" : "opacity-0"}`}>
             &gt; My Skills
           </h2>
           <TechCarousel />
