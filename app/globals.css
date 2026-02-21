@@ -146,9 +146,12 @@ body {
   .preloader {
     display: none !important;
   }
-  .title-char {
-    opacity: 1 !important;
-  }
+  /* GSAPのopacity:0アニメーションをバイパスしてLCP改善 */
+  .title-char,
+  .char,
+  .desc-char,
+  .command-prompt,
+  .ls-char,
   .loading-text {
     opacity: 1 !important;
   }

@@ -128,10 +128,10 @@ export default function Hero() {
             sessionStorage.setItem("burst_booted", "true");
             return;
         }
-        // デスクトップは演出を維持しつつ短縮（合訐1100ms）
-        const d1 = 300;
-        const d2 = 300;
-        const d3 = 500;
+        // デスクトップは演出を維持しつつ短縮（合計500ms → Speed Index改善）
+        const d1 = 150;
+        const d2 = 150;
+        const d3 = 200;
 
         // ステップ 1: 初期化中（設定済み）
         await new Promise(r => setTimeout(r, d1));
@@ -323,7 +323,7 @@ export default function Hero() {
             {/* コマンドプロンプトエリア */}
             <div className="font-mono text-green-500 text-sm sm:text-base">
               <div className="command-prompt opacity-0 flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap">
-                <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-500">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-500">~ &gt;</span></span>
+                <span className="text-fuchsia-400">Eric Kei<span className="text-zinc-400">@</span><span className="text-green-500">Burst Style</span> <span className="text-zinc-400">~ &gt;</span></span>
                 <SplitText charClassName="ls-char">ls</SplitText>
               </div>
              <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">

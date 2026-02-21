@@ -23,7 +23,7 @@ export default function Footer() {
                 <span className="text-fuchsia-500">&gt;</span>
                 <span>ERIC KEI</span>
            </div>
-           <p className="text-xs text-zinc-500 font-mono">
+           <p className="text-xs text-zinc-400 font-mono">
              <DecryptedText text={`© ${currentYear} Burst Style. All rights reserved.`} animateOnHover speed={50} />
            </p>
         </div>
@@ -70,7 +70,7 @@ export default function Footer() {
             <MagneticButton strength={0.2}>
                 <button 
                     onClick={scrollToTop}
-                    className="group flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-fuchsia-400 transition-colors uppercase tracking-wider"
+                    className="group flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-fuchsia-400 transition-colors uppercase tracking-wider"
                 >
                     Top
                     <svg 

@@ -40,22 +40,22 @@ const ServerSpecs = () => (
     <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 font-mono text-xs sm:text-sm text-zinc-300 flex flex-col justify-center gap-3">
        
        <div>
-         <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Model</div>
+         <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">Model</div>
          <div className="font-semibold text-fuchsia-400">Raspberry Pi 4 Model B</div>
        </div>
 
        <div>
-         <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">OS</div>
+         <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">OS</div>
          <div className="text-zinc-200">Ubuntu 24.04.3 LTS</div>
        </div>
 
        <div>
-         <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Role</div>
+         <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">Role</div>
          <div className="text-zinc-200">Home Server & BOT Host</div>
        </div>
 
        <div>
-         <div className="text-zinc-500 text-[10px] uppercase tracking-wider mb-0.5">Running</div>
+         <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">Running</div>
          <div className="flex flex-wrap gap-1.5">
             <span className="inline-flex items-center rounded bg-[#2496ed]/10 px-1.5 py-0.5 text-[#2496ed]">Docker</span>
             <span className="inline-flex items-center rounded bg-[#5865F2]/10 px-1.5 py-0.5 text-[#5865F2]">Discord BOT</span>
@@ -548,7 +548,7 @@ export default function AboutSection() {
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   !isProfessional 
                     ? "bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30" 
-                    : "text-zinc-500 hover:text-zinc-300"
+                    : "text-zinc-400 hover:text-zinc-300"
                 }`}
               >
                 Geek Mode
@@ -558,7 +558,7 @@ export default function AboutSection() {
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   isProfessional 
                     ? "bg-blue-500/20 text-blue-400 border border-blue-500/30" 
-                    : "text-zinc-500 hover:text-zinc-300"
+                    : "text-zinc-400 hover:text-zinc-300"
                 }`}
               >
                 Pro Mode
@@ -682,7 +682,7 @@ export default function AboutSection() {
 
                   <div className="mt-4 flex flex-wrap gap-2">
                     {item.tags.map((t) => (
-                      <span key={t} className="rounded-md border border-zinc-800 bg-black/50 px-2 py-1 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
+                      <span key={t} className="rounded-md border border-zinc-800 bg-black/50 px-2 py-1 text-[10px] font-medium text-zinc-400 uppercase tracking-wide">
                         {t}
                       </span>
                     ))}
