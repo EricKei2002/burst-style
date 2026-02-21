@@ -61,14 +61,14 @@ export default function Projects() {
 
         {/* ヘッダー */}
         <div className="mb-16 max-w-2xl">
-          <div className="flex items-center gap-2 text-fuchsia-300 mb-4">
+          <div className="mb-4 flex items-center gap-2 text-fuchsia-200">
             <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-xs tracking-wider uppercase">01. Selected Works</span>
+            <span className="font-mono text-xs font-semibold tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             <DecryptedText text="Projects" animateOnHover speed={30} />
           </h2>
-          <p className="text-zinc-300 leading-relaxed">
+          <p className="text-zinc-100 leading-relaxed">
             既成概念を打ち砕き、記憶に残る体験を。<br />
             デザインと技術を融合した『Burst Style』の実践。
           </p>
