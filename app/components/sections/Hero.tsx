@@ -101,7 +101,7 @@ export default function Hero() {
 
     return {
       canRender3D,
-      qualityTier: canRender3D ? (lowSpec ? "mid" : "high") : ("low" as const),
+      qualityTier: canRender3D ? (lowSpec ? "mid" as const : "high" as const) : ("low" as const),
     };
   });
 
@@ -139,8 +139,8 @@ export default function Hero() {
       return () => window.cancelIdleCallback(id);
     }
 
-    const timer = window.setTimeout(activate, 900);
-    return () => window.clearTimeout(timer);
+    const timer = setTimeout(activate, 900);
+    return () => clearTimeout(timer);
   }, [canRender3D, isHeroInView, showCanvas]);
 
 

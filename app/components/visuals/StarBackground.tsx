@@ -143,8 +143,8 @@ export default function StarBackground() {
       const id = window.requestIdleCallback(activate, { timeout: 2500 });
       return () => window.cancelIdleCallback(id);
     }
-    const timer = window.setTimeout(activate, 1200);
-    return () => window.clearTimeout(timer);
+    const timer = setTimeout(activate, 1200);
+    return () => clearTimeout(timer);
   }, [hasInteraction, isMobile, isVisible, starCount]);
 
   if (isProjectPage) {
