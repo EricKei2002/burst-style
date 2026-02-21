@@ -28,28 +28,17 @@ const techStack = [
 ];
 
 export default function TechCarousel() {
+  const loopStack = [...techStack, ...techStack];
+
   return (
-    <div className="w-full overflow-hidden py-20 opacity-0 tech-carousel fade-mask">
-      <div className="flex w-max gap-24 animate-scroll-left">
-        {/* 1つ目のセット */}
-        {techStack.map((tech, index) => (
-          <div key={`first-${index}`} className="flex items-center gap-6 group">
-             <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
-          </div>
-        ))}
-        {/* 2つ目のセット（ループ用の複製） */}
-        {techStack.map((tech, index) => (
-          <div key={`second-${index}`} className="flex items-center gap-6 group">
-             <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
-          </div>
-        ))}
-        {/* 3つ目のセット（ワイドスクリーン用の予備） */}
-        {techStack.map((tech, index) => (
-          <div key={`third-${index}`} className="flex items-center gap-6 group">
-             <tech.icon className={`text-8xl ${tech.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
-             <span className="font-mono text-2xl text-zinc-200 group-hover:text-white transition-colors">{tech.name}</span>
+    <div className="w-full overflow-hidden py-16 tech-carousel fade-mask">
+      <div className="flex w-max gap-10 md:gap-16 lg:gap-24 animate-scroll-left">
+        {loopStack.map((tech, index) => (
+          <div key={`${tech.name}-${index}`} className="flex items-center gap-3 md:gap-6 group">
+            <tech.icon aria-hidden="true" className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
+            <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-100 group-hover:text-white transition-colors whitespace-nowrap">
+              {tech.name}
+            </span>
           </div>
         ))}
       </div>

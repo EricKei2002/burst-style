@@ -2,7 +2,6 @@
 
 import { useCallback, useRef, useEffect, useMemo, useState } from "react";
 import { useTransitionStore } from "../../lib/store";
-import DecryptedText from "../ui/DecryptedText";
 import MagneticButton from "../ui/MagneticButton";
 import dynamic from "next/dynamic";
 
@@ -45,14 +44,13 @@ const SplitText = ({
   );
 };
 
-export default function Hero() {
+export default function Top() {
   const containerRef = useRef<HTMLElement>(null);
   const canvasHostRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
   const [introVisible, setIntroVisible] = useState(false);
   const [descriptionVisible, setDescriptionVisible] = useState(false);
-  const [promptVisible, setPromptVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
 
@@ -157,7 +155,6 @@ export default function Hero() {
 
   const showDescription = useCallback(() => {
     setDescriptionVisible(true);
-    setTimeout(() => setPromptVisible(true), 350);
   }, []);
 
   useEffect(() => {
@@ -174,25 +171,40 @@ export default function Hero() {
 
   return (
     <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col overflow-hidden">
-      <header className="sticky inset-x-0 top-0 z-30 border-b border-white/10 bg-black/75 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+      <header className="sticky inset-x-0 top-0 z-30 border-b border-zinc-800/80 bg-[#0a0a0a]/90 backdrop-blur-md">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
           <a
             href="#top"
             aria-label="ページトップへ移動"
-            className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-100 transition-colors hover:text-fuchsia-300"
+            className="inline-flex min-h-[68px] w-full items-center rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-xs tracking-[0.08em] text-zinc-100 transition-colors hover:border-fuchsia-400/60 hover:text-fuchsia-200 lg:max-w-[340px]"
           >
-            Burst Style
+            <span className="break-words">
+              My portfolio <span className="text-fuchsia-200">Web site</span>
+            </span>
           </a>
-          <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-wider text-zinc-200">
-            <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-300">
-              Projects
-            </a>
-            <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-300">
-              About
-            </a>
-            <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-300">
-              Contact
-            </a>
+          <nav
+            aria-label="サイト内ナビゲーション"
+            className="min-h-[68px] w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-[10px] sm:text-xs tracking-wide text-left text-zinc-100 lg:max-w-[760px]"
+          >
+            <div className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
+              <span className="text-fuchsia-200">Eric Kei</span>
+              <span className="text-zinc-300">@</span>
+              <span className="text-zinc-100">Burst Style</span>
+              <span className="text-zinc-300">~</span>
+              <span className="text-fuchsia-200">&gt;</span>
+              <span className="text-zinc-200">ls</span>
+            </div>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-8">
+              <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
+                /Projects
+              </a>
+              <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
+                /About Me
+              </a>
+              <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
+                /Contact
+              </a>
+            </div>
           </nav>
         </div>
       </header>
@@ -247,40 +259,14 @@ export default function Hero() {
                 <br className="hidden sm:block" />
                 <SplitText revealed={descriptionVisible} charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
               </p>
-
-              {/* コマンドプロンプトエリア */}
-              <div className="font-mono text-green-300 text-sm sm:text-base">
-                <div className={`command-prompt flex items-center gap-2 mb-2 flex-wrap sm:flex-nowrap transition-opacity duration-500 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
-                  <span className="text-fuchsia-300">Eric Kei<span className="text-zinc-200">@</span><span className="text-green-300">Burst Style</span> <span className="text-zinc-200">~ &gt;</span></span>
-                  <SplitText revealed={promptVisible} charClassName="ls-char">ls</SplitText>
-                </div>
-                <div className="flex flex-wrap gap-4 sm:gap-6 pl-4">
-                  <MagneticButton>
-                      <a href="#projects" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
-                          <DecryptedText text="/Projects" animateOnHover speed={30} className="font-bold" />
-                      </a>
-                  </MagneticButton>
-                  <MagneticButton>
-                      <a href="#about" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
-                          <DecryptedText text="/About Me" animateOnHover speed={30} className="font-bold" />
-                      </a>
-                  </MagneticButton>
-                  <MagneticButton>
-                      <a href="#contact" className={`ls-result hover:text-fuchsia-300 hover:underline decoration-fuchsia-300 decoration-2 underline-offset-4 transition-all block p-2 ${promptVisible ? "opacity-100" : "opacity-0"}`}>
-                          <DecryptedText text="/Contact" animateOnHover speed={30} className="font-bold" />
-                      </a>
-                  </MagneticButton>
-                </div>
-              </div>
             </div>
-
           </div>
         </div>
 
         {/* テックカルーセル（全幅） */}
         <div className="w-full mt-16 relative z-10">
           <h2
-            className={`mx-auto mb-8 inline-flex rounded-lg border border-green-200/30 bg-black/70 px-4 py-2 text-center font-mono text-xl text-green-100 tech-carousel-title transition-opacity duration-500 md:text-2xl ${
+            className={`text-center font-mono text-xl md:text-2xl text-green-300 mb-8 tech-carousel-title transition-opacity duration-500 ${
               skillsVisible ? "opacity-100" : "opacity-0"
             }`}
           >

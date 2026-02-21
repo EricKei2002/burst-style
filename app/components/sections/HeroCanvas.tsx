@@ -21,7 +21,6 @@ export default function HeroCanvas({ isWarping, starCount, qualityTier }: HeroCa
       gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
       dpr={dpr}
     >
-      <fog attach="fog" args={['#000', 0, 100]} />
       <WarpStars isWarping={isWarping} count={starCount} />
     </Canvas>
   );

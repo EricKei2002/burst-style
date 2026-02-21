@@ -9,7 +9,7 @@ interface WarpStarsProps {
   count?: number;
 }
 
-// コンポーネント外（モジュールスコープ）でデータ生成 — lintルール準拠
+// セクション背景（StarBackground）と同じ星データ生成に統一
 function createStarData(count: number) {
   const positions = new Float32Array(count * 3);
   const speeds = new Float32Array(count);
@@ -17,20 +17,17 @@ function createStarData(count: number) {
     positions[i * 3]     = (Math.random() - 0.5) * 200;
     positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
     positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
-    // 元コードの個別速度そのまま（0.01〜0.16）
-    speeds[i] = Math.random() * 0.15 + 0.01;
+    // StarBackgroundと同一スケール（units/sec）
+    speeds[i] = (Math.random() * 0.15 + 0.06) * 60;
   }
   return { positions, speeds };
 }
 
-// Hero背景の星もGLSLシェーダーに移行してJSループを廃止
-// ワープ時の速度変化は uOffset/uFrames の2つのuniformで表現
+// Hero背景の星もセクション背景と同じシェーダーに統一
+// isWarping時のみuTimeの進み方を加速してワープ感を維持
 export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
-  // 速度補間用のRef（これだけJSで管理）
-  const currentSpeed = useRef(0.05);
-  const targetSpeed = useRef(0.05);
+  const speedFactorRef = useRef(1);
 
-  // geometry と material を useRef で管理してuseFrame内書き換えのlintを回避
   const geometry = useMemo(() => {
     const { positions, speeds } = createStarData(count);
     const geo = new THREE.BufferGeometry();
@@ -43,24 +40,17 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
     () =>
       new THREE.ShaderMaterial({
       uniforms: {
-        uOffset:  { value: 0 },   // 累積ベース移動距離（currentSpeedの積分）
-        uFrames:  { value: 0 },   // 累積フレーム数（per-particle speedの積分）
-        uStretch: { value: 1 },   // ワープ時のポイントサイズ拡大
+        uTime: { value: 0 },
       },
       vertexShader: `
         attribute float aSpeed;
-        uniform float uOffset;
-        uniform float uFrames;
-        uniform float uStretch;
+        uniform float uTime;
         void main() {
           vec3 pos = position;
-          // ベース移動 + 個別速度 × フレーム数 = 合計移動距離
-          float totalZ = position.z + 100.0 + uOffset + aSpeed * uFrames;
-          // 範囲 [-200, 100] (300単位) でループ
-          pos.z = mod(totalZ, 300.0) - 200.0;
+          // StarBackgroundと同一の移動式
+          pos.z = mod(position.z + 150.0 + aSpeed * uTime, 200.0) - 150.0;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-          // ワープ時にポイントサイズを大きくしてストリーク感を演出
-          gl_PointSize = max(1.0, uStretch);
+          gl_PointSize = 1.5;
         }
       `,
       fragmentShader: `
@@ -80,27 +70,17 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
     };
   }, [geometry, material]);
 
-  // 毎フレーム更新するのは3つのuniformと速度補間のみ（O(1)）
+  // ワープ時だけ時間進行を加速
   useFrame((_, delta) => {
-    targetSpeed.current = isWarping ? 8.0 : 0.05;
-    currentSpeed.current = THREE.MathUtils.lerp(
-      currentSpeed.current,
-      targetSpeed.current,
+    const targetFactor = isWarping ? 24 : 1;
+    speedFactorRef.current = THREE.MathUtils.lerp(
+      speedFactorRef.current,
+      targetFactor,
       delta * 2
     );
 
-    const mat = material;
-    // 累積ベース移動距離（フレーム単位換算）
     // eslint-disable-next-line react-hooks/immutability
-    mat.uniforms.uOffset.value  += currentSpeed.current;
-    // 累積フレーム数（per-particle speed計算用）
-    mat.uniforms.uFrames.value  += 1;
-    // ストレッチ量をスムーズに補間
-    mat.uniforms.uStretch.value = THREE.MathUtils.lerp(
-      mat.uniforms.uStretch.value,
-      isWarping ? Math.max(1, currentSpeed.current * 3) : 1,
-      delta * 3
-    );
+    material.uniforms.uTime.value += delta * speedFactorRef.current;
   });
 
   return <points geometry={geometry} material={material} />;
