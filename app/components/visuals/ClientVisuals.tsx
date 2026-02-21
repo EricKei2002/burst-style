@@ -60,9 +60,9 @@ export default function ClientVisuals() {
       };
     }
 
-    const timer = window.setTimeout(activate, 1200);
+    const timer = setTimeout(activate, 1200);
     return () => {
-      window.clearTimeout(timer);
+      clearTimeout(timer);
       window.removeEventListener("pointermove", handlePointerMove);
     };
   }, []);
