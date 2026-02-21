@@ -159,13 +159,19 @@ export default App;`;
         </div>
         <div className="flex gap-2">
            <button 
+             type="button"
              onClick={() => setViewMode("design")}
+             aria-pressed={viewMode === "design"}
+             aria-label="プレビュー表示に切り替え"
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
            >
              Preview
            </button>
            <button 
+             type="button"
              onClick={() => setViewMode("source")}
+             aria-pressed={viewMode === "source"}
+             aria-label="コード表示に切り替え"
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
            >
              Code
@@ -183,7 +189,9 @@ export default App;`;
             <h2 className="text-lg mb-4 text-zinc-100 font-bold">Todoリスト with Typescript</h2>
             
             <form onSubmit={handleSubmit} className="mb-6 flex gap-2 justify-center">
+              <label htmlFor="todo-new-task" className="sr-only">新しいタスク</label>
               <input 
+                id="todo-new-task"
                 type="text" 
                 onChange={handleChange} 
                 className="p-2 rounded bg-zinc-800 border border-zinc-600 text-zinc-200 text-sm focus:outline-none focus:border-blue-500" 
@@ -206,15 +214,19 @@ export default App;`;
                     className="flex-1 p-1 bg-transparent border-b border-transparent focus:border-zinc-500 text-zinc-200 text-sm outline-none disabled:text-zinc-500 disabled:line-through"
                     value={todo.inputValue}
                     disabled={todo.checked}
+                    aria-label={`Todo ${todo.id + 1} の内容`}
                   />
                   <input
                     type="checkbox"
                     onChange={() => handleChecked(todo.id, todo.checked)}
                     checked={todo.checked}
                     className="cursor-pointer"
+                    aria-label={`Todo ${todo.id + 1} を完了済みにする`}
                   />
                   <button 
+                    type="button"
                     onClick={() => handleDelete(todo.id)}
+                    aria-label={`Todo ${todo.id + 1} を削除`}
                     className="px-2 py-1 bg-red-500/10 text-red-400 text-xs rounded hover:bg-red-500/20 transition-colors"
                   >
                     消

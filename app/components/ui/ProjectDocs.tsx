@@ -16,6 +16,17 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
+    if (!isExpanded) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsExpanded(false);
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isExpanded]);
+
+  useEffect(() => {
     // Mermaidをレンダリングする関数
     const render = async (ref: React.RefObject<HTMLDivElement | null>, idSuffix: string) => {
         if (ref.current) {
@@ -55,8 +66,12 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
 
   return (
     <>
-        <div 
-            className="rounded-2xl border border-zinc-800 bg-[#0d1117] overflow-hidden cursor-pointer transition-all hover:border-zinc-600 group"
+        <button
+            type="button"
+            aria-label="システム構成図を拡大表示"
+            aria-haspopup="dialog"
+            aria-expanded={isExpanded}
+            className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600 focus-visible:outline-none"
             onClick={() => setIsExpanded(true)}
         >
           <div className="border-b border-zinc-800 bg-[#010409] px-4 py-3 flex items-center justify-between">
@@ -73,7 +88,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                 システム設計とデータフロー
               </p>
           </div>
-        </div>
+        </button>
 
         {/* 拡大表示用のモーダル */}
         {isExpanded && (
@@ -82,6 +97,9 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                 onClick={() => setIsExpanded(false)}
             >
                 <div 
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="project-docs-title"
                     className="relative w-full max-w-[90vw] max-h-[90vh] overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] p-8 shadow-2xl"
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -93,7 +111,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                     
-                    <h3 className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
+                    <h3 id="project-docs-title" className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
                         <FiCpu /> システム構成図
                     </h3>
                     

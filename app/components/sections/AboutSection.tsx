@@ -639,6 +639,9 @@ export default function AboutSection() {
             {/* ビューモード切り替え */}
             <div className="flex items-center gap-3 bg-black/40 p-1.5 rounded-full border border-zinc-800 self-start sm:self-auto">
               <button
+                type="button"
+                aria-pressed={!isProfessional}
+                aria-label="Geek Modeに切り替え"
                 onClick={() => setIsProfessional(false)}
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   !isProfessional 
@@ -649,6 +652,9 @@ export default function AboutSection() {
                 Geek Mode
               </button>
               <button
+                type="button"
+                aria-pressed={isProfessional}
+                aria-label="Pro Modeに切り替え"
                 onClick={() => setIsProfessional(true)}
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   isProfessional 

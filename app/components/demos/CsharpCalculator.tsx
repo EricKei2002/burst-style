@@ -98,13 +98,19 @@ export default function CsharpCalculator() {
         </div>
         <div className="flex gap-2">
            <button 
+             type="button"
              onClick={() => setViewMode("design")}
+             aria-pressed={viewMode === "design"}
+             aria-label="電卓プレビュー表示に切り替え"
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
            >
              Design
            </button>
            <button 
+             type="button"
              onClick={() => setViewMode("source")}
+             aria-pressed={viewMode === "source"}
+             aria-label="C#ソース表示に切り替え"
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-500 hover:text-zinc-300"}`}
            >
              Source
@@ -123,43 +129,43 @@ export default function CsharpCalculator() {
           {/* Keypad */}
           <div className="grid grid-cols-4 gap-2">
             {/* Row 1 */}
-            <button onClick={clear} className="col-span-2 flex h-10 items-center justify-center rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 active:translate-y-0.5">
+            <button type="button" onClick={clear} aria-label="計算をクリア" className="col-span-2 flex h-10 items-center justify-center rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 active:translate-y-0.5">
               C
             </button>
-            <button onClick={() => handleOperator("/")} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button type="button" onClick={() => handleOperator("/")} aria-label="割り算" className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
               <FiDivide size={16} />
             </button>
-            <button onClick={() => handleOperator("*")} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button type="button" onClick={() => handleOperator("*")} aria-label="掛け算" className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
               <FiX size={16} />
             </button>
 
             {/* Row 2 */}
-            <button onClick={() => handleNumber("7")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">7</button>
-            <button onClick={() => handleNumber("8")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">8</button>
-            <button onClick={() => handleNumber("9")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">9</button>
-            <button onClick={() => handleOperator("-")} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button type="button" onClick={() => handleNumber("7")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">7</button>
+            <button type="button" onClick={() => handleNumber("8")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">8</button>
+            <button type="button" onClick={() => handleNumber("9")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">9</button>
+            <button type="button" onClick={() => handleOperator("-")} aria-label="引き算" className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
               <FiMinus size={16} />
             </button>
 
             {/* Row 3 */}
-            <button onClick={() => handleNumber("4")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">4</button>
-            <button onClick={() => handleNumber("5")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">5</button>
-            <button onClick={() => handleNumber("6")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">6</button>
-            <button onClick={() => handleOperator("+")} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button type="button" onClick={() => handleNumber("4")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">4</button>
+            <button type="button" onClick={() => handleNumber("5")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">5</button>
+            <button type="button" onClick={() => handleNumber("6")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">6</button>
+            <button type="button" onClick={() => handleOperator("+")} aria-label="足し算" className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
               <FiPlus size={16} />
             </button>
 
             {/* Row 4 */}
-            <button onClick={() => handleNumber("1")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">1</button>
-            <button onClick={() => handleNumber("2")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">2</button>
-            <button onClick={() => handleNumber("3")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">3</button>
-            <button onClick={calculate} className="row-span-2 flex items-center justify-center rounded bg-fuchsia-600/80 text-white hover:bg-fuchsia-600 active:translate-y-0.5">
+            <button type="button" onClick={() => handleNumber("1")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">1</button>
+            <button type="button" onClick={() => handleNumber("2")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">2</button>
+            <button type="button" onClick={() => handleNumber("3")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">3</button>
+            <button type="button" onClick={calculate} aria-label="計算結果を表示" className="row-span-2 flex items-center justify-center rounded bg-fuchsia-600/80 text-white hover:bg-fuchsia-600 active:translate-y-0.5">
               <FaEquals size={16} />
             </button>
 
             {/* Row 5 */}
-            <button onClick={() => handleNumber("0")} className="col-span-2 flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">0</button>
-            <button onClick={() => handleNumber(".")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">.</button>
+            <button type="button" onClick={() => handleNumber("0")} className="col-span-2 flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">0</button>
+            <button type="button" onClick={() => handleNumber(".")} aria-label="小数点" className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">.</button>
           </div>
         </div>
         
