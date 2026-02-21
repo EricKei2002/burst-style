@@ -13,11 +13,11 @@ import Earth from "./Earth";
 import ShootingStars from "./ShootingStars";
 import SpaceshipInterior from "./SpaceshipInterior";
 
-function WarpStars() {
+function WarpStars({ count = 4000 }: { count?: number }) {
   const starsRef = useRef<THREE.Points>(null);
   
-  // 超空間効果を高めるために星の数を増やす
-  const starsCount = 4000;
+  // 星の数は外部から変更可能
+  const starsCount = count;
   
   // Z軸に沿ってトンネル/シリンダー状に星を初期化
   const [positions] = useState(() => {
@@ -107,15 +107,24 @@ export default function StarBackground() {
   const pathname = usePathname();
   const isProjectPage = pathname.startsWith('/projects/');
 
+  // モバイル時は星の数を減らしてパフォーマンスを確保（useStateで初期レンダリング時に判定）
+  const [starCount] = useState(() => {
+    if (typeof window === 'undefined') return 4000;
+    if (window.innerWidth < 768) return 800;
+    if (window.innerWidth < 1024) return 2000;
+    return 4000;
+  });
+
   if (isProjectPage) {
     return <SpaceshipInterior />;
   }
 
   return (
-    <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]">
+    <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true">
       <Canvas
         camera={{ position: [0, 0, 1] }}
-        gl={{ alpha: false, antialias: false }}
+        gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
+        dpr={[1, 1.5]}
       >
         <ambientLight intensity={0.1} />
         <Suspense fallback={null}>
@@ -124,7 +133,7 @@ export default function StarBackground() {
           <Earth />
         </Suspense>
 
-        <WarpStars />
+        <WarpStars count={starCount} />
         <ShootingStars />
       </Canvas>
     </div>

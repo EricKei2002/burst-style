@@ -33,6 +33,7 @@ export default function Hero() {
   const textRef = useRef<HTMLDivElement>(null);
   const mainTlRef = useRef<gsap.core.Timeline | null>(null);
   const [loaderText, setLoaderText] = useState("INITIALIZING SYSTEM...");
+  const [isPreloaderVisible, setIsPreloaderVisible] = useState(true);
 
   const flashRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +100,8 @@ export default function Hero() {
     if (hasBooted) {
         // シーケンスをスキップ
         gsap.set(".preloader", { display: "none" });
+        // setTimeout(0)でsetStateをエフェクトの外に出してカスケードレンダリングを防ぐ
+        setTimeout(() => setIsPreloaderVisible(false), 0);
         mainTlRef.current?.play();
         return;
     }
@@ -156,6 +159,7 @@ export default function Hero() {
             onComplete: () => {
                 if (isMounted) {
                     gsap.set(".preloader", { display: "none" });
+                    setIsPreloaderVisible(false);
                     mainTlRef.current?.play();
                     // ブート済みとしてマーク
                     sessionStorage.setItem("burst_booted", "true");
@@ -235,8 +239,13 @@ export default function Hero() {
 
       <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
       
-      {/* プリローダーオーバーレイ（システムブート） */}
-      <div className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait">
+      {/* プリローダーオーバーレイ（システムブート）。表示中は裏コンテンツをスクリーンリーダーから隠す */}
+      <div
+        className="preloader fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] px-4 cursor-wait"
+        aria-hidden={!isPreloaderVisible}
+        aria-live="assertive"
+        aria-label="システムを起動中"
+      >
         <div className="flex flex-col items-center gap-4">
              {/* 回転/パルスアイコン */}
             <div className="h-12 w-12 rounded-full border-2 border-green-500/20 border-t-green-500 animate-spin"></div>
@@ -279,8 +288,16 @@ export default function Hero() {
             <div className="loading-text font-mono text-green-500 text-xl md:text-2xl mb-8 mt-4 opacity-0">
                &gt; ESTABLISHING CONNECTION...<br />
                &gt; What is Burst Style ? 
-               <MagneticButton className="ml-2 inline-block">
-                 <span onClick={showDescription} className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block"> /Enter </span>
+              <MagneticButton className="ml-2 inline-block">
+                 {/* アクセシビリティのためspanからbuttonに変更 */}
+                 <button
+                   type="button"
+                   onClick={showDescription}
+                   className="trigger-btn cursor-pointer animate-pulse hover:bg-green-500/20 px-1 rounded transition-colors inline-block font-mono text-xs"
+                   aria-label="詳細を表示する"
+                 >
+                   /Enter
+                 </button>
                </MagneticButton>
             </div>
             <p className="text-sm leading-relaxed text-green-500 sm:text-base font-mono mb-6">

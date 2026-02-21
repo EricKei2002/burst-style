@@ -5,11 +5,9 @@ import "./globals.css";
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 import SmoothScroll from "./components/SmoothScroll";
-import StarBackground from "./components/visuals/StarBackground";
-import MouseTrail from "./components/visuals/MouseTrail";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
-
-import CustomCursor from "./components/visuals/CustomCursor";
+// StarBackground・MouseTrail・CustomCursorはクライアントラッパー内でdynamic（ssr:false）取り込み
+import ClientVisuals from "./components/visuals/ClientVisuals";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://burst.style"),
@@ -47,11 +45,9 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={`min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased ${jetbrainsMono.variable} font-mono`}>
-        <CustomCursor />
+        <ClientVisuals />
         <HangarDoorTransition />
-        <MouseTrail />
         <SmoothScroll>
-          <StarBackground />
           <main className="min-h-screen w-full">
             {children}
           </main>
