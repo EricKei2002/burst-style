@@ -110,10 +110,12 @@ export default function Hero() {
     
     const sequence = async () => {
         // ボットやLighthouseを検知して遅延をスキップ（SEOやパフォーマンス判定対策）
+        // PSIのUser-Agentは 'lighthouse' を含まないため、一律短縮済み
         const isBot = /bot|googlebot|crawler|spider|robot|crawling|lighthouse/i.test(navigator.userAgent);
-        const d1 = isBot ? 1 : 1200;
-        const d2 = isBot ? 1 : 1200;
-        const d3 = isBot ? 1 : 2000;
+        // LCP改善: 4400ms → 合計1100ms に短縮
+        const d1 = isBot ? 1 : 300;
+        const d2 = isBot ? 1 : 300;
+        const d3 = isBot ? 1 : 500;
 
         // ステップ 1: 初期化中（設定済み）
         await new Promise(r => setTimeout(r, d1));
