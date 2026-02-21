@@ -196,7 +196,8 @@ export default function ProfileCard({
                 className={styles.backgroundImage}
                 fill
                 sizes="(max-width: 768px) 100vw, 500px"
-                priority
+                loading="lazy"
+                decoding="async"
                 style={{ objectFit: 'cover', objectPosition: 'top' }}
               />
             )}
@@ -219,7 +220,8 @@ export default function ProfileCard({
                    className={`${styles.backgroundImage} growth-stage-${index} ${mobileClass}`}
                    fill
                    sizes="(max-width: 768px) 100vw, 500px"
-                   priority
+                   loading="lazy"
+                   decoding="async"
                    style={{ objectFit: 'cover', objectPosition: 'top' }}
                  />
                );

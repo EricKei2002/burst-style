@@ -485,6 +485,21 @@ export default function AboutSection() {
         }
       });
 
+      // ヘッダー表示（Projects / Contactと同じ見せ方）
+      gsap.fromTo(".about-header",
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+          }
+        }
+      );
+
       // コンテンツの表示
       gsap.fromTo(".about-card",
         { y: 50, opacity: 0 },
@@ -531,7 +546,7 @@ export default function AboutSection() {
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* ヘッダー */}
-        <div className="mb-16 max-w-2xl">
+        <header className="about-header mb-16 max-w-2xl">
           <div className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}>
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
@@ -565,7 +580,10 @@ export default function AboutSection() {
               </button>
             </div>
           </div>
-        </div>
+          <p className="text-zinc-400 leading-relaxed">
+            技術と経験を積み上げてきた背景を、タイムライン形式で紹介します。
+          </p>
+        </header>
 
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
 
@@ -667,10 +685,11 @@ export default function AboutSection() {
                         <div key={`vid-${i}`} className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-black/50">
                           <video
                             src={src}
-                            autoPlay
+                            controls
                             loop
                             muted
                             playsInline
+                            preload="none"
                             className="h-full w-full object-contain"
                           >
                             <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />

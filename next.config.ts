@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // Best Practices改善: ソースマップを本番環境でも提供
-  productionBrowserSourceMaps: true,
+  // 本番配信サイズを抑えてLighthouseの転送量指標を改善
+  productionBrowserSourceMaps: false,
   async headers() {
     return [
       {

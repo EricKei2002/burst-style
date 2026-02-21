@@ -150,6 +150,27 @@ export default function Hero() {
 
   return (
     <section ref={containerRef} className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden">
+      <header className="absolute inset-x-0 top-0 z-20">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-6 lg:px-8">
+          <a
+            href="#"
+            className="font-mono text-xs uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:text-fuchsia-400"
+          >
+            Burst Style
+          </a>
+          <nav className="flex items-center gap-5 font-mono text-xs uppercase tracking-wider text-zinc-400">
+            <a href="#projects" className="transition-colors hover:text-fuchsia-400">
+              Projects
+            </a>
+            <a href="#about" className="transition-colors hover:text-fuchsia-400">
+              About
+            </a>
+            <a href="#contact" className="transition-colors hover:text-fuchsia-400">
+              Contact
+            </a>
+          </nav>
+        </div>
+      </header>
       
       {/* 背景の星 */}
       <div className="absolute inset-0 z-0">

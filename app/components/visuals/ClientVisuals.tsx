@@ -18,19 +18,53 @@ const CustomCursor = dynamic(
 );
 
 export default function ClientVisuals() {
-  // ready状態にモバイル判定を含めて一回のsetStateで完結させる
-  const [config, setConfig] = useState<{ ready: boolean; showStars: boolean }>({
+  const [config, setConfig] = useState<{
+    ready: boolean;
+    showStars: boolean;
+    showPointerFx: boolean;
+  }>({
     ready: false,
     showStars: false,
+    showPointerFx: false,
   });
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
-    // 初期レンダリング後にビジュアルを有効化（LCP計測後）
-    const timer = setTimeout(() => {
-      setConfig({ ready: true, showStars: !isMobile });
-    }, 100);
-    return () => clearTimeout(timer);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ?? false;
+    const shouldSkipVisuals = reducedMotion || saveData;
+
+    const handlePointerMove = () => {
+      setConfig((prev) => ({ ...prev, showPointerFx: true }));
+      window.removeEventListener("pointermove", handlePointerMove);
+    };
+
+    const activate = () => {
+      setConfig({
+        ready: true,
+        showStars: !isMobile && !shouldSkipVisuals,
+        showPointerFx: false,
+      });
+      if (canHover && !shouldSkipVisuals) {
+        window.addEventListener("pointermove", handlePointerMove, { once: true });
+      }
+    };
+
+    // 初回描画とLCP計測を優先して、装飾ビジュアルはアイドル時に起動
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 1500 });
+      return () => {
+        window.cancelIdleCallback(id);
+        window.removeEventListener("pointermove", handlePointerMove);
+      };
+    }
+
+    const timer = window.setTimeout(activate, 1200);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pointermove", handlePointerMove);
+    };
   }, []);
 
   if (!config.ready) return null;
@@ -38,8 +72,12 @@ export default function ClientVisuals() {
   return (
     <>
       {config.showStars && <StarBackground />}
-      <MouseTrail />
-      <CustomCursor />
+      {config.showPointerFx && (
+        <>
+          <MouseTrail />
+          <CustomCursor />
+        </>
+      )}
     </>
   );
 }
