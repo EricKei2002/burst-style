@@ -59,15 +59,15 @@ export default function Projects() {
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
 
         {/* ヘッダー */}
-        <div className="mb-16 max-w-2xl">
-          <div className="mb-4 flex items-center gap-2 text-fuchsia-200">
+        <div className="mb-16 max-w-2xl rounded-2xl border border-white/10 bg-black/65 p-6 backdrop-blur-sm">
+          <div className="mb-4 flex items-center gap-2 text-fuchsia-100">
             <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-xs font-semibold tracking-wider uppercase">01. Selected Works</span>
+            <span className="font-mono text-sm font-semibold tracking-wider uppercase">01. Selected Works</span>
           </div>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             Projects
           </h2>
-          <p className="text-zinc-100 leading-relaxed">
+          <p className="text-zinc-50 leading-relaxed">
             既成概念を打ち砕き、記憶に残る体験を。<br />
             デザインと技術を融合した『Burst Style』の実践。
           </p>
