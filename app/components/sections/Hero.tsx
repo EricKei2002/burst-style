@@ -178,7 +178,7 @@ export default function Top() {
             aria-label="ページトップへ移動"
             className="inline-flex min-h-[68px] w-full items-center rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-xs tracking-[0.08em] text-zinc-100 transition-colors hover:border-fuchsia-400/60 hover:text-fuchsia-200 lg:max-w-[340px]"
           >
-            <span className="break-words">
+            <span className="wrap-break-word">
               My portfolio <span className="text-fuchsia-200">Web site</span>
             </span>
           </a>
