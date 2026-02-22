@@ -1,17 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useEffect, useMemo, useState } from "react";
-import { useTransitionStore } from "../../lib/store";
+import { useCallback, useRef, useEffect, useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
 import Header from "./Header";
 import dynamic from "next/dynamic";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HeroStarsCanvas = dynamic(() => import("./HeroStarsCanvas") as any, { ssr: false }) as React.ComponentType<{
-  isWarping: boolean;
-  starCount: number;
-  qualityTier: "high" | "mid" | "low";
-}>;
 
 const GlitchText = dynamic(() => import("../ui/GlitchText"), {
   ssr: false,
@@ -45,35 +37,16 @@ const SplitText = ({
 
 export default function Top() {
   const containerRef = useRef<HTMLElement>(null);
-  const canvasHostRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
-  const [introVisible, setIntroVisible] = useState(false);
+  const [introVisible] = useState(true);
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
-
-  // グローバルストアのワープ状態を使用
-  const { isWarping, setIsWarping } = useTransitionStore();
-
-  // ページ遷移（戻る）で戻ってきた場合、ワープ状態を解除する（着陸エフェクト）
-  useEffect(() => {
-    if (isWarping) {
-        // 少し遅延させてからワープを解除し、減速して着陸するような演出にする
-        const timer = setTimeout(() => {
-            setIsWarping(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }
-  }, [isWarping, setIsWarping]);
   
   useEffect(() => {
-    const t1 = setTimeout(() => setIntroVisible(true), 120);
     const t2 = setTimeout(() => setSkillsVisible(true), 700);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    return () => clearTimeout(t2);
   }, []);
 
   useEffect(() => {
@@ -86,71 +59,6 @@ export default function Top() {
     const timer = setTimeout(activate, 900);
     return () => clearTimeout(timer);
   }, [showTechCarousel, skillsVisible]);
-
-  const [showCanvas, setShowCanvas] = useState(false);
-  const [isHeroInView, setIsHeroInView] = useState(false);
-  const [deviceProfile] = useState(() => {
-    if (typeof window === "undefined") {
-      return { canRender3D: false, qualityTier: "low" as const, isMobile3D: false };
-    }
-
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.innerWidth < 768;
-    const saveData = connection?.saveData ?? false;
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
-    const cpuCores = navigator.hardwareConcurrency ?? 8;
-    const veryLowSpec = deviceMemory <= 2 || cpuCores <= 2;
-    const lowSpec = deviceMemory <= 4 || cpuCores <= 4 || isMobile;
-    const isMobile3D = isMobile && !reducedMotion && !saveData && !veryLowSpec;
-    const canRender3D = !reducedMotion && !saveData && !veryLowSpec && (!isMobile || isMobile3D);
-
-    return {
-      canRender3D,
-      isMobile3D,
-      qualityTier: canRender3D ? (lowSpec ? "mid" as const : "high" as const) : ("low" as const),
-    };
-  });
-
-  const canRender3D = deviceProfile.canRender3D;
-  const isMobile3D = deviceProfile.isMobile3D;
-  const qualityTier = deviceProfile.qualityTier;
-
-  const starCount = useMemo(() => {
-    if (isMobile3D) return 220;
-    if (qualityTier === "high") return 1400;
-    if (qualityTier === "mid") return 900;
-    return 500;
-  }, [isMobile3D, qualityTier]);
-
-  useEffect(() => {
-    const target = canvasHostRef.current;
-    if (!target) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsHeroInView(entry.isIntersecting);
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(target);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!canRender3D || !isHeroInView || showCanvas) return;
-
-    const activate = () => setShowCanvas(true);
-
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 2000 });
-      return () => window.cancelIdleCallback(id);
-    }
-
-    const timer = setTimeout(activate, 900);
-    return () => clearTimeout(timer);
-  }, [canRender3D, isHeroInView, showCanvas]);
 
   const showDescription = useCallback(() => {
     setDescriptionVisible(true);
@@ -173,13 +81,6 @@ export default function Top() {
       <Header />
 
       <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
-        {/* 背景の星 */}
-        <div ref={canvasHostRef} className="absolute inset-0 z-0">
-          {showCanvas && canRender3D && isHeroInView && (
-            <HeroStarsCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
-          )}
-        </div>
-
         <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
 
         {/* 前景のテキストコンテンツ */}
