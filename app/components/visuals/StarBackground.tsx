@@ -104,8 +104,9 @@ export default function StarBackground() {
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
     if (window.innerWidth < 768) {
-      if (deviceMemory <= 4 || cpuCores <= 6) return 90;
-      return 140;
+      // ユーザーの要望により、モバイルでも星の数を大幅に増やす（パフォーマンスとのバランスを取って700程度に）
+      if (deviceMemory <= 4 || cpuCores <= 6) return 300;
+      return 700;
     }
     if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 650;
     return 1000;
@@ -114,7 +115,8 @@ export default function StarBackground() {
     if (typeof window === "undefined") return false;
     const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
-    return window.innerWidth >= 1280 && deviceMemory > 4 && cpuCores > 4;
+    // モバイルでも天体（惑星や月など）を描画するように条件を緩和（極端な低スペックのみ除外）
+    return deviceMemory > 2 && cpuCores > 2;
   });
 
   useEffect(() => {
@@ -183,7 +185,7 @@ export default function StarBackground() {
           {showCelestialBodies && showCelestialsNow && <Earth />}
 
           <WarpStars count={starCount} />
-          {!isMobile && showCelestialsNow && <ShootingStars />}
+          {showCelestialsNow && <ShootingStars />}
         </Canvas>
       )}
     </div>
