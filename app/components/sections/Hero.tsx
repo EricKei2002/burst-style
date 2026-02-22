@@ -17,7 +17,6 @@ export default function Top() {
   const containerRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
-  const [introVisible] = useState(true);
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
@@ -82,13 +81,13 @@ export default function Top() {
 
         {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
-              <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
+              <div className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
                 <span className="title-char">Hello, I&apos;m</span>
               </div>
-              <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
+              <div className="flex items-center justify-center">
                 <div className="font-mono pb-2 inline-block">
                   <GlitchText text="Eric Kei." />
                 </div>
@@ -97,7 +96,7 @@ export default function Top() {
             </h1>
 
             <div className="max-w-3xl w-full px-4 mt-8 text-left">
-              <div className={`loading-text font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4 transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
+              <div className="loading-text font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4">
                 &gt; ESTABLISHING CONNECTION...<br />
                 &gt; What is Burst Style ? 
                 <MagneticButton className="ml-2 inline-block">
