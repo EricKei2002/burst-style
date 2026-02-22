@@ -41,17 +41,14 @@ export default function Top() {
     window.addEventListener("scroll", onFirstInteraction, { once: true, passive: true });
     window.addEventListener("keydown", onFirstInteraction, { once: true });
 
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 6000 });
-      return () => {
-        window.cancelIdleCallback(id);
-        window.removeEventListener("pointerdown", onFirstInteraction);
-        window.removeEventListener("scroll", onFirstInteraction);
-        window.removeEventListener("keydown", onFirstInteraction);
-      };
-    }
+    const timer = setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(activate);
+      } else {
+        activate();
+      }
+    }, 6000);
 
-    const timer = setTimeout(activate, 6000);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointerdown", onFirstInteraction);

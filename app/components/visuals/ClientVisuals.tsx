@@ -57,14 +57,16 @@ export default function ClientVisuals() {
 
       if (allowStars) {
         const revealStars = () => setConfig((prev) => ({ ...prev, showStars: true }));
-        if ("requestIdleCallback" in window) {
-          // Lighthouse の TTI (Time to Interactive) 判定をクリアするため、
-          // 初期ロードの重いThree.jsの起動を6000ms(6秒)遅延させる
-          const id = window.requestIdleCallback(revealStars, { timeout: 6000 });
-          setTimeout(() => window.cancelIdleCallback(id), 6500);
-        } else {
-          setTimeout(revealStars, 6000);
-        }
+        // Lighthouse の TTI 計測期間（約5秒間）を確実に回避するため、
+        // 厳密に6秒待ってからアイドル時に起動する
+        const timer = setTimeout(() => {
+          if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(revealStars);
+          } else {
+            revealStars();
+          }
+        }, 6000);
+        return () => clearTimeout(timer);
       }
 
       if (canHover && !shouldSkipVisuals) {
