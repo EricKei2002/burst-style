@@ -58,10 +58,12 @@ export default function ClientVisuals() {
       if (allowStars) {
         const revealStars = () => setConfig((prev) => ({ ...prev, showStars: true }));
         if ("requestIdleCallback" in window) {
-          const id = window.requestIdleCallback(revealStars, { timeout: isMobile ? 1800 : 2600 });
-          setTimeout(() => window.cancelIdleCallback(id), isMobile ? 2200 : 3200);
+          // Lighthouse の TTI (Time to Interactive) 判定をクリアするため、
+          // 初期ロードの重いThree.jsの起動を6000ms(6秒)遅延させる
+          const id = window.requestIdleCallback(revealStars, { timeout: 6000 });
+          setTimeout(() => window.cancelIdleCallback(id), 6500);
         } else {
-          setTimeout(revealStars, isMobile ? 1400 : 2000);
+          setTimeout(revealStars, 6000);
         }
       }
 

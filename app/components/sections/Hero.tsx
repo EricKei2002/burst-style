@@ -42,7 +42,7 @@ export default function Top() {
     window.addEventListener("keydown", onFirstInteraction, { once: true });
 
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 3000 });
+      const id = window.requestIdleCallback(activate, { timeout: 6000 });
       return () => {
         window.cancelIdleCallback(id);
         window.removeEventListener("pointerdown", onFirstInteraction);
@@ -51,7 +51,7 @@ export default function Top() {
       };
     }
 
-    const timer = setTimeout(activate, 2500);
+    const timer = setTimeout(activate, 6000);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointerdown", onFirstInteraction);
