@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import mermaid from "mermaid";
+// mermaid は使用時に動的にインポート（初期バンドルから除外）
 import { FiCpu } from "react-icons/fi";
 
 interface ProjectDocsProps {
@@ -27,41 +27,54 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
   }, [isExpanded]);
 
   useEffect(() => {
-    // Mermaidをレンダリングする関数
-    const render = async (ref: React.RefObject<HTMLDivElement | null>, idSuffix: string) => {
-        if (ref.current) {
-            try {
-                ref.current.innerHTML = '';
-                const id = `mermaid-${idSuffix}-${Date.now()}`;
-                const { svg } = await mermaid.render(id, documentation.architectureMermaid);
-                ref.current.innerHTML = svg;
-            } catch (error) {
-                console.error("Mermaid render error:", error);
-                ref.current.innerHTML = "Diagram render failed.";
-            }
-        }
-    };
+    let cancelled = false;
 
-    mermaid.initialize({
+    const loadAndRender = async () => {
+      // mermaid を動的にインポート
+      const mermaid = (await import("mermaid")).default;
+      if (cancelled) return;
+
+      mermaid.initialize({
         startOnLoad: true,
         theme: 'dark',
         securityLevel: 'loose',
         fontFamily: 'monospace',
         themeVariables: {
-            primaryColor: '#1e1e1e',
-            primaryTextColor: '#e4e4e7',
-            primaryBorderColor: '#3f3f46',
-            lineColor: '#a1a1aa',
-            secondaryColor: '#27272a',
-            tertiaryColor: '#18181b',
+          primaryColor: '#1e1e1e',
+          primaryTextColor: '#e4e4e7',
+          primaryBorderColor: '#3f3f46',
+          lineColor: '#a1a1aa',
+          secondaryColor: '#27272a',
+          tertiaryColor: '#18181b',
         }
-    });
+      });
 
-    render(mermaidRef, 'thumb');
-    if (isExpanded) {
+      // Mermaidをレンダリングする関数
+      const render = async (ref: React.RefObject<HTMLDivElement | null>, idSuffix: string) => {
+        if (ref.current && !cancelled) {
+          try {
+            ref.current.innerHTML = '';
+            const id = `mermaid-${idSuffix}-${Date.now()}`;
+            const { svg } = await mermaid.render(id, documentation.architectureMermaid);
+            if (!cancelled && ref.current) {
+              ref.current.innerHTML = svg;
+            }
+          } catch (error) {
+            console.error("Mermaid render error:", error);
+            if (ref.current) ref.current.innerHTML = "Diagram render failed.";
+          }
+        }
+      };
+
+      await render(mermaidRef, 'thumb');
+      if (isExpanded && !cancelled) {
         // モーダルがレンダリングされるのを少し遅延させる
         setTimeout(() => render(modalRef, 'modal'), 100);
-    }
+      }
+    };
+
+    loadAndRender();
+    return () => { cancelled = true; };
   }, [documentation.architectureMermaid, isExpanded]);
 
   return (

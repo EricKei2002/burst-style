@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+// GSAP/ScrollTrigger は useEffect 内で動的にインポート（初期バンドルから除外）
 import { ReactNode } from "react";
 import ProfileCard from "../ui/ProfileCard";
 import DecryptedText from "../ui/DecryptedText";
@@ -550,82 +549,87 @@ export default function AboutSection() {
   const [activeVideoKey, setActiveVideoKey] = useState<string | null>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobile = window.matchMedia("(max-width: 767px)").matches;
-    if (reducedMotion || isMobile) {
-      gsap.set(".about-header", { y: 0, opacity: 1 });
-      gsap.set(".about-card", { y: 0, opacity: 1 });
-      gsap.set(".bg-grid", { yPercent: 0 });
-      return;
-    }
+    let ctx: { revert: () => void } | null = null;
 
-    const ctx = gsap.context(() => {
-      // 背景パララックス
-      gsap.to(".bg-grid", {
-        yPercent: 30,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        }
-      });
+    const initAnimations = async () => {
+      const { gsap } = await import("gsap");
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      gsap.registerPlugin(ScrollTrigger);
 
-      // ヘッダー表示（Projects / Contactと同じ見せ方）
-      gsap.fromTo(".about-header",
-        { y: 30, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: "power3.out",
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      if (reducedMotion || isMobile) {
+        gsap.set(".about-header", { y: 0, opacity: 1 });
+        gsap.set(".about-card", { y: 0, opacity: 1 });
+        gsap.set(".bg-grid", { yPercent: 0 });
+        return;
+      }
+
+      ctx = gsap.context(() => {
+        // 背景パララックス
+        gsap.to(".bg-grid", {
+          yPercent: 30,
+          ease: "none",
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 80%",
-          }
-        }
-      );
-
-      // コンテンツの表示
-      gsap.fromTo(".about-card",
-        { y: 50, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          ease: "power3.out",
-          stagger: 0.2,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 85%",
-          }
-        }
-      );
-      // プロフィールの成長トランジション
-      // 遷移: 幼少期 -> 中期 -> 現在
-      // デスクトップのみ: アニメーション。モバイル: CSSで処理し最終状態を表示。
-      
-      const mm = gsap.matchMedia();
-
-      mm.add("(min-width: 1024px)", () => {
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top top", 
-            end: "bottom bottom",
+            start: "top bottom",
+            end: "bottom top",
             scrub: true,
           }
         });
 
-        tl.to(".growth-stage-0", { opacity: 1, duration: 1, ease: "none" })
-          .to(".growth-stage-1", { opacity: 1, duration: 1, ease: "none" });
-      });
+        // ヘッダー表示（Projects / Contactと同じ見せ方）
+        gsap.fromTo(".about-header",
+          { y: 30, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 80%",
+            }
+          }
+        );
 
-    }, sectionRef);
+        // コンテンツの表示
+        gsap.fromTo(".about-card",
+          { y: 50, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.2,
+            ease: "power3.out",
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 85%",
+            }
+          }
+        );
+        // プロフィールの成長トランジション
+        const mm = gsap.matchMedia();
 
-    return () => ctx.revert();
+        mm.add("(min-width: 1024px)", () => {
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top top", 
+              end: "bottom bottom",
+              scrub: true,
+            }
+          });
+
+          tl.to(".growth-stage-0", { opacity: 1, duration: 1, ease: "none" })
+            .to(".growth-stage-1", { opacity: 1, duration: 1, ease: "none" });
+        });
+
+      }, sectionRef);
+    };
+
+    initAnimations();
+    return () => { ctx?.revert(); };
   }, []);
 
   return (
