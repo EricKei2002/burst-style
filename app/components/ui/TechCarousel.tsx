@@ -6,6 +6,7 @@ import {
   SiBlender, SiHtml5, SiCss3, SiJavascript,
   SiDocker, SiLinux
 } from "react-icons/si";
+import styles from "./TechCarousel.module.css";
 
 const techStack = [
   { name: "HTML", icon: SiHtml5, color: "text-[#E34F26]" },
@@ -31,8 +32,8 @@ export default function TechCarousel() {
   const loopStack = [...techStack, ...techStack];
 
   return (
-    <div className="w-full overflow-hidden py-16 tech-carousel fade-mask">
-      <div className="flex w-max gap-10 md:gap-16 lg:gap-24 animate-scroll-left">
+    <div className={`w-full overflow-hidden py-16 tech-carousel ${styles.fadeMask}`}>
+      <div className={`flex w-max gap-10 md:gap-16 lg:gap-24 ${styles.scrollTrack}`}>
         {loopStack.map((tech, index) => (
           <div
             key={`${tech.name}-${index}`}
