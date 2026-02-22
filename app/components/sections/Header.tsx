@@ -8,7 +8,7 @@ export default function Header() {
           aria-hidden="true"
           className="inline-flex min-h-[68px] w-full items-center rounded-xl border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm sm:text-base tracking-wide text-green-100 lg:max-w-[340px]"
         >
-          <span className="font-semibold text-green-100">My Web SIte</span>
+          <span className="font-semibold text-green-100">My Web Site</span>
         </div>
         <nav
           aria-label="サイト内ナビゲーション"

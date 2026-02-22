@@ -38,7 +38,10 @@ export default function ClientVisuals() {
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const shouldSkipVisuals = reducedMotion || saveData;
-    const allowStars = !isMobile && !shouldSkipVisuals && !isLowSpec;
+    const allowDesktopStars = !isMobile && !isLowSpec;
+    // モバイルは中〜高スペック端末のみに限定して3D背景を有効化
+    const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
+    const allowStars = !shouldSkipVisuals && (allowDesktopStars || allowMobileStars);
 
     const handlePointerMove = () => {
       setConfig((prev) => ({ ...prev, showPointerFx: true }));

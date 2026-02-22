@@ -87,7 +87,7 @@ export default function StarBackground() {
   const [isReady, setIsReady] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-  // モバイルは非表示: Heroセクションに独自のCanvasがあるため二重稼働を防ぐ
+  // モバイルでも条件付きで描画する（低負荷設定）
   const [isMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth < 768;
@@ -101,6 +101,10 @@ export default function StarBackground() {
     const cpuCores = navigator.hardwareConcurrency ?? 8;
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
+    if (window.innerWidth < 768) {
+      if (deviceMemory <= 4 || cpuCores <= 6) return 120;
+      return 220;
+    }
     if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 1200;
     return 2000;
   });
@@ -127,7 +131,7 @@ export default function StarBackground() {
   }, []);
 
   useEffect(() => {
-    if (!isVisible || isMobile || starCount === 0) return;
+    if (!isVisible || starCount === 0) return;
 
     const activate = () => setIsReady(true);
     if ("requestIdleCallback" in window) {
@@ -136,7 +140,7 @@ export default function StarBackground() {
     }
     const timer = setTimeout(activate, 500);
     return () => clearTimeout(timer);
-  }, [isMobile, isVisible, starCount]);
+  }, [isVisible, starCount]);
 
   useEffect(() => {
     if (!isReady) return;
@@ -147,8 +151,7 @@ export default function StarBackground() {
     return <SpaceshipInterior />;
   }
 
-  // モバイルは背景Canvasを描画しない（パフォーマンス向上）
-  if (isMobile || starCount === 0) {
+  if (starCount === 0) {
     return <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true" />;
   }
 
@@ -158,7 +161,7 @@ export default function StarBackground() {
         <Canvas
           camera={{ position: [0, 0, 1] }}
           gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
-          dpr={[1, 1.4]}
+          dpr={isMobile ? [0.75, 1] : [1, 1.4]}
         >
           <ambientLight intensity={0.1} />
           {showCelestialBodies && (
@@ -170,7 +173,7 @@ export default function StarBackground() {
           )}
 
           <WarpStars count={starCount} />
-          <ShootingStars />
+          {!isMobile && <ShootingStars />}
         </Canvas>
       )}
     </div>
