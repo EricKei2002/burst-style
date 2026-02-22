@@ -3,12 +3,11 @@
 import { useCallback, useRef, useEffect, useMemo, useState } from "react";
 import { useTransitionStore } from "../../lib/store";
 import MagneticButton from "../ui/MagneticButton";
+import Header from "./Header";
 import dynamic from "next/dynamic";
 
-// Three.jsのバンドルパースを初期ロードから完全に切り離す
-// モバイルは低負荷条件を満たす端末だけ描画を有効化する
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HeroCanvas = dynamic(() => import("./HeroCanvas") as any, { ssr: false }) as React.ComponentType<{
+const HeroStarsCanvas = dynamic(() => import("./HeroStarsCanvas") as any, { ssr: false }) as React.ComponentType<{
   isWarping: boolean;
   starCount: number;
   qualityTier: "high" | "mid" | "low";
@@ -171,56 +170,20 @@ export default function Top() {
 
   return (
     <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col overflow-hidden">
-      <header className="sticky inset-x-0 top-0 z-30 border-b border-zinc-800/80 bg-[#0a0a0a]/90 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
-          <a
-            href="#top"
-            aria-label="ページトップへ移動"
-            className="inline-flex min-h-[68px] w-full items-center rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-xs tracking-[0.08em] text-zinc-100 transition-colors hover:border-fuchsia-400/60 hover:text-fuchsia-200 lg:max-w-[340px]"
-          >
-            <span className="wrap-break-word">
-              My portfolio <span className="text-fuchsia-200">Web site</span>
-            </span>
-          </a>
-          <nav
-            aria-label="サイト内ナビゲーション"
-            className="min-h-[68px] w-full rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-[10px] sm:text-xs tracking-wide text-left text-zinc-100 lg:max-w-[760px]"
-          >
-            <div className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
-              <span className="text-fuchsia-200">Eric Kei</span>
-              <span className="text-zinc-300">@</span>
-              <span className="text-zinc-100">Burst Style</span>
-              <span className="text-zinc-300">~</span>
-              <span className="text-fuchsia-200">&gt;</span>
-              <span className="text-zinc-200">ls</span>
-            </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 sm:gap-x-8">
-              <a href="#projects" aria-label="Projectsセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
-                /Projects
-              </a>
-              <a href="#about" aria-label="Aboutセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
-                /About Me
-              </a>
-              <a href="#contact" aria-label="Contactセクションへ移動" className="transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-200">
-                /Contact
-              </a>
-            </div>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
-      <div className="relative flex flex-1 flex-col items-center justify-center">
+      <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
         {/* 背景の星 */}
         <div ref={canvasHostRef} className="absolute inset-0 z-0">
           {showCanvas && canRender3D && isHeroInView && (
-            <HeroCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
+            <HeroStarsCanvas isWarping={isWarping} starCount={starCount} qualityTier={qualityTier} />
           )}
         </div>
 
         <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
 
         {/* 前景のテキストコンテンツ */}
-        <div className="container relative z-10 mx-auto px-6">
+        <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
           <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/70 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
@@ -264,15 +227,17 @@ export default function Top() {
         </div>
 
         {/* テックカルーセル（全幅） */}
-        <div className="w-full mt-16 relative z-10">
+        <div className="relative z-10 mt-10 w-full min-h-[320px] sm:mt-12">
           <h2
-            className={`text-center font-mono text-xl md:text-2xl text-green-300 mb-8 tech-carousel-title transition-opacity duration-500 ${
+            className={`mb-8 text-center font-mono text-xl text-green-300 tech-carousel-title transition-opacity duration-500 md:text-2xl ${
               skillsVisible ? "opacity-100" : "opacity-0"
             }`}
           >
             &gt; My Skills
           </h2>
-          {showTechCarousel ? <TechCarousel /> : <div className="h-[320px]" aria-hidden="true" />}
+          <div className="min-h-[240px]">
+            {showTechCarousel ? <TechCarousel /> : <div className="h-[240px]" aria-hidden="true" />}
+          </div>
         </div>
       </div>
 
