@@ -12,12 +12,19 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   const [shouldUseLenis, setShouldUseLenis] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const initLenis = () => {
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
       setShouldUseLenis(!reducedMotion && !isCoarsePointer);
-    }, 0);
-    return () => clearTimeout(timer);
+    };
+
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(initLenis, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(initLenis, 1500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   if (!shouldUseLenis) {
