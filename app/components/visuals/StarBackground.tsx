@@ -155,11 +155,16 @@ export default function StarBackground() {
     if (!isReady || !showCelestialBodies) return;
 
     const activate = () => setShowCelestialsNow(true);
+    const isMobile = window.innerWidth < 768;
+    // モバイルはLCP保護のために遅延させるが、デスクトップはすぐ表示して「再読み込み」に見えるカクつきを防ぐ
+    const delay = isMobile ? 2500 : 100;
+    const timeout = isMobile ? 3500 : 200;
+
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 3500 });
+      const id = window.requestIdleCallback(activate, { timeout });
       return () => window.cancelIdleCallback(id);
     }
-    const timer = setTimeout(activate, 2500);
+    const timer = setTimeout(activate, delay);
     return () => clearTimeout(timer);
   }, [isReady, showCelestialBodies]);
 
