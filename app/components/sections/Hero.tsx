@@ -47,7 +47,7 @@ export default function Top() {
       } else {
         activate();
       }
-    }, 6000);
+    }, 3000);
 
     return () => {
       clearTimeout(timer);
@@ -82,7 +82,7 @@ export default function Top() {
 
         {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black/70 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
               <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
@@ -105,8 +105,8 @@ export default function Top() {
                   <button
                     type="button"
                     onClick={showDescription}
-                    className={`trigger-btn rounded border border-green-300/45 bg-zinc-950/95 px-2 py-0.5 text-green-100 transition-colors inline-block font-mono text-xs ${
-                      descriptionVisible ? "opacity-60 cursor-default pointer-events-none" : "cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
+                    className={`trigger-btn rounded border px-2 py-0.5 transition-colors inline-block font-mono text-xs ${
+                      descriptionVisible ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none" : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
                     }`}
                     aria-label="詳細を表示する"
                   >
