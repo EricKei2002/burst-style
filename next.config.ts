@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // 本番配信サイズを抑えてLighthouseの転送量指標を改善
   productionBrowserSourceMaps: false,
+  experimental: {
+    optimizePackageImports: ['react-icons', 'lucide-react', '@react-three/drei', 'three'],
+  },
   async headers() {
     return [
       {
@@ -55,4 +58,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const analyzerConfig = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default analyzerConfig(nextConfig);

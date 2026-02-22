@@ -21,42 +21,31 @@ export default function Top() {
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
   
+  const carouselTriggerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const t2 = setTimeout(() => setSkillsVisible(true), 700);
     return () => clearTimeout(t2);
   }, []);
 
   useEffect(() => {
-    if (!skillsVisible || showTechCarousel) return;
-    let activated = false;
-    const activate = () => {
-      if (activated) return;
-      activated = true;
-      setShowTechCarousel(true);
-    };
+    if (showTechCarousel) return;
+    const target = carouselTriggerRef.current;
+    if (!target) return;
 
-    const onFirstInteraction = () => activate();
-    window.addEventListener("pointerdown", onFirstInteraction, { once: true, passive: true });
-    window.addEventListener("scroll", onFirstInteraction, { once: true, passive: true });
-    window.addEventListener("keydown", onFirstInteraction, { once: true });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowTechCarousel(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px 500px 0px", threshold: 0.01 }
+    );
 
-    const isMobile = window.innerWidth < 768;
-    const delay = isMobile ? 3500 : 800;
-    const timer = setTimeout(() => {
-      if ("requestIdleCallback" in window) {
-        window.requestIdleCallback(activate);
-      } else {
-        activate();
-      }
-    }, delay);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("pointerdown", onFirstInteraction);
-      window.removeEventListener("scroll", onFirstInteraction);
-      window.removeEventListener("keydown", onFirstInteraction);
-    };
-  }, [showTechCarousel, skillsVisible]);
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [showTechCarousel]);
 
   const showDescription = useCallback(() => {
     setDescriptionVisible(true);
@@ -137,7 +126,7 @@ export default function Top() {
           >
             &gt; My Skills
           </h2>
-          <div className="min-h-[240px]">
+          <div ref={carouselTriggerRef} className="min-h-[240px]">
             {showTechCarousel ? <TechCarousel /> : <div className="h-[240px]" aria-hidden="true" />}
           </div>
         </div>

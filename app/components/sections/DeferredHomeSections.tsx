@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
+const Projects = dynamic(() => import("./Projects"), { ssr: false });
 const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
 const ContactSection = dynamic(() => import("./ContactSection"), { ssr: false });
 const Footer = dynamic(() => import("./Footer"), { ssr: false });
@@ -36,6 +37,7 @@ export default function DeferredHomeSections() {
 
   return (
     <>
+      <Projects />
       <AboutSection />
       <ContactSection />
       <Footer />
