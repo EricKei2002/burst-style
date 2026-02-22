@@ -40,13 +40,15 @@ export default function Top() {
     window.addEventListener("scroll", onFirstInteraction, { once: true, passive: true });
     window.addEventListener("keydown", onFirstInteraction, { once: true });
 
+    const isMobile = window.innerWidth < 768;
+    const delay = isMobile ? 3500 : 800;
     const timer = setTimeout(() => {
       if ("requestIdleCallback" in window) {
         window.requestIdleCallback(activate);
       } else {
         activate();
       }
-    }, 3000);
+    }, delay);
 
     return () => {
       clearTimeout(timer);

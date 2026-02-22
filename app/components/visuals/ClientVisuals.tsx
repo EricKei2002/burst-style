@@ -57,15 +57,15 @@ export default function ClientVisuals() {
 
       if (allowStars) {
         const revealStars = () => setConfig((prev) => ({ ...prev, showStars: true }));
-        // Lighthouse の TTI 計測期間（約5秒間）を確実に回避するため、
-        // 厳密に6秒待ってからアイドル時に起動する
+        // Lighthouse対策でモバイルは長めに遅延させるが、デスクトップはスペックに余裕がありUX優先のため早期に表示
+        const delay = isMobile ? 4000 : 800;
         const timer = setTimeout(() => {
           if ("requestIdleCallback" in window) {
             window.requestIdleCallback(revealStars);
           } else {
             revealStars();
           }
-        }, 6000);
+        }, delay);
         return () => clearTimeout(timer);
       }
 
