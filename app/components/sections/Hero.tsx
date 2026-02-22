@@ -13,28 +13,6 @@ const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
   ssr: false,
 });
 
-const SplitText = ({
-  children,
-  className = "",
-  charClassName = "",
-  revealed = false,
-}: {
-  children: string;
-  className?: string;
-  charClassName?: string;
-  revealed?: boolean;
-}) => {
-  return (
-    <span className={`${className}`}>
-      {children.split("").map((char, i) => (
-        <span key={i} className={`char inline-block transition-opacity duration-300 ${revealed ? "opacity-100" : "opacity-0"} ${charClassName}`}>
-          {char === " " ? "\u00A0" : char}
-        </span>
-      ))}
-    </span>
-  );
-};
-
 export default function Top() {
   const containerRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -51,13 +29,35 @@ export default function Top() {
 
   useEffect(() => {
     if (!skillsVisible || showTechCarousel) return;
-    const activate = () => setShowTechCarousel(true);
+    let activated = false;
+    const activate = () => {
+      if (activated) return;
+      activated = true;
+      setShowTechCarousel(true);
+    };
+
+    const onFirstInteraction = () => activate();
+    window.addEventListener("pointerdown", onFirstInteraction, { once: true, passive: true });
+    window.addEventListener("scroll", onFirstInteraction, { once: true, passive: true });
+    window.addEventListener("keydown", onFirstInteraction, { once: true });
+
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 2200 });
-      return () => window.cancelIdleCallback(id);
+      const id = window.requestIdleCallback(activate, { timeout: 3000 });
+      return () => {
+        window.cancelIdleCallback(id);
+        window.removeEventListener("pointerdown", onFirstInteraction);
+        window.removeEventListener("scroll", onFirstInteraction);
+        window.removeEventListener("keydown", onFirstInteraction);
+      };
     }
-    const timer = setTimeout(activate, 900);
-    return () => clearTimeout(timer);
+
+    const timer = setTimeout(activate, 2500);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("pointerdown", onFirstInteraction);
+      window.removeEventListener("scroll", onFirstInteraction);
+      window.removeEventListener("keydown", onFirstInteraction);
+    };
   }, [showTechCarousel, skillsVisible]);
 
   const showDescription = useCallback(() => {
@@ -89,7 +89,7 @@ export default function Top() {
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
               <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
-                <SplitText revealed={introVisible} charClassName="title-char">Hello, I&apos;m</SplitText>
+                <span className="title-char">Hello, I&apos;m</span>
               </div>
               <div className={`flex items-center justify-center transition-opacity duration-500 ${introVisible ? "opacity-100" : "opacity-0"}`}>
                 <div className="font-mono pb-2 inline-block">
@@ -118,9 +118,13 @@ export default function Top() {
                 </MagneticButton>
               </div>
               <p className="text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
-                <SplitText revealed={descriptionVisible} charClassName="desc-char">&quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。</SplitText>
+                <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
+                  &quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。
+                </span>
                 <br className="hidden sm:block" />
-                <SplitText revealed={descriptionVisible} charClassName="desc-char">Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。</SplitText>
+                <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
+                  Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。
+                </span>
               </p>
             </div>
           </div>
