@@ -18,13 +18,17 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       setShouldUseLenis(!reducedMotion && !isCoarsePointer);
     };
 
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(initLenis, { timeout: 2000 });
-      return () => window.cancelIdleCallback(id);
-    } else {
-      const timer = setTimeout(initLenis, 1500);
-      return () => clearTimeout(timer);
-    }
+    // モバイルの重いLCP要素の描画が完了するのを待つため、厳密な遅延を設ける。
+    // requestIdleCallbackのtimeoutを使うとTTI計測期間中に強制実行されTBT/LCP悪化につながるため、setTimeoutを基本とする。
+    const timer = setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(initLenis);
+      } else {
+        initLenis();
+      }
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (!shouldUseLenis) {
