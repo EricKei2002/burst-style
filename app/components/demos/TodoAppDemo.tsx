@@ -154,7 +154,7 @@ export default App;`;
       {/* Title Bar & Tabs */}
       <div className="flex h-8 items-center justify-between bg-zinc-800 px-3 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded-full bg-blue-500 text-[9px] font-bold flex items-center justify-center text-white">TS</div>
+          <div className="h-4 w-4 rounded-full bg-blue-600 text-[9px] font-bold flex items-center justify-center text-white">TS</div>
           <span className="text-xs text-zinc-200">App.tsx</span>
         </div>
         <div className="flex gap-2">

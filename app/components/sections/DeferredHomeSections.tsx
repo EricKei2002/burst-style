@@ -24,7 +24,7 @@ export default function DeferredHomeSections() {
           observer.disconnect();
         }
       },
-      { rootMargin: "450px 0px 450px 0px", threshold: 0.01 }
+      { rootMargin: "100px 0px 100px 0px", threshold: 0.01 }
     );
 
     observer.observe(target);

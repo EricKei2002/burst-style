@@ -40,7 +40,7 @@ export default function Top() {
           observer.disconnect();
         }
       },
-      { rootMargin: "200px 0px 500px 0px", threshold: 0.01 }
+      { rootMargin: "100px 0px 100px 0px", threshold: 0.01 }
     );
 
     observer.observe(target);
