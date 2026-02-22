@@ -51,9 +51,20 @@ export default function ClientVisuals() {
     const activate = () => {
       setConfig({
         ready: true,
-        showStars: allowStars,
+        showStars: false,
         showPointerFx: false,
       });
+
+      if (allowStars) {
+        const revealStars = () => setConfig((prev) => ({ ...prev, showStars: true }));
+        if ("requestIdleCallback" in window) {
+          const id = window.requestIdleCallback(revealStars, { timeout: isMobile ? 1800 : 2600 });
+          setTimeout(() => window.cancelIdleCallback(id), isMobile ? 2200 : 3200);
+        } else {
+          setTimeout(revealStars, isMobile ? 1400 : 2000);
+        }
+      }
+
       if (canHover && !shouldSkipVisuals) {
         window.addEventListener("pointermove", handlePointerMove, { once: true });
       }
@@ -61,14 +72,14 @@ export default function ClientVisuals() {
 
     // 初回描画とLCP計測を優先して、装飾ビジュアルはアイドル時に起動
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 700 });
+      const id = window.requestIdleCallback(activate, { timeout: 1000 });
       return () => {
         window.cancelIdleCallback(id);
         window.removeEventListener("pointermove", handlePointerMove);
       };
     }
 
-    const timer = setTimeout(activate, 500);
+    const timer = setTimeout(activate, 800);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointermove", handlePointerMove);

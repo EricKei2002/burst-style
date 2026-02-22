@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, Suspense } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 
 // Components
-import TheSun from "./TheSun";
-import Moon from "./Moon";
-import Earth from "./Earth";
-import ShootingStars from "./ShootingStars";
-import SpaceshipInterior from "./SpaceshipInterior";
+const TheSun = dynamic(() => import("./TheSun"), { ssr: false });
+const Moon = dynamic(() => import("./Moon"), { ssr: false });
+const Earth = dynamic(() => import("./Earth"), { ssr: false });
+const ShootingStars = dynamic(() => import("./ShootingStars"), { ssr: false });
+const SpaceshipInterior = dynamic(() => import("./SpaceshipInterior"), { ssr: false });
 
 // コンポーネント外（モジュールスコープ）でデータ生成 — lintルール準拠
 function createStarData(count: number) {
@@ -85,6 +86,7 @@ export default function StarBackground() {
   const isProjectPage = pathname.startsWith("/projects/");
   const observerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
+  const [showCelestialsNow, setShowCelestialsNow] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // モバイルでも条件付きで描画する（低負荷設定）
@@ -102,11 +104,11 @@ export default function StarBackground() {
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
     if (window.innerWidth < 768) {
-      if (deviceMemory <= 4 || cpuCores <= 6) return 120;
-      return 220;
+      if (deviceMemory <= 4 || cpuCores <= 6) return 90;
+      return 140;
     }
-    if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 1200;
-    return 2000;
+    if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 650;
+    return 1000;
   });
   const [showCelestialBodies] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -147,6 +149,18 @@ export default function StarBackground() {
     window.dispatchEvent(new CustomEvent("burst:stars-ready"));
   }, [isReady]);
 
+  useEffect(() => {
+    if (!isReady || !showCelestialBodies) return;
+
+    const activate = () => setShowCelestialsNow(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 3500 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(activate, 2500);
+    return () => clearTimeout(timer);
+  }, [isReady, showCelestialBodies]);
+
   if (isProjectPage) {
     return <SpaceshipInterior />;
   }
@@ -161,19 +175,15 @@ export default function StarBackground() {
         <Canvas
           camera={{ position: [0, 0, 1] }}
           gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
-          dpr={isMobile ? [0.75, 1] : [1, 1.4]}
+          dpr={isMobile ? [0.75, 1] : [1, 1.1]}
         >
           <ambientLight intensity={0.1} />
-          {showCelestialBodies && (
-            <Suspense fallback={null}>
-              <TheSun />
-              <Moon />
-              <Earth />
-            </Suspense>
-          )}
+          {showCelestialBodies && showCelestialsNow && <TheSun />}
+          {showCelestialBodies && showCelestialsNow && <Moon />}
+          {showCelestialBodies && showCelestialsNow && <Earth />}
 
           <WarpStars count={starCount} />
-          {!isMobile && <ShootingStars />}
+          {!isMobile && showCelestialsNow && <ShootingStars />}
         </Canvas>
       )}
     </div>
