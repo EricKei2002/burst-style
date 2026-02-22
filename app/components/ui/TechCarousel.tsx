@@ -34,9 +34,12 @@ export default function TechCarousel() {
     <div className="w-full overflow-hidden py-16 tech-carousel fade-mask">
       <div className="flex w-max gap-10 md:gap-16 lg:gap-24 animate-scroll-left">
         {loopStack.map((tech, index) => (
-          <div key={`${tech.name}-${index}`} className="flex items-center gap-3 md:gap-6 group">
+          <div
+            key={`${tech.name}-${index}`}
+            className="group flex items-center gap-3 rounded-md border border-zinc-700/80 bg-zinc-950/95 px-3 py-2 md:gap-6 md:px-4"
+          >
             <tech.icon aria-hidden="true" className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
-            <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-100 group-hover:text-white transition-colors whitespace-nowrap">
+            <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-50 group-hover:text-white transition-colors whitespace-nowrap">
               {tech.name}
             </span>
           </div>

@@ -45,38 +45,12 @@ export default function ClientVisuals() {
       window.removeEventListener("pointermove", handlePointerMove);
     };
 
-    const waitInitialInteraction = (callback: () => void) => {
-      const done = () => {
-        window.removeEventListener("pointerdown", done);
-        window.removeEventListener("scroll", done);
-        window.removeEventListener("keydown", done);
-        callback();
-      };
-
-      window.addEventListener("pointerdown", done, { once: true, passive: true });
-      window.addEventListener("scroll", done, { once: true, passive: true });
-      window.addEventListener("keydown", done, { once: true });
-
-      return () => {
-        window.removeEventListener("pointerdown", done);
-        window.removeEventListener("scroll", done);
-        window.removeEventListener("keydown", done);
-      };
-    };
-
-    let cleanupInitialInteraction: (() => void) | null = null;
-
     const activate = () => {
       setConfig({
         ready: true,
-        showStars: false,
+        showStars: allowStars,
         showPointerFx: false,
       });
-      if (allowStars) {
-        cleanupInitialInteraction = waitInitialInteraction(() => {
-          setConfig((prev) => ({ ...prev, showStars: true }));
-        });
-      }
       if (canHover && !shouldSkipVisuals) {
         window.addEventListener("pointermove", handlePointerMove, { once: true });
       }
@@ -84,19 +58,17 @@ export default function ClientVisuals() {
 
     // 初回描画とLCP計測を優先して、装飾ビジュアルはアイドル時に起動
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 1500 });
+      const id = window.requestIdleCallback(activate, { timeout: 700 });
       return () => {
         window.cancelIdleCallback(id);
         window.removeEventListener("pointermove", handlePointerMove);
-        cleanupInitialInteraction?.();
       };
     }
 
-    const timer = setTimeout(activate, 1200);
+    const timer = setTimeout(activate, 500);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointermove", handlePointerMove);
-      cleanupInitialInteraction?.();
     };
   }, []);
 

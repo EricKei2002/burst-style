@@ -86,7 +86,6 @@ export default function StarBackground() {
   const observerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [hasInteraction, setHasInteraction] = useState(false);
 
   // モバイルは非表示: Heroセクションに独自のCanvasがあるため二重稼働を防ぐ
   const [isMobile] = useState(() => {
@@ -128,30 +127,21 @@ export default function StarBackground() {
   }, []);
 
   useEffect(() => {
-    const onInteraction = () => setHasInteraction(true);
-
-    window.addEventListener("pointerdown", onInteraction, { once: true, passive: true });
-    window.addEventListener("scroll", onInteraction, { once: true, passive: true });
-    window.addEventListener("keydown", onInteraction, { once: true });
-
-    return () => {
-      window.removeEventListener("pointerdown", onInteraction);
-      window.removeEventListener("scroll", onInteraction);
-      window.removeEventListener("keydown", onInteraction);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isVisible || !hasInteraction || isMobile || starCount === 0) return;
+    if (!isVisible || isMobile || starCount === 0) return;
 
     const activate = () => setIsReady(true);
     if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 2500 });
+      const id = window.requestIdleCallback(activate, { timeout: 900 });
       return () => window.cancelIdleCallback(id);
     }
-    const timer = setTimeout(activate, 1200);
+    const timer = setTimeout(activate, 500);
     return () => clearTimeout(timer);
-  }, [hasInteraction, isMobile, isVisible, starCount]);
+  }, [isMobile, isVisible, starCount]);
+
+  useEffect(() => {
+    if (!isReady) return;
+    window.dispatchEvent(new CustomEvent("burst:stars-ready"));
+  }, [isReady]);
 
   if (isProjectPage) {
     return <SpaceshipInterior />;
