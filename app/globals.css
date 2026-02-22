@@ -189,4 +189,11 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
+
+  /* TechCarouselはユーザー要望により常時スクロールを維持 */
+  .tech-carousel .animate-scroll-left {
+    animation: scroll-left 40s linear infinite !important;
+    animation-duration: 40s !important;
+    animation-iteration-count: infinite !important;
+  }
 }
