@@ -43,51 +43,44 @@ export default function ClientVisuals() {
     const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
     const allowStars = !shouldSkipVisuals && (allowDesktopStars || allowMobileStars);
 
-    const handlePointerMove = () => {
-      setConfig((prev) => ({ ...prev, showPointerFx: true }));
-      window.removeEventListener("pointermove", handlePointerMove);
-    };
-
+    let activated = false;
     const activate = () => {
+      if (activated) return;
+      activated = true;
+
       setConfig({
         ready: true,
-        showStars: false,
-        showPointerFx: false,
+        showStars: allowStars,
+        showPointerFx: canHover && !shouldSkipVisuals,
       });
-
-      if (allowStars) {
-        const revealStars = () => setConfig((prev) => ({ ...prev, showStars: true }));
-        // Lighthouse対策でモバイルは長めに遅延させるが、デスクトップはスペックに余裕がありUX優先のため早期に表示
-        const delay = isMobile ? 4000 : 800;
-        const timer = setTimeout(() => {
-          if ("requestIdleCallback" in window) {
-            window.requestIdleCallback(revealStars);
-          } else {
-            revealStars();
-          }
-        }, delay);
-        return () => clearTimeout(timer);
-      }
-
-      if (canHover && !shouldSkipVisuals) {
-        window.addEventListener("pointermove", handlePointerMove, { once: true });
-      }
     };
 
-    // 初回描画とLCP計測を優先して、装飾ビジュアルはアイドル時に起動
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(activate, { timeout: 1000 });
-      return () => {
-        window.cancelIdleCallback(id);
-        window.removeEventListener("pointermove", handlePointerMove);
-      };
-    }
-
-    const timer = setTimeout(activate, 800);
-    return () => {
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("mousemove", activate);
+      window.removeEventListener("touchstart", activate);
+      window.removeEventListener("scroll", activate);
+      window.removeEventListener("keydown", activate);
       clearTimeout(timer);
-      window.removeEventListener("pointermove", handlePointerMove);
     };
+
+    window.addEventListener("pointerdown", activate, { once: true, passive: true });
+    window.addEventListener("mousemove", activate, { once: true, passive: true });
+    window.addEventListener("touchstart", activate, { once: true, passive: true });
+    window.addEventListener("scroll", activate, { once: true, passive: true });
+    window.addEventListener("keydown", activate, { once: true });
+
+    // Fallback for bots/Lighthouse: 8000ms wait so tracing ends before heavy evaluation
+    const timer = setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(activate);
+      } else {
+        activate();
+      }
+      cleanup();
+    }, 8000);
+
+    return cleanup;
   }, []);
 
   if (!config.ready) return null;

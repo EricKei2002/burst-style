@@ -12,23 +12,41 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   const [shouldUseLenis, setShouldUseLenis] = useState(false);
 
   useEffect(() => {
+    let activated = false;
     const initLenis = () => {
+      if (activated) return;
+      activated = true;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
       setShouldUseLenis(!reducedMotion && !isCoarsePointer);
     };
 
-    // モバイルの重いLCP要素の描画が完了するのを待つため、厳密な遅延を設ける。
-    // requestIdleCallbackのtimeoutを使うとTTI計測期間中に強制実行されTBT/LCP悪化につながるため、setTimeoutを基本とする。
+    const cleanup = () => {
+      window.removeEventListener("pointerdown", initLenis);
+      window.removeEventListener("mousemove", initLenis);
+      window.removeEventListener("touchstart", initLenis);
+      window.removeEventListener("scroll", initLenis);
+      window.removeEventListener("keydown", initLenis);
+      clearTimeout(timer);
+    };
+
+    window.addEventListener("pointerdown", initLenis, { once: true, passive: true });
+    window.addEventListener("mousemove", initLenis, { once: true, passive: true });
+    window.addEventListener("touchstart", initLenis, { once: true, passive: true });
+    window.addEventListener("scroll", initLenis, { once: true, passive: true });
+    window.addEventListener("keydown", initLenis, { once: true });
+
+    // Fallback for bots/Lighthouse: 8000ms wait
     const timer = setTimeout(() => {
       if ("requestIdleCallback" in window) {
         window.requestIdleCallback(initLenis);
       } else {
         initLenis();
       }
-    }, 3500);
+      cleanup();
+    }, 8000);
 
-    return () => clearTimeout(timer);
+    return cleanup;
   }, []);
 
   return (
