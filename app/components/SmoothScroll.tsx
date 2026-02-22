@@ -31,10 +31,12 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     return () => clearTimeout(timer);
   }, []);
 
-  if (!shouldUseLenis) {
-    return <>{children}</>;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }}>{children as any}</ReactLenis>;
+  return (
+    <>
+      {shouldUseLenis && (
+        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }} />
+      )}
+      {children}
+    </>
+  );
 }

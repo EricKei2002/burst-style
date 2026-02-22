@@ -74,11 +74,16 @@ export default function ClientVisuals() {
       }
     };
 
-    // 初回描画とLCP計測を優先しつつも、デスクトップ等でのカクつきを防ぐため
-    // requestIdleCallbackは使用せず、シンプルなタイマーで即座〜短時間で起動する
-    const activateDelay = isMobile ? 800 : 100;
-    const timer = setTimeout(activate, activateDelay);
-    
+    // 初回描画とLCP計測を優先して、装飾ビジュアルはアイドル時に起動
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 1000 });
+      return () => {
+        window.cancelIdleCallback(id);
+        window.removeEventListener("pointermove", handlePointerMove);
+      };
+    }
+
+    const timer = setTimeout(activate, 800);
     return () => {
       clearTimeout(timer);
       window.removeEventListener("pointermove", handlePointerMove);
