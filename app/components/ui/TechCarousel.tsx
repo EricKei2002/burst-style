@@ -2,9 +2,9 @@
 
 import { 
   SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiNodedotjs, 
-  SiThreedotjs, SiFigma, SiGithub, SiVercel, SiBun, SiDiscord,
+  SiThreedotjs, SiGithub, SiVercel, SiBun, SiDiscord,
   SiBlender, SiHtml5, SiCss3, SiJavascript,
-  SiDocker, SiLinux
+  SiDocker, SiLinux, SiNpm, SiTailscale, SiGithubactions
 } from "react-icons/si";
 
 const techStack = [
@@ -20,7 +20,9 @@ const techStack = [
   { name: "Blender", icon: SiBlender, color: "text-[#F5792A]" },
   { name: "Docker", icon: SiDocker, color: "text-[#2496ED]" },
   { name: "Linux", icon: SiLinux, color: "text-white" },
-  { name: "Figma", icon: SiFigma, color: "text-[#F24E1E]" },
+  { name: "npm", icon: SiNpm, color: "text-[#CB3837]" },
+  { name: "Tailscale", icon: SiTailscale, color: "text-white" },
+  { name: "GitHub Actions", icon: SiGithubactions, color: "text-[#2088FF]" },
   { name: "GitHub", icon: SiGithub, color: "text-white" },
   { name: "Vercel", icon: SiVercel, color: "text-white" },
   { name: "Bun", icon: SiBun, color: "text-[#FBF0DF]" },
