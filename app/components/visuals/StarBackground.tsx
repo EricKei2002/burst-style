@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 
 // Components
@@ -11,7 +10,6 @@ const TheSun = dynamic(() => import("./TheSun"), { ssr: false });
 const Moon = dynamic(() => import("./Moon"), { ssr: false });
 const Earth = dynamic(() => import("./Earth"), { ssr: false });
 const ShootingStars = dynamic(() => import("./ShootingStars"), { ssr: false });
-const SpaceshipInterior = dynamic(() => import("./SpaceshipInterior"), { ssr: false });
 
 // コンポーネント外（モジュールスコープ）でデータ生成 — lintルール準拠
 function createStarData(count: number) {
@@ -82,8 +80,6 @@ function WarpStars({ count = 4000 }: { count?: number }) {
 
 
 export default function StarBackground() {
-  const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
   const observerRef = useRef<HTMLDivElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [showCelestialsNow, setShowCelestialsNow] = useState(false);
@@ -167,10 +163,6 @@ export default function StarBackground() {
     const timer = setTimeout(activate, delay);
     return () => clearTimeout(timer);
   }, [isReady, showCelestialBodies]);
-
-  if (isProjectPage) {
-    return <SpaceshipInterior />;
-  }
 
   if (starCount === 0) {
     return <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true" />;

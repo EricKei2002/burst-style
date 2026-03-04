@@ -2,10 +2,15 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 // クライアントコンポーネント内でssr:falseのdynamic importを使う
 const StarBackground = dynamic(
   () => import("./StarBackground"),
+  { ssr: false }
+);
+const SpaceshipInterior = dynamic(
+  () => import("./SpaceshipInterior"),
   { ssr: false }
 );
 const MouseTrail = dynamic(
@@ -18,6 +23,9 @@ const CustomCursor = dynamic(
 );
 
 export default function ClientVisuals() {
+  const pathname = usePathname();
+  const isProjectPage = pathname.startsWith("/projects/");
+
   const [config, setConfig] = useState<{
     ready: boolean;
     showStars: boolean;
@@ -29,15 +37,15 @@ export default function ClientVisuals() {
   });
 
   useEffect(() => {
+    // Projectsページは動画背景を常に即座に表示するためここでは処理しない
     const isMobile = window.innerWidth < 768;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     const saveData = connection?.saveData ?? false;
     const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
-    const shouldSkipVisuals = reducedMotion || saveData;
+    const shouldSkipVisuals = saveData;
     const allowDesktopStars = !isMobile && !isLowSpec;
     // モバイルは中〜高スペック端末のみに限定して3D背景を有効化
     const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
@@ -81,7 +89,17 @@ export default function ClientVisuals() {
     }, 8000);
 
     return cleanup;
-  }, []);
+  }, [isProjectPage]);
+
+  // Projectsページは動画背景を即座に表示
+  if (isProjectPage) {
+    return <SpaceshipInterior />;
+  }
+
+  // Projectsページは動画背景を即座に表示（状態管理不要）
+  if (isProjectPage) {
+    return <SpaceshipInterior />;
+  }
 
   if (!config.ready) return null;
 
