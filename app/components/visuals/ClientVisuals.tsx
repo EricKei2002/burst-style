@@ -47,8 +47,8 @@ export default function ClientVisuals() {
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const shouldSkipVisuals = saveData;
     const allowDesktopStars = !isMobile && !isLowSpec;
-    // モバイルは中〜高スペック端末のみに限定して3D背景を有効化
-    const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
+    // モバイルは一般的なスマホでも表示できるよう条件を緩和（RAM 2GB超 & CPU 4コア超）
+    const allowMobileStars = isMobile && deviceMemory > 2 && cpuCores > 4;
     const allowStars = !shouldSkipVisuals && (allowDesktopStars || allowMobileStars);
 
     let activated = false;
