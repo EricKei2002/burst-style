@@ -4,10 +4,8 @@ import { notFound } from "next/navigation";
 import DecryptedText from "../../components/ui/DecryptedText";
 import ProjectDocs from "../../components/ui/ProjectDocs";
 import BackButton from "../../components/ui/BackButton";
-import dynamic from "next/dynamic";
-
-// クライアントのみで動作するイントロ演出（SSR不要）
-const ProjectIntro = dynamic(() => import("../../components/visuals/ProjectIntro"), { ssr: false });
+// ProjectIntroは"use client"のServer Componentから直接importできる
+import ProjectIntro from "../../components/visuals/ProjectIntro";
 
 // 静的エクスポートのために静的パラメータが生成されることを確認
 export function generateStaticParams() {
