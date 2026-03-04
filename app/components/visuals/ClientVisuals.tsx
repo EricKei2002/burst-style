@@ -40,16 +40,13 @@ export default function ClientVisuals() {
     // Projectsページは動画背景を常に即座に表示するためここでは処理しない
     const isMobile = window.innerWidth < 768;
     const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-    const saveData = connection?.saveData ?? false;
     const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
-    const shouldSkipVisuals = saveData;
     const allowDesktopStars = !isMobile && !isLowSpec;
-    // モバイルは一般的なスマホでも表示できるよう条件を緩和（RAM 2GB超 & CPU 4コア超）
-    const allowMobileStars = isMobile && deviceMemory > 2 && cpuCores > 4;
-    const allowStars = !shouldSkipVisuals && (allowDesktopStars || allowMobileStars);
+    // モバイルは中〜高スペック端末のみに限定して3D背景を有効化
+    const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
+    const allowStars = allowDesktopStars || allowMobileStars;
 
     let activated = false;
     const activate = () => {
@@ -59,7 +56,7 @@ export default function ClientVisuals() {
       setConfig({
         ready: true,
         showStars: allowStars,
-        showPointerFx: canHover && !shouldSkipVisuals,
+        showPointerFx: canHover,
       });
     };
 
