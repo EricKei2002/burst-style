@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: false,
   experimental: {
     optimizePackageImports: ['react-icons', 'lucide-react', '@react-three/drei', 'three'],
+    optimizeCss: true,
   },
   async headers() {
     return [

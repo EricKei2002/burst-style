@@ -29,24 +29,51 @@ const techStack = [
   { name: "Discord.js", icon: SiDiscord, color: "text-[#5865F2]" },
 ];
 
+// globals.cssから移動: スクロールアニメーションとフェードマスクをインライン化して
+// レンダーブロッキングCSSチャンクのサイズを削減する
+const carouselStyles = `
+  @keyframes scroll-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .tech-carousel-inner {
+    animation: scroll-left 40s linear infinite;
+  }
+  .tech-carousel-wrap {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tech-carousel-inner {
+      animation: scroll-left 40s linear infinite !important;
+      animation-duration: 40s !important;
+      animation-iteration-count: infinite !important;
+    }
+  }
+`;
+
 export default function TechCarousel() {
   const loopStack = [...techStack, ...techStack];
 
   return (
-    <div className="w-full overflow-hidden py-16 tech-carousel fade-mask">
-      <div className="flex w-max gap-10 md:gap-16 lg:gap-24 animate-scroll-left">
-        {loopStack.map((tech, index) => (
-          <div
-            key={`${tech.name}-${index}`}
-            className="group flex items-center gap-3 rounded-md border border-zinc-700/80 bg-zinc-950/95 px-3 py-2 md:gap-6 md:px-4"
-          >
-            <tech.icon aria-hidden="true" className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
-            <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-50 group-hover:text-white transition-colors whitespace-nowrap">
-              {tech.name}
-            </span>
-          </div>
-        ))}
+    <>
+      {/* スクロールアニメーションCSSをコンポーネントローカルに配置しレンダーブロッキングを削減 */}
+      <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
+      <div className="w-full overflow-hidden py-16 tech-carousel tech-carousel-wrap">
+        <div className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner">
+          {loopStack.map((tech, index) => (
+            <div
+              key={`${tech.name}-${index}`}
+              className="group flex items-center gap-3 rounded-md border border-zinc-700/80 bg-zinc-950/95 px-3 py-2 md:gap-6 md:px-4"
+            >
+              <tech.icon aria-hidden="true" className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
+              <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-50 group-hover:text-white transition-colors whitespace-nowrap">
+                {tech.name}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
