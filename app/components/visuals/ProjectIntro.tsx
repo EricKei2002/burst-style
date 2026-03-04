@@ -68,43 +68,9 @@ export default function ProjectIntro() {
         />
         <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
       </video>
-
       {/* 映画的なオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
-
-      {/* スキップヒント */}
-      <div
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        style={{
-          animation: "pulse-hint 1.5s ease-in-out infinite",
-        }}
-      >
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            @keyframes pulse-hint {
-              0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
-              50% { opacity: 1; transform: translateX(-50%) translateY(-4px); }
-            }
-          `
-        }} />
-        <span className="font-mono text-xs text-zinc-400 tracking-widest uppercase">
-          tap to enter
-        </span>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-zinc-500"
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      </div>
     </div>
   );
 }
