@@ -44,8 +44,8 @@ export default function ClientVisuals() {
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const allowDesktopStars = !isMobile && !isLowSpec;
-    // モバイルは中〜高スペック端末のみに限定して3D背景を有効化
-    const allowMobileStars = isMobile && deviceMemory > 4 && cpuCores > 6;
+    // モバイルはRAM 2GB超・CPUコア2超の端末で有効化（条件を緩和）
+    const allowMobileStars = isMobile && deviceMemory > 2 && cpuCores > 2;
     const allowStars = allowDesktopStars || allowMobileStars;
 
     let activated = false;
