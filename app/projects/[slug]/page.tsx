@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import DecryptedText from "../../components/ui/DecryptedText";
 import ProjectDocs from "../../components/ui/ProjectDocs";
 import BackButton from "../../components/ui/BackButton";
+import dynamic from "next/dynamic";
+
+// クライアントのみで動作するイントロ演出（SSR不要）
+const ProjectIntro = dynamic(() => import("../../components/visuals/ProjectIntro"), { ssr: false });
 
 // 静的エクスポートのために静的パラメータが生成されることを確認
 export function generateStaticParams() {
@@ -21,7 +25,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   }
 
   return (
-    <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
+    <>
+      {/* ページを開いた直後に動画を全画面表示するイントロ演出 */}
+      <ProjectIntro />
+      <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
         
         {/* ナビゲーション - 固定配置のためここでは削除、または空のdivを残すことなく配置 */}
@@ -163,5 +170,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
       </div>
     </article>
+    </>
   );
 }
