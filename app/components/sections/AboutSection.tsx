@@ -423,7 +423,7 @@ const timeline: TimelineItem[] = [
     ]
   },
   {
-    year: "2025 (Autumn)",
+    year: "2025 ",
     title: "Web Development & TypeScript",
     description: (
       <div className="space-y-4">
@@ -442,10 +442,10 @@ const timeline: TimelineItem[] = [
     ),
     professionalDescription: (
       <div className="space-y-4 text-zinc-300">
-        <p>Webエンジニアとしてのキャリアを志し、モダンなWeb開発技術（HTML, CSS, JavaScript, TypeScript, React）を集中的に学習しました。</p>
+        <p>Webエンジニアとしてのキャリアを志し、モダンなWeb開発技術（ TypeScript, React, Next.js）を集中的に学習しました。</p>
         <p>
           学習の過程では、単なる写経にとどまらず、実際にTodoアプリなどの成果物を作成することで、実践的なスキルを習得しました。
-          特にTypeScriptによる型安全な開発や、Reactのコンポーネント設計思想、Hooksの使用法など、実務で求められるレベルの技術理解を深めることに注力しました。
+          特にTypeScriptによる型安全な開発や、Reactのコンポーネント設計思想、Next.jsのサーバーサイドレンダリング、実務で求められるレベルの技術理解を深めることに注力しました。
           また、エラー解決にはAIツールを積極的に活用し、効率的な問題解決能力も身につけました。
         </p>
       </div>

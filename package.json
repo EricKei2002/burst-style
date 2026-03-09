@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "spell": "cspell ."
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -41,7 +42,8 @@
     "lightningcss": "^1.30.2",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "cspell": "^8.19.3"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.18",
