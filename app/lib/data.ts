@@ -59,7 +59,7 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    subgraph Client ["クライアントサイド (ブラウザ)"]
+    subgraph Client ["クライアントサイド "]
         Browser[ユーザーブラウザ]
     end
 
@@ -230,22 +230,19 @@ export const projectsData: Project[] = [
     documentation: {
       architectureMermaid: `sequenceDiagram
     participant User as ユーザー
-    participant DiscordAPI as Discord API
-    participant Bot as Node.js Bot
-    participant LogChannel as 管理ログ
+    participant API as Discord API
+    participant Bot as Bot
 
-    User->>DiscordAPI: 「認証する」をクリック
-    DiscordAPI->>Bot: インタラクション受信 (Button)
-    Bot->>DiscordAPI: モーダル表示 (Form)
-    User->>DiscordAPI: フォーム送信
-    DiscordAPI->>Bot: インタラクション受信 (ModalSubmit)
-    Bot->>Bot: 入力検証
-    alt 成功 (Valid)
-        Bot->>DiscordAPI: 「Member」ロール付与
-        Bot->>LogChannel: 成功Embed送信
-        Bot->>User: Ephemeral応答 "成功"
-    else 失敗 (Invalid)
-        Bot->>User: Ephemeral応答 "エラー"
+    User->>API: 認証クリック
+    API->>Bot: Button受信
+    Bot->>API: モーダル表示
+    User->>API: 送信
+    API->>Bot: ModalSubmit
+    alt 成功
+        Bot->>API: Memberロール付与
+        Bot->>User: 成功
+    else 失敗
+        Bot->>User: エラー
     end
 `,
     },
@@ -301,23 +298,15 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    User[ユーザー] -->|アクセス| Vercel[Vercel Edge Network]
-    Vercel -->|配信| Next[Next.js App Router]
-    Next -->|UIレンダリング| React[React Server Components]
-    Next -->|ハイドレーション| Client[Client Components]
-    
-    Client -->|状態管理| Store[Zustand Store]
-    Store -->|開閉制御| Door[Hangar Door Transition]
-    Door -->|演出同期| Router[Next.js Router]
-    
-    Client -->|3D描画| Three[Three.js Canvas]
-    Client -->|動画再生| Video[Video Background]
-    Video -->|アセット読込| Public["動画ファイル (.mp4)"]
-    
-    User -->|フォーム送信| Contact[Contact API Route]
-    Contact -->|Bot認証| Turnstile[Cloudflare Turnstile]
-    Contact -->|管理者通知| Formspree[Formspree]
-    Contact -->|自動返信メール| Resend[Resend Email API]
+    User[ユーザー] --> Next[Next.js App]
+    Next --> Client[Client Components]
+    Client --> Store[Zustand]
+    Client --> Three[Three.js]
+    Client --> Video[動画背景]
+    User --> Contact[Contact API]
+    Contact --> Turnstile[Turnstile]
+    Contact --> Formspree[Formspree]
+    Contact --> Resend[Resend]
 `,
     },
   },
