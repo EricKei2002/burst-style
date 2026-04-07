@@ -26,6 +26,15 @@ export default function Header() {
             <a href="#projects" aria-label="Projectsセクションへ移動" className="text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50">
               /Projects
             </a>
+            <a href="#now" aria-label="Nowセクションへ移動" className="text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50">
+              /Now
+            </a>
+            <a href="#lab" aria-label="Labセクションへ移動" className="text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50">
+              /Lab
+            </a>
+            <a href="#writing" aria-label="Writingセクションへ移動" className="text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50">
+              /Writing
+            </a>
             <a href="#about" aria-label="Aboutセクションへ移動" className="text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50">
               /About Me
             </a>

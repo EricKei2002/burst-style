@@ -246,7 +246,11 @@ const timeline: TimelineItem[] = [
       </div>
     ),
     tags: ["C#", "Windows Forms", "Algorithms"],
-    extraComponent: <CsharpCalculator />,
+    extraComponent: (
+      <div id="about-lab-csharp" className="scroll-mt-32 w-full">
+        <CsharpCalculator />
+      </div>
+    ),
   },
   {
     year: "High School",
@@ -453,7 +457,7 @@ const timeline: TimelineItem[] = [
     tags: ["Web Development", "TypeScript", "Frontend", "Study"],
     githubUrl: "https://github.com/EricKei2002/Todo-with-Typescript",
     extraComponent: (
-      <div className="w-full">
+      <div id="about-lab-todo" className="scroll-mt-32 w-full">
         <TodoAppDemo />
       </div>
     ),
@@ -490,57 +494,66 @@ const timeline: TimelineItem[] = [
     extraComponent: <ServerSpecs />
   },
   {
-    year: "2026 〜 Future",
-    title: "Looking for New Opportunities",
+    year: "2026 〜",
+    title: "Engineer, shipped",
     description: (
       <div className="space-y-4">
-        <p>v2026.1 Update Log: バックエンド（人生経験）は複雑ですが、フロントエンド（人柄）はモダンでレスポンシブ対応済み。</p>
+        <p>v2026.1 Stable Release: 本番環境（キャリア）へのデプロイに成功。個人サイトは引き続き実験フィールドとして稼働。</p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">[Fix]</span>
-            <span>住所不定バグを修正し、定住意欲が向上。</span>
+            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">[Ship]</span>
+            <span>フロントエンドエンジニアとしてプロダクト開発の一員に。</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-blue-400 font-mono text-xs shrink-0 mt-1">[Add]</span>
-            <span>独学で実装した技術力と、海外でデプロイされた適応力をバンドル。</span>
+            <span className="text-blue-400 font-mono text-xs shrink-0 mt-1">[Keep]</span>
+            <span>独学で育てたスタックと、個人での検証ループは継続チャネルとして維持。</span>
           </li>
           <li className="flex gap-2">
             <span className="text-green-400 font-mono text-xs shrink-0 mt-1">[Note]</span>
-            <span>仕様により「好奇心」がメモリを大量消費しますが、パフォーマンスは絶好調です。</span>
+            <span>仕様により「好奇心」がメモリを消費しますが、本番とサイドプロジェクトの両方で返済中です。</span>
           </li>
         </ul>
-        <p>この最新バージョンを本番環境で運用してくれる企業様、プルリクエストをお待ちしています！</p>
+        <p>連絡や共同作業のご相談は、これまでどおり Contact からどうぞ。</p>
       </div>
     ),
     professionalDescription: (
       <div className="space-y-4 text-zinc-300">
-        <p>現在、フロントエンドエンジニアとしての就業機会を求めています。</p>
+        <p>フロントエンドエンジニアとして就業し、プロダクト開発に携わっています。</p>
         <p>
-          独学で培った確かな技術力（React, TypeScript）に加え、海外経験やリゾートバイトで培った「新しい環境への適応力」「英語力」「困難に立ち向かう精神力」が私の強みです。
-          技術トレンドへの感度を高く持ち続け、チーム開発においても積極的に貢献できるエンジニアとして成長していきたいと考えています。
-          私のスキルや経験が貴社の事業に貢献できると確信しています。
+          React / TypeScript を中心とした実装に加え、学習で培った適応力と英語コミュニケーションを活かし、チームに貢献することを重視しています。
+          業務外ではインフラや AI 周りの実験も続け、視野を広げながら成長していきたいと考えています。
         </p>
       </div>
     ),
-    tags: ["Open to Work", "Job Seeker", "Frontend Engineer", "Creative"],
+    tags: ["Career", "Frontend Engineer", "Growth", "Side projects"],
     extraComponent: (isProfessional: boolean) => (
-      <div className="mt-4">
-        <a 
-          href="#contact" 
-          className={`inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
-            isProfessional 
+      <div className="mt-4 flex flex-wrap gap-3">
+        <a
+          href="#now"
+          className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
+            isProfessional
               ? "bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 focus:ring-blue-500"
               : "bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 focus:ring-fuchsia-500"
           }`}
         >
-          <span>Contact Me</span>
+          <span>Now を見る</span>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </a>
+        <a
+          href="#contact"
+          className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
+            isProfessional
+              ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus:ring-blue-500"
+              : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus:ring-fuchsia-500"
+          }`}
+        >
+          Contact
+        </a>
       </div>
-    )
-  }
+    ),
+  },
 ];
 
 export default function AboutSection() {
@@ -641,7 +654,7 @@ export default function AboutSection() {
         <header className="about-header mb-16 max-w-2xl">
           <div className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}>
             <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
+            <span className="font-mono text-xs tracking-wider uppercase">05. Who I am</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
