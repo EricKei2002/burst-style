@@ -8,6 +8,34 @@ import ProfileCard from "../ui/ProfileCard";
 import DecryptedText from "../ui/DecryptedText";
 import CsharpCalculator from "../demos/CsharpCalculator";
 import TodoAppDemo from "../demos/TodoAppDemo";
+import {
+  ABOUT_TIMELINE_GEEK_EN,
+  ABOUT_TIMELINE_PRO_EN,
+  GeekEnglishView,
+  ProEnglishView,
+} from "../../lib/aboutTimelineEn";
+import { useLocale, useSiteCopy } from "../../lib/locale";
+
+function TranslatedViewNowLabel() {
+  const copy = useSiteCopy();
+  return <span>{copy.about.viewNow}</span>;
+}
+
+function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
+  const copy = useSiteCopy();
+  return (
+    <a
+      href="#contact"
+      className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
+        isProfessional
+          ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus:ring-blue-500"
+          : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus:ring-fuchsia-500"
+      }`}
+    >
+      {copy.about.contactCta}
+    </a>
+  );
+}
 
 interface TimelineItem {
   year: string;
@@ -96,6 +124,7 @@ function TimelineVideoCard({
   onPlay: (key: string) => void;
   onUnmount: () => void;
 }) {
+  const copy = useSiteCopy();
   const cardRef = useRef<HTMLDivElement>(null);
   const posterSrc = VIDEO_POSTERS[src] ?? "/icon.jpg";
 
@@ -129,7 +158,7 @@ function TimelineVideoCard({
             type="button"
             onClick={() => onPlay(videoKey)}
             className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/20 focus-visible:outline-none"
-            aria-label={`${title} の動画を再生`}
+            aria-label={copy.about.videoPlay(title)}
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/60 bg-black/70 px-4 py-2 font-mono text-xs text-fuchsia-300">
               ▶ Play Video
@@ -536,27 +565,20 @@ const timeline: TimelineItem[] = [
               : "bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 focus:ring-fuchsia-500"
           }`}
         >
-          <span>Now を見る</span>
+          <TranslatedViewNowLabel />
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
         </a>
-        <a
-          href="#contact"
-          className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
-            isProfessional
-              ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus:ring-blue-500"
-              : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus:ring-fuchsia-500"
-          }`}
-        >
-          Contact
-        </a>
+        <AboutContactCtaLink isProfessional={isProfessional} />
       </div>
     ),
   },
 ];
 
 export default function AboutSection() {
+  const { locale } = useLocale();
+  const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
   const [isProfessional, setIsProfessional] = useState(false);
   const [activeVideoKey, setActiveVideoKey] = useState<string | null>(null);
@@ -666,7 +688,7 @@ export default function AboutSection() {
               <button
                 type="button"
                 aria-pressed={!isProfessional}
-                aria-label="Geek Modeに切り替え"
+                aria-label={copy.about.switchGeekAria}
                 onClick={() => setIsProfessional(false)}
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   !isProfessional 
@@ -674,12 +696,12 @@ export default function AboutSection() {
                     : "text-zinc-400 hover:text-zinc-300"
                 }`}
               >
-                Geek Mode
+                {copy.about.geekModeLabel}
               </button>
               <button
                 type="button"
                 aria-pressed={isProfessional}
-                aria-label="Pro Modeに切り替え"
+                aria-label={copy.about.switchProAria}
                 onClick={() => setIsProfessional(true)}
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
                   isProfessional 
@@ -687,13 +709,11 @@ export default function AboutSection() {
                     : "text-zinc-400 hover:text-zinc-300"
                 }`}
               >
-                Pro Mode
+                {copy.about.proModeLabel}
               </button>
             </div>
           </div>
-          <p className="text-zinc-400 leading-relaxed">
-            技術と経験を積み上げてきた背景を、タイムライン形式で紹介します。
-          </p>
+          <p className="text-zinc-400 leading-relaxed">{copy.about.intro}</p>
         </header>
 
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr]">
@@ -745,11 +765,23 @@ export default function AboutSection() {
                     <div className="relative min-h-[60px]">
                       {isProfessional && item.professionalDescription ? (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                          {item.professionalDescription}
+                          {locale === "en" ? (
+                            <ProEnglishView
+                              block={ABOUT_TIMELINE_PRO_EN[index]!}
+                            />
+                          ) : (
+                            item.professionalDescription
+                          )}
                         </div>
                       ) : (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-                          {item.description}
+                          {locale === "en" ? (
+                            <GeekEnglishView
+                              block={ABOUT_TIMELINE_GEEK_EN[index]!}
+                            />
+                          ) : (
+                            item.description
+                          )}
                         </div>
                       )}
                     </div>

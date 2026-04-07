@@ -7,10 +7,11 @@ import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../lib/data";
+import { useSiteCopy } from "../../lib/locale";
 import { useTransitionStore } from "../../lib/store";
 
-
 export default function Projects() {
+  const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
   const { setPhase, phase } = useTransitionStore();
@@ -68,8 +69,9 @@ export default function Projects() {
             Projects
           </h2>
           <p className="text-zinc-50 leading-relaxed">
-            既成概念を打ち砕き、記憶に残る体験を。<br />
-            デザインと技術を融合した『Burst Style』の実践。
+            {copy.projects.introLine1}
+            <br />
+            {copy.projects.introLine2}
           </p>
         </div>
 
@@ -81,7 +83,7 @@ export default function Projects() {
                 <button
                   type="button"
                   onClick={() => handleNavigation(`/projects/${project.slug}`)}
-                  aria-label={`${project.title} の詳細を見る`}
+                  aria-label={copy.projects.viewDetails(project.title)}
                   className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none ${
                     isVisible ? "translate-y-0 opacity-100 scale-100" : "translate-y-8 opacity-0 scale-[0.98]"
                   }`}

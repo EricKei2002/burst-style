@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useEffect, useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
+import { useSiteCopy } from "../../lib/locale";
 import Header from "./Header";
 import dynamic from "next/dynamic";
 
@@ -14,6 +15,7 @@ const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
 });
 
 export default function Top() {
+  const copy = useSiteCopy();
   const containerRef = useRef<HTMLElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -88,17 +90,17 @@ export default function Top() {
 
             <div className="max-w-3xl w-full px-4 mt-8 text-left">
               <div className="loading-text font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4">
-                &gt; ESTABLISHING CONNECTION...<br />
-                &gt; What is Burst Style ? 
+                {copy.hero.establishing}
+                <br />
+                {copy.hero.question}{" "}
                 <MagneticButton className="ml-2 inline-block">
-                  {/* アクセシビリティのためspanからbuttonに変更 */}
                   <button
                     type="button"
                     onClick={showDescription}
                     className={`trigger-btn rounded border px-2 py-0.5 transition-colors inline-block font-mono text-xs ${
                       descriptionVisible ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none" : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
                     }`}
-                    aria-label="詳細を表示する"
+                    aria-label={copy.hero.enterAria}
                   >
                     /Enter
                   </button>
@@ -106,11 +108,11 @@ export default function Top() {
               </div>
               <p className="text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
                 <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
-                  &quot;Burst Style&quot; — 創造性を爆発させ、未知の体験を形にする。
+                  {copy.hero.tagline1}
                 </span>
                 <br className="hidden sm:block" />
                 <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
-                  Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。
+                  {copy.hero.tagline2}
                 </span>
               </p>
             </div>

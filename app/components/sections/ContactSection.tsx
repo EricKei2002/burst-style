@@ -5,13 +5,20 @@ import dynamic from "next/dynamic";
 import DecryptedText from "../ui/DecryptedText";
 import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
+import { useLocale, useSiteCopy } from "../../lib/locale";
 
 const Turnstile = dynamic(
   () => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile),
   { ssr: false },
 );
 
+const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
+const NEEDS_TURNSTILE = TURNSTILE_SITE_KEY.length > 0;
+
 export default function ContactSection() {
+  const { locale } = useLocale();
+  const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -25,18 +32,25 @@ export default function ContactSection() {
     const target = sectionRef.current;
     if (!target) return;
 
+    let rafId = 0;
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+
     if (reducedMotion) {
-      setIsVisible(true);
+      rafId = requestAnimationFrame(() => {
+        setIsVisible(true);
+        if (!NEEDS_TURNSTILE) setIsTurnstileReady(true);
+      });
+    } else if (!NEEDS_TURNSTILE) {
+      rafId = requestAnimationFrame(() => setIsTurnstileReady(true));
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          setIsTurnstileReady(true);
+          if (NEEDS_TURNSTILE) setIsTurnstileReady(true);
           observer.disconnect();
         }
       },
@@ -44,15 +58,16 @@ export default function ContactSection() {
     );
 
     observer.observe(target);
-    return () => observer.disconnect();
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!turnstileToken) {
-      setErrorMessage(
-        "SECURITY CHECK NOT READY. CAPTCHAの読み込み完了後に再試行してください。",
-      );
+    if (NEEDS_TURNSTILE && !turnstileToken) {
+      setErrorMessage(copy.contact.errTurnstile);
       return;
     }
 
@@ -61,7 +76,9 @@ export default function ContactSection() {
 
     try {
       const formData = new FormData(e.currentTarget as HTMLFormElement);
-      formData.append("cf-turnstile-response", turnstileToken);
+      if (NEEDS_TURNSTILE && turnstileToken) {
+        formData.append("cf-turnstile-response", turnstileToken);
+      }
 
       const response = await fetch("/api/contact", {
         method: "POST",
@@ -72,15 +89,14 @@ export default function ContactSection() {
         setIsSent(true);
         if (formRef.current) formRef.current.reset();
         setTurnstileToken(null);
-        // 10秒後に状態をリセット
         setTimeout(() => setIsSent(false), 10000);
       } else {
         console.error("Submission failed");
-        setErrorMessage("ERROR: TRANSMISSION FAILED. PLEASE RETRY.");
+        setErrorMessage(copy.contact.errTransmit);
       }
     } catch (error) {
       console.error("Submission error:", error);
-      setErrorMessage("CRITICAL ERROR: CONNECTION LOST.");
+      setErrorMessage(copy.contact.errConnection);
     } finally {
       setIsSubmitting(false);
     }
@@ -93,14 +109,13 @@ export default function ContactSection() {
       className="relative w-full py-24 sm:py-32 overflow-clip"
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        {/* ヘッダー */}
         <div
           className={`mb-16 max-w-2xl transition-all duration-700 ease-out ${
             isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
           }`}
         >
           <div className="flex items-center gap-2 text-fuchsia-300 mb-4">
-            <span className="h-px w-8 bg-current"></span>
+            <span className="h-px w-8 bg-current" />
             <span className="font-mono text-xs tracking-wider uppercase">
               06. Contact
             </span>
@@ -109,13 +124,12 @@ export default function ContactSection() {
             <DecryptedText text="Get In Touch" animateOnHover speed={30} />
           </h2>
           <p className="text-zinc-200 leading-relaxed">
-            新しいプロジェクト、コラボレーション、またはカジュアルな挨拶まで。
+            {copy.contact.leadLine1}
             <br />
-            『Burst Style』への通信回線は常に開かれています。
+            {copy.contact.leadLine2}
           </p>
         </div>
 
-        {/* お問い合わせフォームエリア */}
         <div
           className={`relative mx-auto max-w-3xl transition-all duration-700 ease-out ${
             isVisible
@@ -125,12 +139,11 @@ export default function ContactSection() {
         >
           <TiltCard rotationIntensity={2} className="w-full">
             <div className="relative w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 sm:p-12 overflow-hidden backdrop-blur-sm">
-              {/* 背景装飾 */}
               <div className="absolute top-0 right-0 p-4 opacity-20">
-                <div className="w-16 h-16 border-t border-r border-fuchsia-500 rounded-tr-xl"></div>
+                <div className="w-16 h-16 border-t border-r border-fuchsia-500 rounded-tr-xl" />
               </div>
               <div className="absolute bottom-0 left-0 p-4 opacity-20">
-                <div className="w-16 h-16 border-b border-l border-fuchsia-500 rounded-bl-xl"></div>
+                <div className="w-16 h-16 border-b border-l border-fuchsia-500 rounded-bl-xl" />
               </div>
 
               {!isSent ? (
@@ -146,7 +159,8 @@ export default function ContactSection() {
                         className="text-xs font-mono text-fuchsia-300 ml-1"
                       >
                         <DecryptedText
-                          text="NAME / お名前"
+                          key={`name-${locale}`}
+                          text={copy.contact.formName}
                           animateOnHover
                           speed={20}
                         />
@@ -157,7 +171,7 @@ export default function ContactSection() {
                         name="name"
                         required
                         className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
-                        placeholder="山田 太郎"
+                        placeholder={copy.contact.placeholderName}
                       />
                     </div>
                     <div className="space-y-2">
@@ -166,7 +180,8 @@ export default function ContactSection() {
                         className="text-xs font-mono text-fuchsia-300 ml-1"
                       >
                         <DecryptedText
-                          text="EMAIL / メールアドレス"
+                          key={`email-${locale}`}
+                          text={copy.contact.formEmail}
                           animateOnHover
                           speed={20}
                         />
@@ -177,7 +192,7 @@ export default function ContactSection() {
                         name="email"
                         required
                         className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
-                        placeholder="email@example.com"
+                        placeholder={copy.contact.placeholderEmail}
                       />
                     </div>
                   </div>
@@ -188,7 +203,8 @@ export default function ContactSection() {
                       className="text-xs font-mono text-fuchsia-300 ml-1"
                     >
                       <DecryptedText
-                        text="MESSAGE / 本文"
+                        key={`msg-${locale}`}
+                        text={copy.contact.formMessage}
                         animateOnHover
                         speed={20}
                       />
@@ -199,26 +215,32 @@ export default function ContactSection() {
                       required
                       rows={6}
                       className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
-                      placeholder="お問い合わせ内容をご入力ください..."
+                      placeholder={copy.contact.placeholderMessage}
                     />
                   </div>
 
                   <div className="flex flex-col items-center gap-4 pt-2">
-                    {isTurnstileReady ? (
-                      <Turnstile
-                        siteKey="0x4AAAAAACMEdoY3D-U7Ag2L"
-                        onSuccess={setTurnstileToken}
-                        onExpire={() => setTurnstileToken(null)}
-                        onError={() => setTurnstileToken(null)}
-                        options={{
-                          theme: "dark",
-                          action: "contact-form",
-                        }}
-                      />
+                    {NEEDS_TURNSTILE ? (
+                      isTurnstileReady ? (
+                        <Turnstile
+                          siteKey={TURNSTILE_SITE_KEY}
+                          onSuccess={setTurnstileToken}
+                          onExpire={() => setTurnstileToken(null)}
+                          onError={() => setTurnstileToken(null)}
+                          options={{
+                            theme: "dark",
+                            action: "contact-form",
+                          }}
+                        />
+                      ) : (
+                        <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-200">
+                          {copy.contact.securityLoading}
+                        </div>
+                      )
                     ) : (
-                      <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-200">
-                        SECURITY CHECK LOADING...
-                      </div>
+                      <p className="rounded-lg border border-zinc-700/80 bg-zinc-950/40 px-4 py-3 text-center font-mono text-xs text-zinc-400">
+                        {copy.contact.turnstileDisabled}
+                      </p>
                     )}
                   </div>
 
@@ -235,7 +257,9 @@ export default function ContactSection() {
                         className="relative overflow-hidden group bg-zinc-100 text-zinc-950 px-8 py-3 rounded-full font-bold tracking-wide transition-all hover:bg-fuchsia-400 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <span className="relative z-10 flex items-center gap-2">
-                          {isSubmitting ? "TRANSMITTING..." : "TRANSMIT / 送信"}
+                          {isSubmitting
+                            ? copy.contact.sending
+                            : copy.contact.send}
                           {!isSubmitting && (
                             <svg
                               width="16"
@@ -248,8 +272,8 @@ export default function ContactSection() {
                               strokeLinejoin="round"
                               className="transform transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                             >
-                              <line x1="7" y1="17" x2="17" y2="7"></line>
-                              <polyline points="7 7 17 7 17 17"></polyline>
+                              <line x1="7" y1="17" x2="17" y2="7" />
+                              <polyline points="7 7 17 7 17 17" />
                             </svg>
                           )}
                         </span>
@@ -270,24 +294,25 @@ export default function ContactSection() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <polyline points="20 6 9 17 4 12"></polyline>
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
-                    Transmission Complete
+                    {copy.contact.successTitle}
                   </h3>
                   <p className="text-zinc-200 max-w-md leading-relaxed">
-                    お問い合わせありがとうございます。
+                    {copy.contact.successBody1}
                     <br />
-                    送信されたデータは正常に受信されました。
+                    {copy.contact.successBody2}
                     <br />
-                    確認次第、折り返しご連絡いたします。
+                    {copy.contact.successBody3}
                   </p>
                   <button
+                    type="button"
                     onClick={() => setIsSent(false)}
                     className="mt-8 text-sm text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4 font-mono uppercase tracking-wider"
                   >
-                    &lt; Send another message
+                    {copy.contact.sendAnother}
                   </button>
                 </div>
               )}

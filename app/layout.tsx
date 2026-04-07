@@ -5,6 +5,7 @@ import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
 // StarBackground・MouseTrail・CustomCursorはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
+import { LocaleProvider } from "./lib/locale";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://burst.style"),
@@ -40,14 +41,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
+    <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
         <HangarDoorTransition />
         <SmoothScroll>
-          <main className="min-h-screen w-full">
-            {children}
-          </main>
+          <LocaleProvider>
+            <main className="min-h-screen w-full">{children}</main>
+          </LocaleProvider>
         </SmoothScroll>
       </body>
     </html>

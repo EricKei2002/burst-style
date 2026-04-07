@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 
 import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
-import { labData, nowData, writingData } from "../../lib/personalSite";
+import { useSiteCopy } from "../../lib/locale";
+import { NOW_UPDATED, type SiteCopy } from "../../lib/siteCopy";
 import { useTransitionStore } from "../../lib/store";
 
 function SectionIntro({
@@ -30,6 +31,7 @@ function SectionIntro({
 }
 
 export default function NowLabWritingSections() {
+  const copy = useSiteCopy();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const router = useRouter();
@@ -71,21 +73,20 @@ export default function NowLabWritingSections() {
 
   return (
     <div ref={wrapRef} className="relative w-full">
-      {/* Now */}
       <section id="now" className="relative w-full py-20 sm:py-28">
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className={`transition-all duration-700 ease-out ${fade}`}>
             <SectionIntro
               kicker="02. Now"
-              title="いま、ここ"
-              description="就職後も続ける個人の関心ごと。短いログとして更新していきます。"
+              title="Here & Now"
+              description={copy.now.sectionIntro}
             />
 
             <div className="grid gap-6 lg:grid-cols-[1fr_minmax(0,280px)] lg:items-start">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 sm:p-8 backdrop-blur-sm">
-                <p className="mb-6 leading-relaxed text-zinc-200">{nowData.lead}</p>
+                <p className="mb-6 leading-relaxed text-zinc-200">{copy.now.lead}</p>
                 <ul className="space-y-4">
-                  {nowData.entries.map((entry, i) => (
+                  {copy.now.entries.map((entry: SiteCopy["now"]["entries"][number], i: number) => (
                     <li
                       key={i}
                       className={`flex gap-3 border-l-2 border-fuchsia-500/40 pl-4 text-sm leading-relaxed sm:text-base ${
@@ -103,13 +104,13 @@ export default function NowLabWritingSections() {
 
               <aside className="rounded-2xl border border-zinc-800/80 bg-black/40 p-5 font-mono text-xs text-zinc-300">
                 <div className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
-                  Last updated
+                  {copy.now.lastUpdated}
                 </div>
-                <time dateTime={nowData.updated} className="text-fuchsia-200">
-                  {nowData.updated}
+                <time dateTime={NOW_UPDATED} className="text-fuchsia-200">
+                  {NOW_UPDATED}
                 </time>
                 <p className="mt-6 border-t border-zinc-800/80 pt-4 text-[11px] leading-relaxed text-zinc-400">
-                  {nowData.disclaimer}
+                  {copy.now.disclaimer}
                 </p>
               </aside>
             </div>
@@ -117,25 +118,24 @@ export default function NowLabWritingSections() {
         </div>
       </section>
 
-      {/* Lab */}
       <section id="lab" className="relative w-full py-20 sm:py-28">
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className={`transition-all duration-700 ease-out delay-100 ${fade}`}>
             <SectionIntro
               kicker="03. Lab"
-              title="実験室"
-              description="完成品ではない試行錯誤。インタラクティブなものは About のタイムライン内にも配置しています。"
+              title="The Lab"
+              description={copy.lab.sectionIntro}
             />
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {labData.map((item) => (
+              {copy.lab.items.map((item: SiteCopy["lab"]["items"][number]) => (
                 <MagneticButton key={item.title} className="h-full" strength={0.15}>
                   <TiltCard className="h-full" rotationIntensity={4}>
                     <div className="flex h-full flex-col rounded-2xl border border-zinc-800 bg-zinc-900/25 p-6 sm:p-7">
                       <h3 className="text-lg font-bold text-white">{item.title}</h3>
                       <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-300">{item.description}</p>
                       <div className="mt-5 flex flex-wrap gap-2">
-                        {item.tags.map((t) => (
+                        {item.tags.map((t: string) => (
                           <span
                             key={t}
                             className="rounded-md border border-zinc-700/80 bg-black/40 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-zinc-400"
@@ -148,21 +148,23 @@ export default function NowLabWritingSections() {
                         {item.link.kind === "hash" ? (
                           <a
                             href={`#${item.link.id}`}
+                            aria-label={item.actionAria}
                             className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-fuchsia-300 transition-colors hover:text-fuchsia-200"
                           >
-                            {item.ctaLabel}
+                            {item.cta}
                             <span aria-hidden="true">→</span>
                           </a>
                         ) : (
                           <button
                             type="button"
+                            aria-label={item.actionAria}
                             onClick={() => {
                               const l = item.link;
                               if (l.kind === "project") goProject(l.slug);
                             }}
                             className="inline-flex cursor-pointer items-center gap-2 border-none bg-transparent p-0 font-mono text-sm font-semibold text-fuchsia-300 transition-colors hover:text-fuchsia-200"
                           >
-                            {item.ctaLabel}
+                            {item.cta}
                             <span aria-hidden="true">→</span>
                           </button>
                         )}
@@ -176,18 +178,17 @@ export default function NowLabWritingSections() {
         </div>
       </section>
 
-      {/* Writing */}
       <section id="writing" className="relative w-full py-20 sm:py-28">
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className={`transition-all duration-700 ease-out delay-200 ${fade}`}>
             <SectionIntro
-              kicker="04. Writing & Links"
-              title="発信・リンク"
-              description="コード以外の思考や記事は、外部サービスとここを行き来しながら整理していきます。"
+              kicker="04. Writing"
+              title="Writing & Links"
+              description={copy.writing.sectionIntro}
             />
 
             <div className="grid gap-6 md:grid-cols-2">
-              {writingData.map((item) => (
+              {copy.writing.cards.map((item: SiteCopy["writing"]["cards"][number]) => (
                 <div
                   key={item.title}
                   className="rounded-2xl border border-zinc-800 bg-zinc-900/20 p-6 sm:p-8 transition-colors hover:border-zinc-600/80"
@@ -199,7 +200,7 @@ export default function NowLabWritingSections() {
                     <h3 className="text-xl font-bold text-white">{item.title}</h3>
                   </div>
                   <p className="text-sm leading-relaxed text-zinc-300">{item.description}</p>
-                  {item.href && item.hrefLabel ? (
+                  {"href" in item && item.href && item.hrefLabel ? (
                     <a
                       href={item.href}
                       target="_blank"
@@ -210,7 +211,9 @@ export default function NowLabWritingSections() {
                       <span aria-hidden="true">↗</span>
                     </a>
                   ) : (
-                    <p className="mt-5 font-mono text-xs text-zinc-500">リンクは準備中です</p>
+                    <p className="mt-5 font-mono text-xs text-zinc-500">
+                      {copy.writing.linkSoon}
+                    </p>
                   )}
                 </div>
               ))}
