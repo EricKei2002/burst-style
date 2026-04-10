@@ -152,6 +152,7 @@ export default function ContactSection() {
                   onSubmit={handleSubmit}
                   className="flex flex-col gap-6"
                 >
+                  <input type="hidden" name="locale" value={locale} />
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div className="space-y-2">
                       <label

@@ -1,4 +1,6 @@
 import { projectsData } from "../../lib/data";
+import { getServerLocale } from "../../lib/getServerLocale";
+import { getLocalizedProject } from "../../lib/projectEn";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import DecryptedText from "../../components/ui/DecryptedText";
@@ -16,11 +18,14 @@ export function generateStaticParams() {
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = projectsData.find((p) => p.slug === slug);
+  const raw = projectsData.find((p) => p.slug === slug);
 
-  if (!project) {
+  if (!raw) {
     notFound();
   }
+
+  const locale = await getServerLocale();
+  const project = getLocalizedProject(raw, locale);
 
   return (
     <>

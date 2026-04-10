@@ -7,10 +7,12 @@ import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../lib/data";
-import { useSiteCopy } from "../../lib/locale";
+import { useLocale, useSiteCopy } from "../../lib/locale";
+import { getLocalizedProject } from "../../lib/projectEn";
 import { useTransitionStore } from "../../lib/store";
 
 export default function Projects() {
+  const { locale } = useLocale();
   const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
@@ -77,7 +79,9 @@ export default function Projects() {
 
         {/* プロジェクトグリッド */}
         <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-          {projectsData.map((project) => (
+          {projectsData.map((raw) => {
+            const project = getLocalizedProject(raw, locale);
+            return (
             <MagneticButton key={project.slug} className="h-full" strength={0.2}>
               <TiltCard className="h-full" rotationIntensity={5}>
                 <button
@@ -130,7 +134,8 @@ export default function Projects() {
                 </button>
               </TiltCard>
             </MagneticButton>
-          ))}
+          );
+          })}
         </div>
 
 

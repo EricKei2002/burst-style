@@ -153,6 +153,62 @@ export function buildSiteCopy(locale: Locale) {
       ],
       linkSoon: pick(locale, { en: "Link coming soon", ja: "リンクは準備中です" }),
     },
+    demos: {
+      csharp: {
+        tabDesign: pick(locale, { en: "Design", ja: "デザイン" }),
+        tabSource: pick(locale, { en: "Source", ja: "ソース" }),
+        designTabAria: pick(locale, {
+          en: "Switch to calculator preview",
+          ja: "電卓プレビュー表示に切り替え",
+        }),
+        sourceTabAria: pick(locale, {
+          en: "Switch to C# source view",
+          ja: "C#ソース表示に切り替え",
+        }),
+        clearAria: pick(locale, { en: "Clear calculation", ja: "計算をクリア" }),
+        divideAria: pick(locale, { en: "Divide", ja: "割り算" }),
+        multiplyAria: pick(locale, { en: "Multiply", ja: "掛け算" }),
+        subtractAria: pick(locale, { en: "Subtract", ja: "引き算" }),
+        addAria: pick(locale, { en: "Add", ja: "足し算" }),
+        equalsAria: pick(locale, { en: "Show result", ja: "計算結果を表示" }),
+        decimalAria: pick(locale, { en: "Decimal point", ja: "小数点" }),
+      },
+      todo: {
+        tabPreview: pick(locale, { en: "Preview", ja: "プレビュー" }),
+        tabCode: pick(locale, { en: "Code", ja: "コード" }),
+        previewTabAria: pick(locale, {
+          en: "Switch to preview",
+          ja: "プレビュー表示に切り替え",
+        }),
+        codeTabAria: pick(locale, {
+          en: "Switch to code view",
+          ja: "コード表示に切り替え",
+        }),
+        heading: pick(locale, {
+          en: "Todo list with TypeScript",
+          ja: "Todoリスト with Typescript",
+        }),
+        newTaskLabel: pick(locale, { en: "New task", ja: "新しいタスク" }),
+        placeholder: pick(locale, { en: "New task", ja: "新しいタスク" }),
+        submit: pick(locale, { en: "Add", ja: "作成" }),
+        delete: pick(locale, { en: "Del", ja: "消" }),
+        todoContentAria: (n: number) =>
+          pick(locale, {
+            en: `Text for todo item ${n}`,
+            ja: `Todo ${n} の内容`,
+          }),
+        todoCompleteAria: (n: number) =>
+          pick(locale, {
+            en: `Mark todo item ${n} complete`,
+            ja: `Todo ${n} を完了済みにする`,
+          }),
+        todoDeleteAria: (n: number) =>
+          pick(locale, {
+            en: `Delete todo item ${n}`,
+            ja: `Todo ${n} を削除`,
+          }),
+      },
+    },
     about: {
       intro: pick(locale, {
         en: "Background and milestones in a timeline—how I grew into the work I do now.",

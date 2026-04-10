@@ -66,7 +66,6 @@ export default function ProjectIntro() {
           src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`}
           type="video/mp4"
         />
-        <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
       </video>
       {/* 映画的なオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />

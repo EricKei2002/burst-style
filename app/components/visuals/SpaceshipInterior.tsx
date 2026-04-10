@@ -33,7 +33,6 @@ export default function SpaceshipInterior() {
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       >
         <source src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`} type="video/mp4" />
-        <track kind="captions" srcLang="ja" label="日本語" default src="data:text/vtt,WEBVTT" />
         Your browser does not support the video tag.
       </video>
       

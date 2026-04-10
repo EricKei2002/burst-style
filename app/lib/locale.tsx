@@ -10,11 +10,13 @@ import {
   type ReactNode,
 } from "react";
 
+import {
+  LOCALE_COOKIE_NAME,
+  LOCALE_STORAGE_KEY,
+} from "./localeConstants";
 import { buildSiteCopy, type Locale } from "./siteCopy";
 
 export type { Locale } from "./siteCopy";
-
-const STORAGE_KEY = "burst-style-locale";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -28,7 +30,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
     if (stored === "en" || stored === "ja") {
       setLocaleState(stored);
     } else if (navigator.language.toLowerCase().startsWith("ja")) {
@@ -39,8 +41,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    localStorage.setItem(STORAGE_KEY, locale);
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     document.documentElement.lang = locale === "ja" ? "ja" : "en";
+    document.cookie = `${LOCALE_COOKIE_NAME}=${locale};path=/;max-age=31536000;SameSite=Lax`;
   }, [locale, hydrated]);
 
   const setLocale = useCallback((next: Locale) => {

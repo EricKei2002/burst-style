@@ -13,16 +13,32 @@ export const metadata: Metadata = {
     default: "Burst Style | Web Developer Portfolio",
     template: "%s | Burst Style",
   },
-  description: "Eric Keiのポートフォリオサイト(Burst Style)。Webエンジニアとして、Next.js, React, Three.jsを用いたクリエイティブなWeb制作を行っています。創造性を爆発させ、未知の体験を形にします。",
-  keywords: ["Webエンジニア", "フロントエンド", "React", "Next.js", "Three.js", "Portfolio", "Web制作", "Creative Coding", "Eric Kei", "Burst Style"],
+  description:
+    "Eric Kei's portfolio (Burst Style)—creative web engineering with Next.js, React, and Three.js. / Eric Keiのポートフォリオ。没入型Web体験とクリエイティブコーディング。",
+  keywords: [
+    "Web Developer",
+    "Frontend",
+    "React",
+    "Next.js",
+    "Three.js",
+    "Portfolio",
+    "Creative Coding",
+    "Eric Kei",
+    "Burst Style",
+    "Webエンジニア",
+    "フロントエンド",
+    "Web制作",
+  ],
   authors: [{ name: "Eric Kei" }],
   creator: "Eric Kei",
   openGraph: {
     type: "website",
-    locale: "ja_JP",
+    locale: "en_US",
+    alternateLocale: ["ja_JP"],
     url: "https://burst.style",
     title: "Burst Style | Web Developer Portfolio",
-    description: "Eric Keiのポートフォリオサイト。Next.jsとThree.jsを駆使した没入型Web体験。",
+    description:
+      "Immersive portfolio by Eric Kei—Next.js, Three.js, and creative engineering. 日本語UI切替あり。",
     siteName: "Burst Style",
     images: [
       {

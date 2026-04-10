@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 
+import { useSiteCopy } from "../../lib/locale";
+
 export default function TodoAppDemo() {
+  const d = useSiteCopy().demos.todo;
   // --- Start of Ported Logic from GitHub ---
   type Todo = {
     inputValue: string;
@@ -162,19 +165,19 @@ export default App;`;
              type="button"
              onClick={() => setViewMode("design")}
              aria-pressed={viewMode === "design"}
-             aria-label="プレビュー表示に切り替え"
+             aria-label={d.previewTabAria}
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
            >
-             Preview
+             {d.tabPreview}
            </button>
            <button 
              type="button"
              onClick={() => setViewMode("source")}
              aria-pressed={viewMode === "source"}
-             aria-label="コード表示に切り替え"
+             aria-label={d.codeTabAria}
              className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
            >
-             Code
+             {d.tabCode}
            </button>
         </div>
       </div>
@@ -186,21 +189,21 @@ export default App;`;
           {/* Equivalent to <div className="App"> */}
           <div className="w-full text-center">
             
-            <h2 className="text-lg mb-4 text-zinc-100 font-bold">Todoリスト with Typescript</h2>
+            <h2 className="text-lg mb-4 text-zinc-100 font-bold">{d.heading}</h2>
             
             <form onSubmit={handleSubmit} className="mb-6 flex gap-2 justify-center">
-              <label htmlFor="todo-new-task" className="sr-only">新しいタスク</label>
+              <label htmlFor="todo-new-task" className="sr-only">{d.newTaskLabel}</label>
               <input 
                 id="todo-new-task"
                 type="text" 
                 onChange={handleChange} 
                 className="p-2 rounded bg-zinc-800 border border-zinc-600 text-zinc-200 text-sm focus:outline-none focus:border-blue-500" 
                 value={inputValue}
-                placeholder="新しいタスク"
+                placeholder={d.placeholder}
               />
               <input 
                 type="submit" 
-                value="作成" 
+                value={d.submit} 
                 className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-pointer hover:bg-blue-500 transition-colors" 
               />
             </form>
@@ -214,22 +217,22 @@ export default App;`;
                     className="flex-1 p-1 bg-transparent border-b border-transparent focus:border-zinc-500 text-zinc-200 text-sm outline-none disabled:text-zinc-500 disabled:line-through"
                     value={todo.inputValue}
                     disabled={todo.checked}
-                    aria-label={`Todo ${todo.id + 1} の内容`}
+                    aria-label={d.todoContentAria(todo.id + 1)}
                   />
                   <input
                     type="checkbox"
                     onChange={() => handleChecked(todo.id, todo.checked)}
                     checked={todo.checked}
                     className="cursor-pointer"
-                    aria-label={`Todo ${todo.id + 1} を完了済みにする`}
+                    aria-label={d.todoCompleteAria(todo.id + 1)}
                   />
                   <button 
                     type="button"
                     onClick={() => handleDelete(todo.id)}
-                    aria-label={`Todo ${todo.id + 1} を削除`}
+                    aria-label={d.todoDeleteAria(todo.id + 1)}
                     className="px-2 py-1 bg-red-500/10 text-red-400 text-xs rounded hover:bg-red-500/20 transition-colors"
                   >
-                    消
+                    {d.delete}
                   </button>
                 </li>
               ))}
