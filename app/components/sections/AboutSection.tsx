@@ -16,11 +16,6 @@ import {
 } from "../../lib/aboutTimelineEn";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 
-function TranslatedViewNowLabel() {
-  const copy = useSiteCopy();
-  return <span>{copy.about.viewNow}</span>;
-}
-
 function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
   const copy = useSiteCopy();
   return (
@@ -555,19 +550,6 @@ const timeline: TimelineItem[] = [
     tags: ["Career", "Frontend Engineer", "Growth", "Side projects"],
     extraComponent: (isProfessional: boolean) => (
       <div className="mt-4 flex flex-wrap gap-3">
-        <a
-          href="#now"
-          className={`inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
-            isProfessional
-              ? "bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 focus:ring-blue-500"
-              : "bg-linear-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-500 hover:to-purple-500 focus:ring-fuchsia-500"
-          }`}
-        >
-          <TranslatedViewNowLabel />
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </a>
         <AboutContactCtaLink isProfessional={isProfessional} />
       </div>
     ),
@@ -674,7 +656,7 @@ export default function AboutSection() {
         <header className="about-header mb-16 max-w-2xl">
           <div className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}>
             <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-xs tracking-wider uppercase">05. Who I am</span>
+            <span className="font-mono text-xs tracking-wider uppercase">02. Who I am</span>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">

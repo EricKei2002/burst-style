@@ -1,31 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
 import { useLocale, useSiteCopy } from "../../lib/locale";
 
 export default function Header() {
   const { locale, setLocale } = useLocale();
   const copy = useSiteCopy();
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreWrapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!moreOpen) return;
-    const onDocMouseDown = (e: MouseEvent) => {
-      if (moreWrapRef.current?.contains(e.target as Node)) return;
-      setMoreOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMoreOpen(false);
-    };
-    document.addEventListener("mousedown", onDocMouseDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocMouseDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [moreOpen]);
 
   const linkClass =
     "text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50";
@@ -103,55 +82,6 @@ export default function Header() {
             >
               /Contact
             </a>
-            <div className="relative" ref={moreWrapRef}>
-              <button
-                type="button"
-                id="nav-more-button"
-                aria-expanded={moreOpen}
-                aria-haspopup="true"
-                aria-controls="nav-more-menu"
-                onClick={() => setMoreOpen((o) => !o)}
-                className={`${linkClass} inline-flex items-center gap-1 rounded border border-transparent px-1 py-0.5 hover:border-green-300/30`}
-              >
-                /More
-                <span className="text-[10px] text-green-300" aria-hidden="true">
-                  {moreOpen ? "▲" : "▼"}
-                </span>
-              </button>
-              {moreOpen ? (
-                <div
-                  id="nav-more-menu"
-                  role="menu"
-                  aria-labelledby="nav-more-button"
-                  className="absolute left-0 top-full z-40 mt-1 min-w-44 rounded-lg border border-green-300/35 bg-zinc-950/98 py-1 shadow-lg backdrop-blur-sm"
-                >
-                  <a
-                    role="menuitem"
-                    href="#now"
-                    className="block px-3 py-2 text-green-100 transition-colors hover:bg-green-900/20 hover:text-fuchsia-200"
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    /Now
-                  </a>
-                  <a
-                    role="menuitem"
-                    href="#lab"
-                    className="block px-3 py-2 text-green-100 transition-colors hover:bg-green-900/20 hover:text-fuchsia-200"
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    /Lab
-                  </a>
-                  <a
-                    role="menuitem"
-                    href="#writing"
-                    className="block px-3 py-2 text-green-100 transition-colors hover:bg-green-900/20 hover:text-fuchsia-200"
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    /Writing
-                  </a>
-                </div>
-              ) : null}
-            </div>
           </div>
         </nav>
       </div>
