@@ -1,83 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import { useEffect, useRef, useState } from "react";
+import { Canvas } from "@react-three/fiber";
 import dynamic from "next/dynamic";
+import StarfieldGravity from "./StarfieldGravity";
 
 // Components
 const TheSun = dynamic(() => import("./TheSun"), { ssr: false });
 const Moon = dynamic(() => import("./Moon"), { ssr: false });
 const Earth = dynamic(() => import("./Earth"), { ssr: false });
 const ShootingStars = dynamic(() => import("./ShootingStars"), { ssr: false });
-
-// コンポーネント外（モジュールスコープ）でデータ生成 — lintルール準拠
-function createStarData(count: number) {
-  const positions = new Float32Array(count * 3);
-  const speeds = new Float32Array(count);
-  for (let i = 0; i < count; i++) {
-    positions[i * 3]     = (Math.random() - 0.5) * 200;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
-    // 元コードの速度: (random*0.15 + 0.01 + base0.05) * 60fps = units/sec
-    speeds[i] = (Math.random() * 0.15 + 0.06) * 60;
-  }
-  return { positions, speeds };
-}
-
-// JSループを廃止し、GLSLシェーダーでGPU側でパーティクル位置を計算
-// これにより4000パーティクル分のメインスレッド負荷をほぼゼロにする
-function WarpStars({ count = 4000 }: { count?: number }) {
-  const geometry = useMemo(() => {
-    const { positions, speeds } = createStarData(count);
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
-    return geo;
-  }, [count]);
-
-  const material = useMemo(
-    () =>
-      new THREE.ShaderMaterial({
-      uniforms: { uTime: { value: 0 } },
-      // GPU側で全パーティクルのZ位置を計算（JSループ不要）
-      vertexShader: `
-        attribute float aSpeed;
-        uniform float uTime;
-        void main() {
-          vec3 pos = position;
-          // Z軸方向に移動してループ（-150 〜 50 の範囲、200単位）
-          pos.z = mod(position.z + 150.0 + aSpeed * uTime, 200.0) - 150.0;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-          gl_PointSize = 1.5;
-        }
-      `,
-      fragmentShader: `
-        void main() {
-          gl_FragColor = vec4(1.0, 1.0, 1.0, 0.8);
-        }
-      `,
-      transparent: true,
-    }),
-    []
-  );
-
-  useEffect(() => {
-    return () => {
-      geometry.dispose();
-      material.dispose();
-    };
-  }, [geometry, material]);
-
-  // 毎フレームuTime（累積秒数）をインクリメントするだけ — O(1)
-  useFrame((_, delta) => {
-    // eslint-disable-next-line react-hooks/immutability
-    material.uniforms.uTime.value += delta;
-  });
-
-  return <points geometry={geometry} material={material} />;
-}
-
 
 export default function StarBackground() {
   const observerRef = useRef<HTMLDivElement>(null);
@@ -181,7 +113,10 @@ export default function StarBackground() {
           {showCelestialBodies && showCelestialsNow && <Moon />}
           {showCelestialBodies && showCelestialsNow && <Earth />}
 
-          <WarpStars count={starCount} />
+          <StarfieldGravity
+            count={starCount}
+            strength={isMobile ? 0.38 : 0.68}
+          />
           {showCelestialsNow && <ShootingStars />}
         </Canvas>
       )}

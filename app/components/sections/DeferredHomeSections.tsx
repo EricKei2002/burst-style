@@ -20,25 +20,60 @@ export default function DeferredHomeSections({
 
   useEffect(() => {
     if (enabled) return;
+
+    const activate = () => setEnabled(true);
+
     const target = triggerRef.current;
-    if (!target) return;
+    let observer: IntersectionObserver | undefined;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setEnabled(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "100px 0px 100px 0px", threshold: 0.01 }
-    );
+    if (target) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) activate();
+        },
+        { rootMargin: "400px 0px 400px 0px", threshold: 0 },
+      );
+      observer.observe(target);
+    }
 
-    observer.observe(target);
-    return () => observer.disconnect();
+    const onScroll = () => {
+      const y =
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop;
+      if (y > window.innerHeight * 0.25) activate();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    const onWheel = () => activate();
+    window.addEventListener("wheel", onWheel, { once: true, passive: true });
+    window.addEventListener("touchmove", onWheel, { once: true, passive: true });
+
+    let idleId: number | undefined;
+    if ("requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(activate, { timeout: 700 });
+    }
+    const fallback = setTimeout(activate, 900);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchmove", onWheel);
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      clearTimeout(fallback);
+    };
   }, [enabled]);
 
   if (!enabled) {
-    return <div ref={triggerRef} className="h-px w-full" aria-hidden="true" />;
+    return (
+      <div
+        ref={triggerRef}
+        className="h-px w-full shrink-0"
+        aria-hidden="true"
+      />
+    );
   }
 
   return (

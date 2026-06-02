@@ -106,11 +106,7 @@ export default function ClientVisuals() {
   return (
     <>
       {config.showStars && <StarBackground />}
-      {config.showPointerFx && (
-        <>
-          <MouseTrail />
-        </>
-      )}
+      {config.showPointerFx && <MouseTrail />}
     </>
   );
 }

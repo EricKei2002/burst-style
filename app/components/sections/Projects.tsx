@@ -39,22 +39,25 @@ export default function Projects() {
       return () => clearTimeout(timer);
     }
 
-    if (isVisible) {
-      return;
-    }
+    if (isVisible) return;
+
+    const reveal = () => setIsVisible(true);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
+        if (entry.isIntersecting) reveal();
       },
-      { threshold: 0.2 }
+      // セクション全体が長いため 20% だと発火しないことがある
+      { rootMargin: "0px 0px 120px 0px", threshold: 0 },
     );
 
     observer.observe(target);
-    return () => observer.disconnect();
+    const fallback = setTimeout(reveal, 1200);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, [phase, isVisible]);
 
   return (

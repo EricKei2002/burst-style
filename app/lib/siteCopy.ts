@@ -43,7 +43,9 @@ export function buildSiteCopy(locale: Locale) {
         ja: "デザインと技術を融合した『Burst Style』の実践。",
       }),
       viewDetails: (title: string) =>
-        locale === "ja" ? `「${title}」の詳細を見る` : `View details for ${title}`,
+        locale === "ja"
+          ? `「${title}」の詳細を見る`
+          : `View details for ${title}`,
     },
     demos: {
       csharp: {
@@ -57,7 +59,10 @@ export function buildSiteCopy(locale: Locale) {
           en: "Switch to C# source view",
           ja: "C#ソース表示に切り替え",
         }),
-        clearAria: pick(locale, { en: "Clear calculation", ja: "計算をクリア" }),
+        clearAria: pick(locale, {
+          en: "Clear calculation",
+          ja: "計算をクリア",
+        }),
         divideAria: pick(locale, { en: "Divide", ja: "割り算" }),
         multiplyAria: pick(locale, { en: "Multiply", ja: "掛け算" }),
         subtractAria: pick(locale, { en: "Subtract", ja: "引き算" }),
@@ -184,7 +189,10 @@ export function buildSiteCopy(locale: Locale) {
       sending: pick(locale, { en: "SENDING...", ja: "送信中..." }),
       send: pick(locale, { en: "SEND MESSAGE", ja: "送信する" }),
       successTitle: pick(locale, { en: "Message received", ja: "送信完了" }),
-      successBody1: pick(locale, { en: "Thanks for reaching out.", ja: "お問い合わせありがとうございます。" }),
+      successBody1: pick(locale, {
+        en: "Thanks for reaching out.",
+        ja: "お問い合わせありがとうございます。",
+      }),
       successBody2: pick(locale, {
         en: "Your message was delivered successfully.",
         ja: "送信されたデータは正常に受信されました。",
