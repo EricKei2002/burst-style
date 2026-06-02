@@ -14,10 +14,15 @@ const Turnstile = dynamic(
 
 type ContactSectionProps = {
   siteKey: string;
+  keySwapped?: boolean;
 };
 
-export default function ContactSection({ siteKey }: ContactSectionProps) {
-  const needsTurnstile = siteKey.length > 0;
+export default function ContactSection({
+  siteKey,
+  keySwapped = false,
+}: ContactSectionProps) {
+  const rawSiteKey = siteKey.trim();
+  const needsTurnstile = rawSiteKey.length > 0 && !keySwapped;
   const { locale } = useLocale();
   const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
@@ -225,7 +230,11 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
                   </div>
 
                   <div className="flex flex-col items-center gap-4 pt-2">
-                    {needsTurnstile ? (
+                    {keySwapped ? (
+                      <p className="rounded-lg border border-red-500/40 bg-red-950/30 px-4 py-3 text-center font-mono text-xs leading-relaxed text-red-100">
+                        {copy.contact.turnstileKeySwapped}
+                      </p>
+                    ) : needsTurnstile ? (
                       <div className="flex min-h-[65px] w-full max-w-[300px] flex-col items-center justify-center">
                         {turnstileError ? (
                           <p className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-center font-mono text-xs leading-relaxed text-amber-100">
@@ -233,22 +242,24 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
                           </p>
                         ) : (
                           <Turnstile
-                            siteKey={siteKey}
+                            siteKey={rawSiteKey}
                             onSuccess={(token) => {
                               setTurnstileToken(token);
                               setTurnstileError(null);
                             }}
                             onExpire={() => setTurnstileToken(null)}
-                            onError={() => {
+                            onError={(code) => {
                               setTurnstileToken(null);
-                              setTurnstileError(copy.contact.turnstileLoadError);
+                              setTurnstileError(
+                                `${copy.contact.turnstileLoadError}${code ? ` (${code})` : ""}`,
+                              );
                             }}
                             scriptOptions={{
                               onError: () =>
                                 setTurnstileError(copy.contact.turnstileLoadError),
                             }}
                             options={{
-                              theme: "light",
+                              theme: "dark",
                               size: "normal",
                               appearance: "always",
                               action: "contact-form",

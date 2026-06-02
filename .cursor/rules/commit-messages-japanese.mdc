@@ -1,0 +1,23 @@
+---
+description: ソース管理のコミットメッセージ自動生成を日本語にする
+alwaysApply: true
+---
+
+# コミットメッセージ（自動生成）
+
+「Generate Commit Message」やコミット提案では、**必ず日本語**で書く。
+
+## 形式
+
+- Conventional Commits のプレフィックスは英語のまま: `feat:`, `fix:`, `refactor:`, `docs:`, `chore:`
+- **本文（説明）は日本語**
+- 1行目は簡潔に（目安 50 字以内）。変更の目的（why）を優先
+- 英語の長文サマリーは使わない
+
+## 例
+
+```
+feat: Turnstileのキー検証を追加し本番の入れ替えミスを防止
+fix: ContactのTurnstileテーマをdarkに統一
+refactor: NowLabWritingSectionsを削除しセクション番号を整理
+```

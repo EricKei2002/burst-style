@@ -10,8 +10,10 @@ const Footer = dynamic(() => import("./Footer"), { ssr: false });
 
 export default function DeferredHomeSections({
   turnstileSiteKey,
+  turnstileKeySwapped,
 }: {
   turnstileSiteKey: string;
+  turnstileKeySwapped: boolean;
 }) {
   const [enabled, setEnabled] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -43,7 +45,10 @@ export default function DeferredHomeSections({
     <>
       <Projects />
       <AboutSection />
-      <ContactSection siteKey={turnstileSiteKey} />
+      <ContactSection
+        siteKey={turnstileSiteKey}
+        keySwapped={turnstileKeySwapped}
+      />
       <Footer />
     </>
   );
