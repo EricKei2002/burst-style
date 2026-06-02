@@ -722,8 +722,7 @@ export default function AboutSection() {
           {/* 右カラム: タイムライン */}
           <div className="about-card relative space-y-12 pl-4 sm:pl-0">
             {/* タイムラインの線 */}
-            <div className="absolute left-4 top-2 h-full w-px bg-zinc-800 sm:left-8" />
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none" />
+            <div className="absolute left-4 top-2 bottom-2 w-px bg-zinc-800 sm:left-8" />
 
             {timeline.map((item, index) => (
               <div key={index} className="relative pl-12 sm:pl-16">

@@ -53,12 +53,13 @@ const fragmentShader = `
     float fine = grid(warped, 32.0);
     float coarse = grid(warped, 8.0) * 0.4;
 
-    vec3 col = vec3(0.018, 0.018, 0.028);
-    col += vec3(0.12, 0.1, 0.2) * fine * 0.42;
-    col += vec3(0.06, 0.08, 0.14) * coarse * 0.3;
+    float intensity = fine * 0.55 + coarse * 0.45;
+    float vig = 1.0 - dot(ndc, ndc) * 0.28;
+    intensity *= clamp(vig, 0.0, 1.0);
 
-    float vig = 1.0 - dot(ndc, ndc) * 0.35;
-    gl_FragColor = vec4(col * vig, 1.0);
+    vec3 col = vec3(0.55, 0.45, 0.95) * (intensity * 0.18);
+    float alpha = clamp(intensity * 0.35, 0.0, 0.28);
+    gl_FragColor = vec4(col, alpha);
   }
 `;
 
@@ -79,6 +80,8 @@ export default function SpaceWarpField({
         fragmentShader,
         depthWrite: false,
         depthTest: false,
+        transparent: true,
+        blending: THREE.AdditiveBlending,
       }),
     [],
   );
