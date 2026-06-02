@@ -12,11 +12,12 @@ const Turnstile = dynamic(
   { ssr: false },
 );
 
-const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? "";
-const NEEDS_TURNSTILE = TURNSTILE_SITE_KEY.length > 0;
+type ContactSectionProps = {
+  siteKey: string;
+};
 
-export default function ContactSection() {
+export default function ContactSection({ siteKey }: ContactSectionProps) {
+  const needsTurnstile = siteKey.length > 0;
   const { locale } = useLocale();
   const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
@@ -40,9 +41,9 @@ export default function ContactSection() {
     if (reducedMotion) {
       rafId = requestAnimationFrame(() => {
         setIsVisible(true);
-        if (!NEEDS_TURNSTILE) setIsTurnstileReady(true);
+        if (!needsTurnstile) setIsTurnstileReady(true);
       });
-    } else if (!NEEDS_TURNSTILE) {
+    } else if (!needsTurnstile) {
       rafId = requestAnimationFrame(() => setIsTurnstileReady(true));
     }
 
@@ -50,7 +51,7 @@ export default function ContactSection() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (NEEDS_TURNSTILE) setIsTurnstileReady(true);
+          if (needsTurnstile) setIsTurnstileReady(true);
           observer.disconnect();
         }
       },
@@ -58,15 +59,25 @@ export default function ContactSection() {
     );
 
     observer.observe(target);
+
+    const rect = target.getBoundingClientRect();
+    const alreadyVisible =
+      rect.top < window.innerHeight && rect.bottom > 0;
+    if (alreadyVisible) {
+      setIsVisible(true);
+      if (needsTurnstile) setIsTurnstileReady(true);
+      observer.disconnect();
+    }
+
     return () => {
       if (rafId) cancelAnimationFrame(rafId);
       observer.disconnect();
     };
-  }, []);
+  }, [needsTurnstile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (NEEDS_TURNSTILE && !turnstileToken) {
+    if (needsTurnstile && !turnstileToken) {
       setErrorMessage(copy.contact.errTurnstile);
       return;
     }
@@ -76,7 +87,7 @@ export default function ContactSection() {
 
     try {
       const formData = new FormData(e.currentTarget as HTMLFormElement);
-      if (NEEDS_TURNSTILE && turnstileToken) {
+      if (needsTurnstile && turnstileToken) {
         formData.append("cf-turnstile-response", turnstileToken);
       }
 
@@ -221,10 +232,10 @@ export default function ContactSection() {
                   </div>
 
                   <div className="flex flex-col items-center gap-4 pt-2">
-                    {NEEDS_TURNSTILE ? (
+                    {needsTurnstile ? (
                       isTurnstileReady ? (
                         <Turnstile
-                          siteKey={TURNSTILE_SITE_KEY}
+                          siteKey={siteKey}
                           onSuccess={setTurnstileToken}
                           onExpire={() => setTurnstileToken(null)}
                           onError={() => setTurnstileToken(null)}

@@ -8,7 +8,11 @@ const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
 const ContactSection = dynamic(() => import("./ContactSection"), { ssr: false });
 const Footer = dynamic(() => import("./Footer"), { ssr: false });
 
-export default function DeferredHomeSections() {
+export default function DeferredHomeSections({
+  turnstileSiteKey,
+}: {
+  turnstileSiteKey: string;
+}) {
   const [enabled, setEnabled] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +43,7 @@ export default function DeferredHomeSections() {
     <>
       <Projects />
       <AboutSection />
-      <ContactSection />
+      <ContactSection siteKey={turnstileSiteKey} />
       <Footer />
     </>
   );
