@@ -3,7 +3,7 @@ import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
-// StarBackground・MouseTrail・CustomCursorはクライアントラッパー内でdynamic（ssr:false）取り込み
+// StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
 import { LocaleProvider } from "./lib/locale";
 

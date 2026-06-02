@@ -27,7 +27,7 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [isTurnstileReady, setIsTurnstileReady] = useState(false);
+  const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
   useEffect(() => {
     const target = sectionRef.current;
@@ -39,19 +39,13 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
     ).matches;
 
     if (reducedMotion) {
-      rafId = requestAnimationFrame(() => {
-        setIsVisible(true);
-        if (!needsTurnstile) setIsTurnstileReady(true);
-      });
-    } else if (!needsTurnstile) {
-      rafId = requestAnimationFrame(() => setIsTurnstileReady(true));
+      rafId = requestAnimationFrame(() => setIsVisible(true));
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (needsTurnstile) setIsTurnstileReady(true);
           observer.disconnect();
         }
       },
@@ -65,7 +59,6 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
       rect.top < window.innerHeight && rect.bottom > 0;
     if (alreadyVisible) {
       setIsVisible(true);
-      if (needsTurnstile) setIsTurnstileReady(true);
       observer.disconnect();
     }
 
@@ -73,7 +66,7 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
       if (rafId) cancelAnimationFrame(rafId);
       observer.disconnect();
     };
-  }, [needsTurnstile]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,22 +226,36 @@ export default function ContactSection({ siteKey }: ContactSectionProps) {
 
                   <div className="flex flex-col items-center gap-4 pt-2">
                     {needsTurnstile ? (
-                      isTurnstileReady ? (
-                        <Turnstile
-                          siteKey={siteKey}
-                          onSuccess={setTurnstileToken}
-                          onExpire={() => setTurnstileToken(null)}
-                          onError={() => setTurnstileToken(null)}
-                          options={{
-                            theme: "dark",
-                            action: "contact-form",
-                          }}
-                        />
-                      ) : (
-                        <div className="rounded-lg border border-zinc-700 bg-zinc-950/40 px-4 py-3 font-mono text-xs text-zinc-200">
-                          {copy.contact.securityLoading}
-                        </div>
-                      )
+                      <div className="flex min-h-[65px] w-full max-w-[300px] flex-col items-center justify-center">
+                        {turnstileError ? (
+                          <p className="rounded-lg border border-amber-500/40 bg-amber-950/30 px-4 py-3 text-center font-mono text-xs leading-relaxed text-amber-100">
+                            {turnstileError}
+                          </p>
+                        ) : (
+                          <Turnstile
+                            siteKey={siteKey}
+                            onSuccess={(token) => {
+                              setTurnstileToken(token);
+                              setTurnstileError(null);
+                            }}
+                            onExpire={() => setTurnstileToken(null)}
+                            onError={() => {
+                              setTurnstileToken(null);
+                              setTurnstileError(copy.contact.turnstileLoadError);
+                            }}
+                            scriptOptions={{
+                              onError: () =>
+                                setTurnstileError(copy.contact.turnstileLoadError),
+                            }}
+                            options={{
+                              theme: "light",
+                              size: "normal",
+                              appearance: "always",
+                              action: "contact-form",
+                            }}
+                          />
+                        )}
+                      </div>
                     ) : (
                       <p className="rounded-lg border border-zinc-700/80 bg-zinc-950/40 px-4 py-3 text-center font-mono text-xs text-zinc-400">
                         {copy.contact.turnstileDisabled}

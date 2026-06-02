@@ -5,22 +5,13 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 // クライアントコンポーネント内でssr:falseのdynamic importを使う
-const StarBackground = dynamic(
-  () => import("./StarBackground"),
-  { ssr: false }
-);
-const SpaceshipInterior = dynamic(
-  () => import("./SpaceshipInterior"),
-  { ssr: false }
-);
-const MouseTrail = dynamic(
-  () => import("./MouseTrail"),
-  { ssr: false }
-);
-const CustomCursor = dynamic(
-  () => import("./CustomCursor"),
-  { ssr: false }
-);
+const StarBackground = dynamic(() => import("./StarBackground"), {
+  ssr: false,
+});
+const SpaceshipInterior = dynamic(() => import("./SpaceshipInterior"), {
+  ssr: false,
+});
+const MouseTrail = dynamic(() => import("./MouseTrail"), { ssr: false });
 
 export default function ClientVisuals() {
   const pathname = usePathname();
@@ -39,8 +30,11 @@ export default function ClientVisuals() {
   useEffect(() => {
     // Projectsページは動画背景を常に即座に表示するためここでは処理しない
     const isMobile = window.innerWidth < 768;
-    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const canHover = window.matchMedia(
+      "(hover: hover) and (pointer: fine)",
+    ).matches;
+    const deviceMemory =
+      (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const allowDesktopStars = !isMobile && !isLowSpec;
@@ -69,9 +63,18 @@ export default function ClientVisuals() {
       clearTimeout(timer);
     };
 
-    window.addEventListener("pointerdown", activate, { once: true, passive: true });
-    window.addEventListener("mousemove", activate, { once: true, passive: true });
-    window.addEventListener("touchstart", activate, { once: true, passive: true });
+    window.addEventListener("pointerdown", activate, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("mousemove", activate, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("touchstart", activate, {
+      once: true,
+      passive: true,
+    });
     window.addEventListener("scroll", activate, { once: true, passive: true });
     window.addEventListener("keydown", activate, { once: true });
 
@@ -106,7 +109,6 @@ export default function ClientVisuals() {
       {config.showPointerFx && (
         <>
           <MouseTrail />
-          <CustomCursor />
         </>
       )}
     </>

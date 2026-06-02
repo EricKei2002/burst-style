@@ -158,8 +158,12 @@ export function buildSiteCopy(locale: Locale) {
         ja: "セキュリティ確認を読み込み中...",
       }),
       turnstileDisabled: pick(locale, {
-        en: "Turnstile disabled: set NEXT_PUBLIC_TURNSTILE_SITE_KEY in .env.local to enable the widget.",
-        ja: "Turnstile 未設定: .env.local に NEXT_PUBLIC_TURNSTILE_SITE_KEY を設定するとウィジェットが有効になります。",
+        en: "Turnstile disabled: set NEXT_PUBLIC_TURNSTILE_SITE_KEY (local: .env.local, production: Vercel env).",
+        ja: "Turnstile 未設定: NEXT_PUBLIC_TURNSTILE_SITE_KEY を設定してください（ローカルは .env.local、本番は Vercel の環境変数）。",
+      }),
+      turnstileLoadError: pick(locale, {
+        en: "Security check failed to load. Add this site’s hostname in Cloudflare Turnstile, then redeploy.",
+        ja: "セキュリティ確認の読み込みに失敗しました。Cloudflare Turnstile のホスト名に本番ドメイン（burst.style 等）を追加してください。",
       }),
       errTurnstile: pick(locale, {
         en: "Security check not ready. Wait for Turnstile to finish loading, then try again.",
