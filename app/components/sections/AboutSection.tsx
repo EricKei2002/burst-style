@@ -544,7 +544,7 @@ const timeline: TimelineItem[] = [
                 rel="noopener noreferrer"
                 className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
               >
-                SAA 日課
+                AWS学習アプリ
               </a>
               」をNext.js + Supabaseで自作し、毎日の学習ログをそのまま実運用中。
             </span>
@@ -569,7 +569,7 @@ const timeline: TimelineItem[] = [
             rel="noopener noreferrer"
             className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
           >
-            SAA 日課
+            AWS学習アプリ
           </a>
           」（Next.js / Supabase）を自作し、実際の受験対策として毎日使っています。
         </p>

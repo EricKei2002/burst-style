@@ -18,7 +18,7 @@ export interface Project {
 export const projectsData: Project[] = [
   {
     slug: "saa-drill",
-    title: "SAA 日課",
+    title: "AWS学習アプリ",
     description:
       "AWS認定試験対策のための毎日10問ドリル。Googleログイン＋Supabaseで進捗を端末間同期、PWA対応。",
     detailedDescription:
