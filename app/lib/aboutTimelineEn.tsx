@@ -4,6 +4,7 @@ export type GeekBulletTone = "fuchsia" | "blue" | "green" | "red";
 
 export type GeekEnglishBlock = {
   lead: string;
+  body?: string;
   bullets: { tone: GeekBulletTone; tag: string; text: string }[];
   footer?: string;
 };
@@ -23,6 +24,7 @@ export function GeekEnglishView({ block }: { block: GeekEnglishBlock }): ReactNo
   return (
     <div className="space-y-4">
       <p>{block.lead}</p>
+      {block.body ? <p>{block.body}</p> : null}
       <ul className="list-none space-y-2 pl-2">
         {block.bullets.map((b, i) => (
           <li key={i} className="flex gap-2">
@@ -201,6 +203,8 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
   },
   {
     lead: "v2026.1 Stable Release: Shipped to production (career). Personal site still runs as an experiment field.",
+    body:
+      "Currently employed as a frontend engineer while pursuing personal projects and studying for AWS SAA certification in my private time.",
     bullets: [
       {
         tone: "fuchsia",
@@ -289,7 +293,8 @@ export const ABOUT_TIMELINE_PRO_EN: ProEnglishBlock[] = [
   {
     paragraphs: [
       "I work as a frontend engineer on a product team.",
-      "I care about shipping with React and TypeScript, contributing with adaptability and English communication, and keep experimenting with infra and AI outside work to widen my lens.",
+      "Outside work I keep building personal projects and studying for the AWS Solutions Architect – Associate (SAA) certification.",
+      "I care about shipping with React and TypeScript, contributing with adaptability and English communication, and keep experimenting with infra and AI to widen my lens.",
     ],
   },
 ];

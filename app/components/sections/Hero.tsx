@@ -74,8 +74,8 @@ export default function Top() {
 
         {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div ref={textRef} className="flex flex-col items-center justify-center space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
-            <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2">
+          <div ref={textRef} className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+            <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
               <div className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
                 <span className="title-char">Hello, I&apos;m</span>
@@ -88,8 +88,8 @@ export default function Top() {
               </div>
             </h1>
 
-            <div className="max-w-3xl w-full px-4 mt-8 text-left">
-              <div className="loading-text font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4">
+            <div className="max-w-3xl w-full shrink-0 px-4 mt-8 text-left">
+              <div className="loading-text h-[5.25rem] md:h-16 font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4">
                 {copy.hero.establishing}
                 <br />
                 {copy.hero.question}{" "}
@@ -106,7 +106,7 @@ export default function Top() {
                   </button>
                 </MagneticButton>
               </div>
-              <p className="text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
+              <p className="h-[7.125rem] md:h-[6.5rem] text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
                 <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
                   {copy.hero.tagline1}
                 </span>

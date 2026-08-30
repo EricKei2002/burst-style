@@ -521,6 +521,10 @@ const timeline: TimelineItem[] = [
     description: (
       <div className="space-y-4">
         <p>v2026.1 Stable Release: 本番環境（キャリア）へのデプロイに成功。個人サイトは引き続き実験フィールドとして稼働。</p>
+        <p>
+          現在は、フロントエンドエンジニアとして会社に所属しながら、プライベートでは個人開発や AWS SAA
+          の資格取得に向けた勉強を続けています。
+        </p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
             <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">[Ship]</span>
@@ -542,12 +546,16 @@ const timeline: TimelineItem[] = [
       <div className="space-y-4 text-zinc-300">
         <p>フロントエンドエンジニアとして就業し、プロダクト開発に携わっています。</p>
         <p>
+          現在は会社に所属しながら、プライベートでは個人開発や AWS SAA（AWS Certified Solutions Architect –
+          Associate）の資格取得に向けた勉強も続けています。
+        </p>
+        <p>
           React / TypeScript を中心とした実装に加え、学習で培った適応力と英語コミュニケーションを活かし、チームに貢献することを重視しています。
           業務外ではインフラや AI 周りの実験も続け、視野を広げながら成長していきたいと考えています。
         </p>
       </div>
     ),
-    tags: ["Career", "Frontend Engineer", "Growth", "Side projects"],
+    tags: ["Career", "Frontend Engineer", "AWS SAA", "Side projects"],
     extraComponent: (isProfessional: boolean) => (
       <div className="mt-4 flex flex-wrap gap-3">
         <AboutContactCtaLink isProfessional={isProfessional} />
