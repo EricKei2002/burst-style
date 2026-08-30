@@ -535,7 +535,22 @@ const timeline: TimelineItem[] = [
             <span>独学で育てたスタックと、個人での検証ループは継続チャネルとして維持。</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-green-400 font-mono text-xs shrink-0 mt-1">[Note]</span>
+            <span className="text-green-400 font-mono text-xs shrink-0 mt-1">[Build]</span>
+            <span>
+              勉強を続けるモチベーション設計として、自分用の毎日10問アプリ「
+              <a
+                href="https://aws-drill.burst.style"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
+              >
+                SAA 日課
+              </a>
+              」をNext.js + Supabaseで自作し、毎日の学習ログをそのまま実運用中。
+            </span>
+          </li>
+          <li className="flex gap-2">
+            <span className="text-red-400 font-mono text-xs shrink-0 mt-1">[Note]</span>
             <span>仕様により「好奇心」がメモリを消費しますが、本番とサイドプロジェクトの両方で返済中です。</span>
           </li>
         </ul>
@@ -547,7 +562,16 @@ const timeline: TimelineItem[] = [
         <p>フロントエンドエンジニアとして就業し、プロダクト開発に携わっています。</p>
         <p>
           現在は会社に所属しながら、プライベートでは個人開発や AWS SAA（AWS Certified Solutions Architect –
-          Associate）の資格取得に向けた勉強も続けています。
+          Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
+          <a
+            href="https://aws-drill.burst.style"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
+          >
+            SAA 日課
+          </a>
+          」（Next.js / Supabase）を自作し、実際の受験対策として毎日使っています。
         </p>
         <p>
           React / TypeScript を中心とした実装に加え、学習で培った適応力と英語コミュニケーションを活かし、チームに貢献することを重視しています。

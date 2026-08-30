@@ -219,6 +219,12 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
       },
       {
         tone: "green",
+        tag: "[Build]",
+        text:
+          "Built a daily 10-question drill for myself, SAA Drill (Next.js + Supabase), and actually use it every day as study motivation.",
+      },
+      {
+        tone: "red",
         tag: "[Note]",
         text:
           "Spec: “curiosity” consumes memory, but paying it down across work and side projects.",
@@ -293,7 +299,7 @@ export const ABOUT_TIMELINE_PRO_EN: ProEnglishBlock[] = [
   {
     paragraphs: [
       "I work as a frontend engineer on a product team.",
-      "Outside work I keep building personal projects and studying for the AWS Solutions Architect – Associate (SAA) certification.",
+      "Outside work I keep building personal projects and studying for the AWS Solutions Architect – Associate (SAA) certification. To keep the habit going, I built SAA Drill (Next.js / Supabase), a daily 10-question practice app, and use it myself every day.",
       "I care about shipping with React and TypeScript, contributing with adaptability and English communication, and keep experimenting with infra and AI to widen my lens.",
     ],
   },

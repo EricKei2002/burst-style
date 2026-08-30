@@ -17,6 +17,62 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    slug: "saa-drill",
+    title: "SAA 日課",
+    description:
+      "AWS認定試験対策のための毎日10問ドリル。Googleログイン＋Supabaseで進捗を端末間同期、PWA対応。",
+    detailedDescription:
+      "AWS Certified Solutions Architect – Associate 合格を目指す、毎日10問形式の学習PWAです。セキュリティ3・可用性3・性能2・コスト2という配点比率に沿って出題ドメインを配分し、「未見→誤答→似た論点→古い」の優先順位で決定論的に10問を選出します。解答直後にその場で解説と「持ち帰る一文」を表示し、間違えた論点は翌日以降の出題に寄せる復習ロジックを実装。Googleログイン（Supabase Auth）で連続学習日数・ドメイン別正答率・試験日カウントダウンをアカウントに紐づけて保存し、スマホと自宅PCなど複数端末で同じ記録を引き継げます。学習タブでは略称（IAM、ALBなど）をタップすると正式名称と意味がその場で開くグロッサリー機能も搭載。問題は公式試験問題の複製ではなく、AWS公式ドキュメント等を根拠にしたオリジナル演習です。",
+    image: "/projects/saa-drill.png",
+    siteUrl: "https://aws-drill.burst.style",
+    githubUrl: "https://github.com/EricKei2002/saa-drill",
+    tags: ["Next.js", "TypeScript", "Supabase", "PWA"],
+    techStack: [
+      { name: "Framework: Next.js 16 (App Router) / React 19" },
+      { name: "Language: TypeScript" },
+      { name: "Styling: Tailwind CSS v4（ダークUI）" },
+      { name: "Auth: Supabase Auth（Google）" },
+      { name: "Database: Supabase（Postgres + RPC）" },
+      { name: "配信: Vercel / PWA（manifest + Service Worker）" },
+    ],
+    challenges: [
+      {
+        title: "「今日の10問」の決定論的な抽選",
+        description:
+          "日付文字列をシードにしたハッシュ関数で疑似乱数を生成し、同じ日にアプリを開き直しても同じ10問が出るようにしました。出題は「未出題→誤答率が高い→似た論点→出題から日数が経っている」の優先順位で並べ替えてから抽選することで、弱点補強と新規学習のバランスを取っています。",
+      },
+      {
+        title: "未ログイン進捗とアカウントの引き継ぎ",
+        description:
+          "ログイン前でもすぐ学習を始められるよう、Googleログイン直前まではsessionStorageに進捗を退避し、ログイン完了と同時にSupabase側のRPC（fetch_progress / push_progress）へマージする設計にしました。これにより「まず10問解いてから、気に入ったらログイン」という体験を崩さずに端末間同期を実現しています。",
+      },
+    ],
+    improvements: [
+      {
+        title: "問題バンクの拡充",
+        description:
+          "現状100問のプールを、AWS公式ドキュメントやWell-Architected Frameworkを出典に増やしていく予定です。100問を超えた日からは復習中心の出題に切り替わる設計です。",
+      },
+      {
+        title: "学習分析の強化",
+        description:
+          "ドメイン別正答率に加えて、時間帯別の得意不得意や、間違えた論点同士の関連性を可視化するダッシュボードを検討しています。",
+      },
+    ],
+    documentation: {
+      architectureMermaid: `graph TD
+    User[ユーザー] --> Next[Next.js App Router]
+    Next --> Quiz[出題エンジン (quiz.ts)]
+    Quiz -->|日付シード付き決定論的シャッフル| QuestionBank[(問題バンク\n questions-*.ts)]
+    Next --> Auth[Supabase Auth (Google)]
+    Next --> Progress[進捗フック (use-progress.ts)]
+    Progress -->|未ログイン退避| SessionStorage[(sessionStorage)]
+    Progress -->|RPC: fetch/push_progress| Supabase[(Supabase Postgres)]
+    Auth --> Supabase
+`,
+    },
+  },
+  {
     slug: "sonta-kun",
     title: "Sontaくん",
     description: "空気を読む、AI日程調整ツール",

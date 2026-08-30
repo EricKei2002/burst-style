@@ -7,6 +7,36 @@ type EnOverlay = Pick<
 >;
 
 const EN_BY_SLUG: Record<string, EnOverlay> = {
+  "saa-drill": {
+    description:
+      "A daily 10-question drill for the AWS SAA exam. Google sign-in and Supabase sync progress across devices; installable as a PWA.",
+    detailedDescription:
+      "A daily-practice PWA for the AWS Certified Solutions Architect – Associate exam. Each day's 10 questions are allocated across domains (3 security, 3 resilience, 2 performance, 2 cost) and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics get folded into the next day's set for review. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the exam countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms (IAM, ALB, etc.) to pop open their full name and meaning inline. Questions are original exercises grounded in official AWS docs, not copies of real exam questions.",
+    challenges: [
+      {
+        title: "Deterministic daily question selection",
+        description:
+          "A date-seeded hash drives a pseudo-random shuffle so reopening the app on the same day always yields the same 10 questions. Candidates are ranked unseen → high miss-rate → related topic → stale before drawing, balancing weak-spot review with new material.",
+      },
+      {
+        title: "Carrying pre-login progress into an account",
+        description:
+          "Users can start solving immediately before signing in—progress is stashed in sessionStorage until Google login completes, then merged into Supabase via RPC (fetch_progress / push_progress). This preserves a 'try 10 questions, then sign in if you like it' flow while still syncing across devices.",
+      },
+    ],
+    improvements: [
+      {
+        title: "Bigger question bank",
+        description:
+          "Growing the pool beyond its current 100 questions, sourced from official AWS docs and the Well-Architected Framework; past 100 the daily mix shifts toward review.",
+      },
+      {
+        title: "Deeper study analytics",
+        description:
+          "Beyond per-domain accuracy, exploring a dashboard for time-of-day performance and correlations between missed topics.",
+      },
+    ],
+  },
   "sonta-kun": {
     description:
       "AI scheduling that reads the room—natural language to calendar slots.",
