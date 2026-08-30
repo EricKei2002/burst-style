@@ -61,14 +61,33 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    User[ユーザー] --> Next[Next.js App Router]
-    Next --> Quiz[出題エンジン (quiz.ts)]
-    Quiz -->|日付シード付き決定論的シャッフル| QuestionBank[(問題バンク\n questions-*.ts)]
-    Next --> Auth[Supabase Auth (Google)]
-    Next --> Progress[進捗フック (use-progress.ts)]
-    Progress -->|未ログイン退避| SessionStorage[(sessionStorage)]
-    Progress -->|RPC: fetch/push_progress| Supabase[(Supabase Postgres)]
-    Auth --> Supabase
+    Browser["ブラウザ / PWA"] -->|HTTPS| NextJS["Next.js App Router (Vercel)"]
+
+    subgraph Pages ["画面"]
+        Today["/today"]
+        Learn["/learn"]
+        Others["/, /review, /progress"]
+        Callback["/auth/callback"]
+    end
+
+    NextJS --> Today
+    NextJS --> Learn
+    NextJS --> Others
+    NextJS --> Callback
+
+    Today --> QuizEngine["出題エンジン (quiz.ts)<br/>日付シード付き決定論的シャッフル"]
+    Learn --> QuizEngine
+    QuizEngine --> QuestionBank[("問題バンク<br/>questions-*.ts（静的100問）")]
+
+    NextJS --> ProgressHook["進捗フック (use-progress.ts)"]
+    ProgressHook -->|未ログイン時に退避| SessionStorage[("sessionStorage")]
+    ProgressHook -->|RPC: fetch/push_progress| Postgres[("Supabase Postgres")]
+
+    Callback --> SupaAuth["Supabase Auth"]
+    SupaAuth -->|OAuth| Google["Google"]
+    SupaAuth --> Postgres
+
+    NextJS -.->|manifest + Service Worker| PWA["オフラインキャッシュ (PWA)"]
 `,
     },
   },
