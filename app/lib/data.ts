@@ -22,7 +22,7 @@ export const projectsData: Project[] = [
     description:
       "AWS認定試験対策のための毎日10問ドリル。Googleログイン＋Supabaseで進捗を端末間同期、PWA対応。",
     detailedDescription:
-      "AWS Certified Solutions Architect – Associate 合格を目指す、毎日10問形式の学習PWAです。セキュリティ3・可用性3・性能2・コスト2という配点比率に沿って出題ドメインを配分し、「未見→誤答→似た論点→古い」の優先順位で決定論的に10問を選出します。解答直後にその場で解説と「持ち帰る一文」を表示し、間違えた論点は翌日以降の出題に寄せる復習ロジックを実装。Googleログイン（Supabase Auth）で連続学習日数・ドメイン別正答率・試験日カウントダウンをアカウントに紐づけて保存し、スマホと自宅PCなど複数端末で同じ記録を引き継げます。学習タブでは略称（IAM、ALBなど）をタップすると正式名称と意味がその場で開くグロッサリー機能も搭載。問題は公式試験問題の複製ではなく、AWS公式ドキュメント等を根拠にしたオリジナル演習です。",
+      "AWS Certified Solutions Architect – Associate 合格を目指す、毎日10問形式の学習PWAです。セキュリティ3・可用性3・性能2・コスト2という配点比率に沿って出題ドメインを配分し、「未見→誤答→似た論点→古い」の優先順位で決定論的に10問を選出します。解答直後にその場で解説と「持ち帰る一文」を表示し、間違えた論点は弱点データとして記録して弱点ドリル（練習専用画面）で優先的に再出題する設計です（かつてあった復習タブは廃止し、弱点ドリルに導線を一本化）。Googleログイン（Supabase Auth）で連続学習日数・ドメイン別正答率・試験日カウントダウンをアカウントに紐づけて保存し、スマホと自宅PCなど複数端末で同じ記録を引き継げます。学習タブでは略称（IAM、ALBなど）をタップすると正式名称と意味がその場で開くグロッサリー機能も搭載。ユーザーが自分のGemini APIキーを設定すると、AWS公式の最新情報（What's New RSS）も踏まえて弱点分野の問題をその場でAI生成でき、Vercel Cronが毎朝事前生成もしておくため学習時の待ち時間がありません。夜21時にはWeb Push（VAPID）で日課の未消化をリマインドします。問題は公式試験問題の複製ではなく、AWS公式ドキュメント等を根拠にしたオリジナル演習です。",
     image: "/projects/saa-drill.png",
     siteUrl: "https://aws-drill.burst.style",
     githubUrl: "https://github.com/EricKei2002/saa-drill",
@@ -33,6 +33,8 @@ export const projectsData: Project[] = [
       { name: "Styling: Tailwind CSS v4（ダークUI）" },
       { name: "Auth: Supabase Auth（Google）" },
       { name: "Database: Supabase（Postgres + RPC）" },
+      { name: "AI: Google Gemini API（弱点問題のパーソナライズ生成、ユーザー自身のAPIキー）" },
+      { name: "通知: Web Push（VAPID）+ Vercel Cron（日課リマインダー / AI問題の事前生成）" },
       { name: "配信: Vercel / PWA（manifest + Service Worker）" },
     ],
     challenges: [
@@ -49,9 +51,9 @@ export const projectsData: Project[] = [
     ],
     improvements: [
       {
-        title: "問題バンクの拡充",
+        title: "AWS以外の学習分野への展開",
         description:
-          "現状100問のプールを、AWS公式ドキュメントやWell-Architected Frameworkを出典に増やしていく予定です。100問を超えた日からは復習中心の出題に切り替わる設計です。",
+          "Gemini APIを使った弱点分野のパーソナライズ出題エンジンを汎用化し、AWS以外の資格・学習分野でも使えるAI機能を追加していきたいと考えています。",
       },
       {
         title: "学習分析の強化",
@@ -61,33 +63,44 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureMermaid: `graph TD
-    Browser["ブラウザ / PWA"] -->|HTTPS| NextJS["Next.js App Router (Vercel)"]
+    Browser["ブラウザ / PWA<br/>Next.js App Router UI"]
+    SW["Service Worker<br/>オフライン / Push受信"]
 
-    subgraph Pages ["画面"]
-        Today["/today"]
-        Learn["/learn"]
-        Others["/, /review, /progress"]
-        Callback["/auth/callback"]
+    SupaAuth["Supabase Auth<br/>Google OAuth (PKCE)"]
+    Postgres[("Supabase Postgres<br/>progress / push_subscriptions")]
+    PushService["ブラウザPushサービス<br/>Web Push (VAPID)"]
+
+    GenAPI["/api/generate-questions<br/>Vercel Function"]
+    PushAPI["/api/push/subscribe<br/>Vercel Function"]
+    GenCore["問題生成ロジック<br/>gemini-generate.ts（共通）"]
+
+    subgraph Cron ["Vercel Cron（CRON_SECRET認証）"]
+        CronPool["cron: prepare-ai-pools<br/>毎日 05:00 JST"]
+        CronReminder["cron: daily-reminder<br/>毎日 21:00 JST"]
     end
 
-    NextJS --> Today
-    NextJS --> Learn
-    NextJS --> Others
-    NextJS --> Callback
+    Gemini["Google Gemini API<br/>@google/genai"]
+    RSS["AWS What's New RSS<br/>5分キャッシュ"]
 
-    Today --> QuizEngine["出題エンジン (quiz.ts)<br/>日付シード付き決定論的シャッフル"]
-    Learn --> QuizEngine
-    QuizEngine --> QuestionBank[("問題バンク<br/>questions-*.ts（静的100問）")]
+    Browser -->|① Googleログイン PKCE, anon key| SupaAuth
+    Browser -->|② 進捗の取得/保存 anon key, RPC| Postgres
+    Browser -->|③ AI問題生成（自分のGeminiキー）| GenAPI
+    Browser -->|④ Push購読 登録/解除 JWT| PushAPI
 
-    NextJS --> ProgressHook["進捗フック (use-progress.ts)"]
-    ProgressHook -->|未ログイン時に退避| SessionStorage[("sessionStorage")]
-    ProgressHook -->|RPC: fetch/push_progress| Postgres[("Supabase Postgres")]
+    GenAPI --> GenCore
+    PushAPI -->|JWT検証 Supabase Admin| SupaAuth
+    PushAPI -->|購読情報を保存 service role| Postgres
 
-    Callback --> SupaAuth["Supabase Auth"]
-    SupaAuth -->|OAuth| Google["Google"]
-    SupaAuth --> Postgres
+    CronPool -->|⑤ 対象ユーザー抽出→結果保存 service role| Postgres
+    CronPool --> GenCore
+    CronReminder -->|⑥ 未完了ユーザー抽出 service role| Postgres
+    CronReminder -->|VAPID署名付きWeb Push送信| PushService
 
-    NextJS -.->|manifest + Service Worker| PWA["オフラインキャッシュ (PWA)"]
+    GenCore -->|Gemini API 呼び出し| Gemini
+    GenCore -.->|新着情報を取得| RSS
+
+    PushService -->|Push配信| SW
+    SW -->|通知表示 → /todayへ遷移| Browser
 `,
     },
   },
