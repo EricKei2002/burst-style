@@ -320,6 +320,7 @@ export const projectsData: Project[] = [
       },
     ],
     documentation: {
+      architectureHtmlUrl: "/projects/discord-role-bot-architecture.html",
       architectureMermaid: `sequenceDiagram
     participant User as ユーザー
     participant API as Discord API

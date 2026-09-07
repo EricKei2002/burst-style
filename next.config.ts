@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
         // プロジェクトページ内のiframeで表示するため、この一覧のファイルだけ
         // 同一オリジンからの埋め込みと、図が使うGoogle Fontsの読み込みを許可する
         // （他は全ページDENY / 厳格なCSPのまま）。
-        source: '/projects/:file(saa-drill|sonta-kun|cutting-works|burst-style)-architecture.html',
+        source: '/projects/:file(saa-drill|sonta-kun|cutting-works|discord-role-bot|burst-style)-architecture.html',
         headers: [
           {
             key: 'X-Frame-Options',
