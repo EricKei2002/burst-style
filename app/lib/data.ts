@@ -226,14 +226,14 @@ export const projectsData: Project[] = [
     description:
       "多彩なカッティングステッカー・デザインサイト制作。ユーザーが直感的にデザインを選べるUIと、制作実績のギャラリー機能を実装。",
     detailedDescription:
-      "カッティングステッカーの制作・販売を行う「Cutting Works」の公式ウェブサイトです。ユーザーが豊富なデザインカタログから直感的に好みのステッカーを選べるよう、視覚的に優れたギャラリーUIを構築しました。また、MicroCMSを導入することで、クライアント自身が手軽に制作実績やニュースを更新できる運用体制を整えています。",
+      "カッティングステッカーの制作・販売を行う「Cutting Works」の公式ウェブサイトです。ユーザーが豊富なデザインカタログから直感的に好みのステッカーを選べるよう、視覚的に優れたギャラリーUIを構築しました。制作実績はNext.jsのビルド時に読み込む静的なTypeScriptデータ（app/data/works.ts）として管理し、画像はnext/imageで最適化配信することで、CMSを介さずシンプルかつ高速な構成にしています。お問い合わせはmailtoリンク経由です。",
     image: "/projects/bg cwb.jpeg",
     siteUrl: "https://cuttingworks.burst.style",
     githubUrl: "https://github.com/EricKei2002/cutting-works-burst",
-    tags: ["Next.js", "MicroCMS", "Tailwind CSS"],
+    tags: ["Next.js", "TypeScript", "Tailwind CSS"],
     techStack: [
       { name: "Framework: Next.js (App Router)" },
-      { name: "CMS: MicroCMS" },
+      { name: "データ: 静的TypeScript配列（app/data/works.ts）" },
       { name: "Styling: Tailwind CSS" },
       { name: "Language: TypeScript" },
       { name: "Hosting: Vercel" },
@@ -245,9 +245,9 @@ export const projectsData: Project[] = [
           "数多くのステッカー画像をギャラリーとして表示するため、ページの読み込み速度が課題となりました。Next.jsのImageコンポーネントを適切に設定し、WebPフォーマットへの変換や遅延読み込みを活用することで、高画質を維持したままCore Web Vitalsの数値を改善しました。",
       },
       {
-        title: "運用負荷の軽減",
+        title: "シンプルな静的構成による運用",
         description:
-          "以前はエンジニアがコードを修正してコンテンツを更新していましたが、更新頻度を高めるためにMicroCMSを導入。非技術者であるクライアントでも直感的に記事を入稿できる管理画面を設計し、運用フローを大幅に簡素化しました。",
+          "制作実績の更新頻度がそれほど高くないことを踏まえ、CMSは導入せずapp/data/works.tsの静的配列で管理する構成にしました。デプロイのたびにVercelが再ビルドするだけで反映されるため、外部サービスへの依存や管理画面の学習コストなしに、Gitでの変更履歴管理と両立できています。",
       },
     ],
     improvements: [
@@ -257,9 +257,9 @@ export const projectsData: Project[] = [
           "ステッカーの種類やカテゴリが増えた際に、ユーザーが目的のデザインに素早く辿り着けるよう、インスタントサーチ機能の実装を計画しています。",
       },
       {
-        title: "注文フォームとの連携",
+        title: "お問い合わせ体験の改善",
         description:
-          "現在は外部フォームへ誘導していますが、お気に入りのデザインを選択した状態でスムーズに見積もり依頼が出せるよう、サイト内でのフォーム連携を検討しています。",
+          "現在はmailtoリンクでメールアプリを起動する形ですが、お気に入りのデザインを選択した状態でスムーズに見積もり依頼が出せるよう、サイト内でのフォーム実装を検討しています。",
       },
     ],
     documentation: {
