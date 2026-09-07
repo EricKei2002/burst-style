@@ -7,6 +7,7 @@ import { FiCpu } from "react-icons/fi";
 interface ProjectDocsProps {
   documentation: {
     architectureMermaid: string;
+    architectureHtmlUrl?: string;
   };
 }
 
@@ -14,6 +15,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
   const mermaidRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const htmlUrl = documentation.architectureHtmlUrl;
 
   useEffect(() => {
     if (!isExpanded) return;
@@ -27,6 +29,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
   }, [isExpanded]);
 
   useEffect(() => {
+    if (htmlUrl) return;
     let cancelled = false;
 
     const loadAndRender = async () => {
@@ -75,7 +78,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
 
     loadAndRender();
     return () => { cancelled = true; };
-  }, [documentation.architectureMermaid, isExpanded]);
+  }, [documentation.architectureMermaid, isExpanded, htmlUrl]);
 
   return (
     <>
@@ -96,7 +99,17 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
           </div>
 
           <div className="p-8 flex flex-col items-center justify-center bg-[#0d1117] min-h-[300px]">
-              <div ref={mermaidRef} className="w-full flex justify-center overflow-x-auto my-4 pointer-events-none"></div>
+              {htmlUrl ? (
+                <iframe
+                  src={htmlUrl}
+                  title="システム構成図プレビュー"
+                  className="h-[300px] w-full rounded-lg border border-zinc-800 pointer-events-none"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                />
+              ) : (
+                <div ref={mermaidRef} className="w-full flex justify-center overflow-x-auto my-4 pointer-events-none"></div>
+              )}
               <p className="mt-8 text-xs text-zinc-400 font-mono">
                 システム設計とデータフロー
               </p>
@@ -109,28 +122,39 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                 className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
                 onClick={() => setIsExpanded(false)}
             >
-                <div 
+                <div
                     role="dialog"
                     aria-modal="true"
-                    aria-labelledby="project-docs-title"
-                    className="relative w-full max-w-[90vw] max-h-[90vh] overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] p-8 shadow-2xl"
+                    aria-label={htmlUrl ? "システム構成図" : undefined}
+                    aria-labelledby={htmlUrl ? undefined : "project-docs-title"}
+                    className={`relative w-full overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl ${htmlUrl ? "max-w-[95vw] max-h-[95vh] p-4" : "max-w-[90vw] max-h-[90vh] p-8"}`}
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <button 
+                    <button
                         onClick={() => setIsExpanded(false)}
-                        className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
+                        className="absolute top-4 right-4 z-10 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
                         aria-label="ダイアグラムを閉じる"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
-                    
-                    <h3 id="project-docs-title" className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
-                        <FiCpu /> システム構成図
-                    </h3>
-                    
-                    <div className="flex justify-center w-full overflow-auto">
-                        <div ref={modalRef} className="min-w-full flex justify-center p-4"></div>
-                    </div>
+
+                    {htmlUrl ? (
+                        <iframe
+                            src={htmlUrl}
+                            title="システム構成図"
+                            className="h-[85vh] w-[90vw] max-w-[1400px] rounded-lg border border-zinc-800"
+                        />
+                    ) : (
+                        <>
+                            <h3 id="project-docs-title" className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
+                                <FiCpu /> システム構成図
+                            </h3>
+
+                            <div className="flex justify-center w-full overflow-auto">
+                                <div ref={modalRef} className="min-w-full flex justify-center p-4"></div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
         )}

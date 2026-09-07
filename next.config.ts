@@ -55,6 +55,32 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // saa-drillのシステム構成図（Archify製の自己完結HTML）を
+        // プロジェクトページ内のiframeで表示するため、この1ファイルだけ
+        // 同一オリジンからの埋め込みと、図が使うGoogle Fontsの読み込みを許可する
+        // （他は全ページDENY / 厳格なCSPのまま）。
+        source: '/projects/saa-drill-architecture.html',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "img-src 'self' data: blob:",
+              "connect-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+            ].join("; "),
+          },
+        ],
+      },
     ];
   },
 };

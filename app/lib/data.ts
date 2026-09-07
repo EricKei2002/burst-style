@@ -12,6 +12,7 @@ export interface Project {
   improvements: { title: string; description: string }[];
   documentation: {
     architectureMermaid: string;
+    architectureHtmlUrl?: string;
   };
 }
 
@@ -62,6 +63,7 @@ export const projectsData: Project[] = [
       },
     ],
     documentation: {
+      architectureHtmlUrl: "/projects/saa-drill-architecture.html",
       architectureMermaid: `graph TD
     Browser["ブラウザ / PWA<br/>Next.js App Router UI"]
     SW["Service Worker<br/>オフライン / Push受信"]
