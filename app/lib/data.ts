@@ -148,6 +148,7 @@ export const projectsData: Project[] = [
       },
     ],
     documentation: {
+      architectureHtmlUrl: "/projects/sonta-kun-architecture.html",
       architectureMermaid: `graph TD
     subgraph Client ["クライアントサイド "]
         Browser[ユーザーブラウザ]
@@ -262,6 +263,7 @@ export const projectsData: Project[] = [
       },
     ],
     documentation: {
+      architectureHtmlUrl: "/projects/cutting-works-architecture.html",
       architectureMermaid: `graph TD
     User[ユーザー / クライアント] -->|ギャラリー閲覧| NextJS[Next.js App Router]
     NextJS -->|コンテンツ取得| MicroCMS[MicroCMS API]
@@ -387,6 +389,7 @@ export const projectsData: Project[] = [
       },
     ],
     documentation: {
+      architectureHtmlUrl: "/projects/burst-style-architecture.html",
       architectureMermaid: `graph TD
     User[ユーザー] --> Next[Next.js App]
     Next --> Client[Client Components]
