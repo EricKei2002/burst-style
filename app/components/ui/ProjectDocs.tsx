@@ -98,20 +98,20 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
              <span className="text-xs text-zinc-400 group-hover:text-fuchsia-400 translation-colors">クリックして拡大</span>
           </div>
 
-          <div className="p-8 flex flex-col items-center justify-center bg-[#0d1117] min-h-[300px]">
+          <div className={`flex flex-col items-center justify-center bg-[#0d1117] ${htmlUrl ? "p-4" : "p-8 min-h-[300px]"}`}>
               {htmlUrl ? (
                 <iframe
                   src={htmlUrl}
                   title="システム構成図プレビュー"
-                  className="h-[300px] w-full rounded-lg border border-zinc-800 pointer-events-none"
+                  className="h-[620px] w-full rounded-lg border border-zinc-800 pointer-events-none"
                   tabIndex={-1}
                   aria-hidden="true"
                 />
               ) : (
                 <div ref={mermaidRef} className="w-full flex justify-center overflow-x-auto my-4 pointer-events-none"></div>
               )}
-              <p className="mt-8 text-xs text-zinc-400 font-mono">
-                システム設計とデータフロー
+              <p className="mt-4 text-xs text-zinc-400 font-mono">
+                システム設計とデータフロー（クリックして拡大・操作可能な図を開く）
               </p>
           </div>
         </button>
@@ -127,25 +127,43 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                     aria-modal="true"
                     aria-label={htmlUrl ? "システム構成図" : undefined}
                     aria-labelledby={htmlUrl ? undefined : "project-docs-title"}
-                    className={`relative w-full overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl ${htmlUrl ? "max-w-[95vw] max-h-[95vh] p-4" : "max-w-[90vw] max-h-[90vh] p-8"}`}
+                    className={
+                        htmlUrl
+                            ? "relative flex h-[95vh] w-full max-w-[98vw] flex-col overflow-hidden rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl"
+                            : "relative w-full max-w-[90vw] max-h-[90vh] overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] p-8 shadow-2xl"
+                    }
                     onClick={(e) => e.stopPropagation()}
                 >
-                    <button
-                        onClick={() => setIsExpanded(false)}
-                        className="absolute top-4 right-4 z-10 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
-                        aria-label="ダイアグラムを閉じる"
-                    >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-
                     {htmlUrl ? (
-                        <iframe
-                            src={htmlUrl}
-                            title="システム構成図"
-                            className="h-[85vh] w-[90vw] max-w-[1400px] rounded-lg border border-zinc-800"
-                        />
+                        <>
+                            <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+                                <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-200">
+                                    <FiCpu /> システム構成図
+                                </h3>
+                                <button
+                                    onClick={() => setIsExpanded(false)}
+                                    className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
+                                    aria-label="ダイアグラムを閉じる"
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </div>
+                            <iframe
+                                src={htmlUrl}
+                                title="システム構成図"
+                                className="min-h-0 w-full flex-1 border-0"
+                            />
+                        </>
                     ) : (
                         <>
+                            <button
+                                onClick={() => setIsExpanded(false)}
+                                className="absolute top-4 right-4 z-10 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
+                                aria-label="ダイアグラムを閉じる"
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+
                             <h3 id="project-docs-title" className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
                                 <FiCpu /> システム構成図
                             </h3>
