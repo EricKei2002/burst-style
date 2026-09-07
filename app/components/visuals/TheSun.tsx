@@ -15,11 +15,12 @@ export default function TheSun() {
     if (meshRef.current) {
       // 軌道ロジック: 同期のために標準化された速度
       const t = state.clock.elapsedTime * 0.2; // 速度
-      const radius = 35; // 軌道半径
-      
+      // コンテンツ中央への侵入を減らすため、揺れ幅を抑えて奥行きを増やす
+      const radius = 18;
+
       meshRef.current.position.x = Math.sin(t) * radius;
       meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // 垂直波
-      meshRef.current.position.z = Math.cos(t) * radius - 20;
+      meshRef.current.position.z = Math.cos(t) * radius - 35;
       
       meshRef.current.rotation.y += 0.002;
     }

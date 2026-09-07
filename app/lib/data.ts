@@ -347,7 +347,7 @@ export const projectsData: Project[] = [
       "没入型Web体験を追求した自身のポートフォリオサイト。「宇宙船への搭乗」をコンセプトに、Three.jsと映像演出を駆使したSPA。",
     detailedDescription:
       "「Burst Style」は、没入感あふれるビジュアル体験と堅牢なバックエンド設計を融合させたポートフォリオサイトです。「宇宙への旅」をテーマにしたThree.jsによる3D演出やシームレスな遷移アニメーションに加え、実用的な機能面も徹底しました。特にフロントエンドでは、Zustandを用いた軽量な状態管理により「ハンガードア」の開閉とページ遷移を完全に同期。左右非対称（シアン＆パープル）のドアが閉まることでローディングを隠し、シームレスに宇宙船内部へと移動する演出を実現しています。バックエンドでは、Cloudflare Turnstileによるスパム対策やResend APIを用いた自動返信メールなど、見えない部分の体験設計（User Experience）にもこだわっています。",
-    image: "/projects/logo.jpg",
+    image: "/projects/burst-style-card.jpg",
     siteUrl: "https://burst.style",
     githubUrl: "https://github.com/EricKei2002/burst-style",
     tags: ["Next.js", "Three.js", "Tailwind CSS", "React"],

@@ -15,11 +15,12 @@ export default function Moon() {
     if (meshRef.current) {
       // 軌道ロジック: 太陽と反対 (PIの位相シフト)
       const t = state.clock.elapsedTime * 0.2 + Math.PI; // 同じ速度、反対の位相
-      const radius = 35; // 同じ半径
-      
+      // コンテンツ中央への侵入を減らすため、揺れ幅を抑えて奥行きを増やす
+      const radius = 18;
+
       meshRef.current.position.x = Math.sin(t) * radius;
       meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // 同じ垂直波
-      meshRef.current.position.z = Math.cos(t) * radius - 20;
+      meshRef.current.position.z = Math.cos(t) * radius - 35;
 
       meshRef.current.rotation.y += 0.005; // 目に見える回転
     }

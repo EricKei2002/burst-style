@@ -82,10 +82,18 @@ export default function Projects() {
 
         {/* プロジェクトグリッド */}
         <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
-          {projectsData.map((raw) => {
+          {projectsData.map((raw, index) => {
             const project = getLocalizedProject(raw, locale);
+            // カード数が奇数の場合、最後の1枚だけが片側に孤立して大きな空白ができるため
+            // 最後のカードを2カラム分に広げて余白を埋める
+            const isDanglingLast =
+              index === projectsData.length - 1 && projectsData.length % 2 === 1;
             return (
-            <MagneticButton key={project.slug} className="h-full" strength={0.2}>
+            <MagneticButton
+              key={project.slug}
+              className={`h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
+              strength={0.2}
+            >
               <TiltCard className="h-full" rotationIntensity={5}>
                 <button
                   type="button"
@@ -102,9 +110,7 @@ export default function Projects() {
                       src={project.image}
                       alt={project.title}
                       fill
-                      className={`transition duration-700 ease-out group-hover:scale-105 ${
-                        project.slug === 'burst-style' ? 'object-contain p-8 bg-black' : 'object-cover'
-                      }`}
+                      className="object-cover transition duration-700 ease-out group-hover:scale-105"
                       sizes="(min-width: 768px) 50vw, 100vw"
                     />
                   </div>

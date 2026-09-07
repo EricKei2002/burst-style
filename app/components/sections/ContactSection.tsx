@@ -180,7 +180,7 @@ export default function ContactSection({
                         id="name"
                         name="name"
                         required
-                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                        className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
                         placeholder={copy.contact.placeholderName}
                       />
                     </div>
@@ -201,7 +201,7 @@ export default function ContactSection({
                         id="email"
                         name="email"
                         required
-                        className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                        className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
                         placeholder={copy.contact.placeholderEmail}
                       />
                     </div>
@@ -224,7 +224,7 @@ export default function ContactSection({
                       name="message"
                       required
                       rows={6}
-                      className="w-full bg-zinc-950/50 border border-zinc-800 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
+                      className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
                       placeholder={copy.contact.placeholderMessage}
                     />
                   </div>

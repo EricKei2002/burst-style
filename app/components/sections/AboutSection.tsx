@@ -668,8 +668,13 @@ export default function AboutSection() {
             }
           });
 
-          tl.to(".growth-stage-0", { opacity: 1, duration: 1, ease: "none" })
-            .to(".growth-stage-1", { opacity: 1, duration: 1, ease: "none" });
+          // スクロール全域でクロスフェードすると、読んでいる間に「二重写し」の途中状態で
+          // 止まって見えるため、遷移区間を短くして各写真を安定して見せる保持区間を挟む
+          tl.to({}, { duration: 0.15 })
+            .to(".growth-stage-0", { opacity: 1, duration: 0.2, ease: "none" })
+            .to({}, { duration: 0.3 })
+            .to(".growth-stage-1", { opacity: 1, duration: 0.2, ease: "none" })
+            .to({}, { duration: 0.15 });
         });
 
       }, sectionRef);

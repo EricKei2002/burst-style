@@ -44,7 +44,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                         src={project.image}
                         alt={project.title}
                         fill
-                        className={project.slug === 'burst-style' ? "object-contain bg-black p-4" : "object-cover"}
+                        className="object-cover"
                         priority
                     />
                  </div>

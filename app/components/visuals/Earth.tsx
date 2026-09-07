@@ -15,11 +15,12 @@ export default function Earth() {
     if (meshRef.current) {
       // 軌道ロジック: 太陽/月と同期しているが、異なる位置
       const t = state.clock.elapsedTime * 0.2 + Math.PI * 1.5; // 270度の位相 (太陽=0, 月=180)
-      const radius = 35; // 対称性のために他と同じ半径
-      
+      // コンテンツ中央への侵入を減らすため、揺れ幅を抑えて奥行きを増やす
+      const radius = 18;
+
       meshRef.current.position.x = Math.sin(t) * radius;
       meshRef.current.position.y = Math.cos(t * 0.5) * 15 - 5;
-      meshRef.current.position.z = Math.cos(t) * radius - 20;
+      meshRef.current.position.z = Math.cos(t) * radius - 35;
       
       meshRef.current.rotation.y += 0.005; 
     }
