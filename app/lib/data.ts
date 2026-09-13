@@ -85,20 +85,29 @@ export const projectsData: Project[] = [
     PushAPI["/api/push/subscribe<br/>Vercel Function"]
     GenCore["問題生成ロジック<br/>gemini-generate.ts（共通）"]
 
+    subgraph Packs ["学習パック（src/packs）"]
+        Registry["パックレジストリ<br/>registry.ts"]
+        PackAws["AWS SAAパック<br/>問題・用語・配点比率"]
+        PackWp["WordPressパック<br/>問題・用語・配点比率"]
+    end
+
     subgraph Cron ["Vercel Cron（CRON_SECRET認証）"]
         CronPool["cron: prepare-ai-pools<br/>毎日 05:00 JST"]
         CronReminder["cron: daily-reminder<br/>毎日 21:00 JST"]
     end
 
     Gemini["Google Gemini API<br/>@google/genai"]
-    RSS["AWS What's New RSS<br/>5分キャッシュ"]
+    RSS["AWS What's New RSS<br/>5分キャッシュ（AWSパックのみ）"]
 
     Browser -->|① Googleログイン PKCE, anon key| SupaAuth
     Browser -->|② 進捗の取得/保存 anon key, RPC| Postgres
-    Browser -->|③ AI問題生成（自分のGeminiキー）| GenAPI
+    Browser -->|③ 選択中パックでAI問題生成（自分のGeminiキー）| GenAPI
     Browser -->|④ Push購読 登録/解除 JWT| PushAPI
 
     GenAPI --> GenCore
+    GenCore -->|パックID指定| Registry
+    Registry --> PackAws
+    Registry --> PackWp
     PushAPI -->|JWT検証 Supabase Admin| SupaAuth
     PushAPI -->|購読情報を保存 service role| Postgres
 
@@ -108,7 +117,7 @@ export const projectsData: Project[] = [
     CronReminder -->|VAPID署名付きWeb Push送信| PushService
 
     GenCore -->|Gemini API 呼び出し| Gemini
-    GenCore -.->|新着情報を取得| RSS
+    PackAws -.->|新着情報を取得| RSS
 
     PushService -->|Push配信| SW
     SW -->|通知表示 → /todayへ遷移| Browser
