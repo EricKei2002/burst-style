@@ -38,7 +38,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "Deeper study analytics",
         description:
-          "Beyond per-domain accuracy, exploring a dashboard for time-of-day performance and correlations between missed topics.",
+          "Beyond per-domain accuracy, exploring a dashboard for correlations between missed topics.",
       },
     ],
   },
