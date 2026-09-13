@@ -7,7 +7,7 @@ type EnOverlay = Pick<
 >;
 
 const EN_BY_SLUG: Record<string, EnOverlay> = {
-  "saa-drill": {
+  "学習アプリ": {
     description:
       "A daily 10-question drill for the AWS SAA exam. Google sign-in and Supabase sync progress across devices; installable as a PWA.",
     detailedDescription:
