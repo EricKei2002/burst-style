@@ -22,7 +22,7 @@ export default function Top() {
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
-  
+
   const carouselTriggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function Top() {
           observer.disconnect();
         }
       },
-      { rootMargin: "100px 0px 100px 0px", threshold: 0.01 }
+      { rootMargin: "100px 0px 100px 0px", threshold: 0.01 },
     );
 
     observer.observe(target);
@@ -56,7 +56,11 @@ export default function Top() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      if (target && ["INPUT", "TEXTAREA", "BUTTON", "SELECT", "A"].includes(target.tagName)) return;
+      if (
+        target &&
+        ["INPUT", "TEXTAREA", "BUTTON", "SELECT", "A"].includes(target.tagName)
+      )
+        return;
       if (e.key === "Enter") {
         showDescription();
       }
@@ -66,15 +70,25 @@ export default function Top() {
   }, [showDescription]);
 
   return (
-    <section id="top" ref={containerRef} className="relative flex min-h-screen w-full flex-col overflow-hidden">
+    <section
+      id="top"
+      ref={containerRef}
+      className="relative flex min-h-screen w-full flex-col overflow-hidden"
+    >
       <Header />
 
       <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
-        <div ref={flashRef} className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"></div>
+        <div
+          ref={flashRef}
+          className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"
+        ></div>
 
         {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div ref={textRef} className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div
+            ref={textRef}
+            className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5"
+          >
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
               <div className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
@@ -84,7 +98,9 @@ export default function Top() {
                 <div className="font-mono pb-2 inline-block">
                   <GlitchText text="Eric Kei." />
                 </div>
-                <span className="animate-pulse font-mono text-fuchsia-300 ml-1 pb-2">_</span>
+                <span className="animate-pulse font-mono text-fuchsia-300 ml-1 pb-2">
+                  _
+                </span>
               </div>
             </h1>
 
@@ -98,7 +114,9 @@ export default function Top() {
                     type="button"
                     onClick={showDescription}
                     className={`trigger-btn rounded border px-2 py-0.5 transition-colors inline-block font-mono text-xs ${
-                      descriptionVisible ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none" : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
+                      descriptionVisible
+                        ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none"
+                        : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
                     }`}
                     aria-label={copy.hero.enterAria}
                   >
@@ -107,11 +125,15 @@ export default function Top() {
                 </MagneticButton>
               </div>
               <p className="h-[7.125rem] md:h-[6.5rem] text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
-                <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
+                <span
+                  className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
+                >
                   {copy.hero.tagline1}
                 </span>
                 <br className="hidden sm:block" />
-                <span className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}>
+                <span
+                  className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
+                >
                   {copy.hero.tagline2}
                 </span>
               </p>
@@ -129,11 +151,14 @@ export default function Top() {
             &gt; My Skills
           </h2>
           <div ref={carouselTriggerRef} className="min-h-[240px]">
-            {showTechCarousel ? <TechCarousel /> : <div className="h-[240px]" aria-hidden="true" />}
+            {showTechCarousel ? (
+              <TechCarousel />
+            ) : (
+              <div className="h-[240px]" aria-hidden="true" />
+            )}
           </div>
         </div>
       </div>
-
     </section>
   );
 }

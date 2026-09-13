@@ -14,7 +14,7 @@ function createStarData(count: number) {
   const positions = new Float32Array(count * 3);
   const speeds = new Float32Array(count);
   for (let i = 0; i < count; i++) {
-    positions[i * 3]     = (Math.random() - 0.5) * 200;
+    positions[i * 3] = (Math.random() - 0.5) * 200;
     positions[i * 3 + 1] = (Math.random() - 0.5) * 200;
     positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
     // StarBackgroundと同一スケール（units/sec）
@@ -39,10 +39,10 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-      },
-      vertexShader: `
+        uniforms: {
+          uTime: { value: 0 },
+        },
+        vertexShader: `
         attribute float aSpeed;
         uniform float uTime;
         void main() {
@@ -53,14 +53,14 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
           gl_PointSize = 1.5;
         }
       `,
-      fragmentShader: `
+        fragmentShader: `
         void main() {
           gl_FragColor = vec4(1.0, 1.0, 1.0, 0.8);
         }
       `,
-      transparent: true,
-    }),
-    []
+        transparent: true,
+      }),
+    [],
   );
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
     speedFactorRef.current = THREE.MathUtils.lerp(
       speedFactorRef.current,
       targetFactor,
-      delta * 2
+      delta * 2,
     );
 
     // eslint-disable-next-line react-hooks/immutability

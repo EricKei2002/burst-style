@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import type { useGravityPointer } from "./useGravityPointer";
 
@@ -90,6 +90,7 @@ export default function SpaceWarpField({
 
   useFrame(() => {
     material.uniforms.uMouse.value.copy(pointer.smoothPointer.current);
+    // eslint-disable-next-line react-hooks/immutability -- r3f: imperative uniform update outside render, avoids re-render every frame
     material.uniforms.uGravity.value = pointer.gravity.current;
     material.uniforms.uTime.value = pointer.time.current;
   });

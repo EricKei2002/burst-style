@@ -60,8 +60,7 @@ export default function ContactSection({
     observer.observe(target);
 
     const rect = target.getBoundingClientRect();
-    const alreadyVisible =
-      rect.top < window.innerHeight && rect.bottom > 0;
+    const alreadyVisible = rect.top < window.innerHeight && rect.bottom > 0;
     if (alreadyVisible) {
       setIsVisible(true);
       observer.disconnect();
@@ -256,7 +255,9 @@ export default function ContactSection({
                             }}
                             scriptOptions={{
                               onError: () =>
-                                setTurnstileError(copy.contact.turnstileLoadError),
+                                setTurnstileError(
+                                  copy.contact.turnstileLoadError,
+                                ),
                             }}
                             options={{
                               theme: "dark",

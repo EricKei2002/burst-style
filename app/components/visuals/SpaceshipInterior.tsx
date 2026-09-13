@@ -10,7 +10,7 @@ export default function SpaceshipInterior() {
 
   useEffect(() => {
     if (videoRef.current) {
-        videoRef.current.playbackRate = 1.0;
+      videoRef.current.playbackRate = 1.0;
     }
   }, []);
 
@@ -32,10 +32,13 @@ export default function SpaceshipInterior() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       >
-        <source src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`} type="video/mp4" />
+        <source
+          src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`}
+          type="video/mp4"
+        />
         Your browser does not support the video tag.
       </video>
-      
+
       {/* 映画のようなフィールと、圧縮アーティファクトを隠すためのオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />

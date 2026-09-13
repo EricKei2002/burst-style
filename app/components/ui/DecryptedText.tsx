@@ -52,7 +52,7 @@ export default function DecryptedText({
             if (index < iteration) return text[index];
             return characters[Math.floor(Math.random() * characters.length)];
           })
-          .join("")
+          .join(""),
       );
 
       if (iteration >= text.length || iteration >= hardLimit) {
@@ -63,7 +63,9 @@ export default function DecryptedText({
   }, [characters, clearScramble, maxIterations, sequential, speed, text]);
 
   useEffect(() => {
-    reducedMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    reducedMotionRef.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const syncTextTimer = window.setTimeout(() => {
       setDisplayText(text);
     }, 0);

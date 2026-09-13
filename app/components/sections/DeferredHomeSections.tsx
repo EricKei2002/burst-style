@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from "react";
 
 const Projects = dynamic(() => import("./Projects"), { ssr: false });
 const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
-const ContactSection = dynamic(() => import("./ContactSection"), { ssr: false });
+const ContactSection = dynamic(() => import("./ContactSection"), {
+  ssr: false,
+});
 const Footer = dynamic(() => import("./Footer"), { ssr: false });
 
 export default function DeferredHomeSections({
@@ -48,7 +50,10 @@ export default function DeferredHomeSections({
 
     const onWheel = () => activate();
     window.addEventListener("wheel", onWheel, { once: true, passive: true });
-    window.addEventListener("touchmove", onWheel, { once: true, passive: true });
+    window.addEventListener("touchmove", onWheel, {
+      once: true,
+      passive: true,
+    });
 
     let idleId: number | undefined;
     if ("requestIdleCallback" in window) {

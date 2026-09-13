@@ -27,7 +27,8 @@ export default function StarBackground() {
   const [starCount] = useState(() => {
     if (typeof window === "undefined") return 1200;
 
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const deviceMemory =
+      (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
@@ -36,12 +37,14 @@ export default function StarBackground() {
       if (deviceMemory <= 4 || cpuCores <= 6) return 300;
       return 700;
     }
-    if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4) return 650;
+    if (window.innerWidth < 1280 || deviceMemory <= 4 || cpuCores <= 4)
+      return 650;
     return 1000;
   });
   const [showCelestialBodies] = useState(() => {
     if (typeof window === "undefined") return false;
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+    const deviceMemory =
+      (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     // モバイルでも天体（惑星や月など）を描画するように条件を緩和（極端な低スペックのみ除外）
     return deviceMemory > 2 && cpuCores > 2;
@@ -55,7 +58,7 @@ export default function StarBackground() {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
       },
-      { threshold: 0.01 }
+      { threshold: 0.01 },
     );
 
     observer.observe(target);
@@ -97,15 +100,28 @@ export default function StarBackground() {
   }, [isReady, showCelestialBodies]);
 
   if (starCount === 0) {
-    return <div className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true" />;
+    return (
+      <div
+        className="fixed inset-0 -z-50 h-full w-full bg-[#050505]"
+        aria-hidden="true"
+      />
+    );
   }
 
   return (
-    <div ref={observerRef} className="fixed inset-0 -z-50 h-full w-full bg-[#050505]" aria-hidden="true">
+    <div
+      ref={observerRef}
+      className="fixed inset-0 -z-50 h-full w-full bg-[#050505]"
+      aria-hidden="true"
+    >
       {isReady && (
         <Canvas
           camera={{ position: [0, 0, 1] }}
-          gl={{ alpha: false, antialias: false, powerPreference: "high-performance" }}
+          gl={{
+            alpha: false,
+            antialias: false,
+            powerPreference: "high-performance",
+          }}
           dpr={isMobile ? [0.75, 1] : [1, 1.1]}
         >
           <ambientLight intensity={0.1} />

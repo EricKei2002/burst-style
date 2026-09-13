@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import SpaceWarpField from "./SpaceWarpField";
 import { useGravityPointer } from "./useGravityPointer";
 import WarpStars from "./WarpStarsPoints";
@@ -15,7 +15,10 @@ export default function StarfieldGravity({
 }) {
   const pointer = useGravityPointer();
   const strengthRef = useRef(strength);
-  strengthRef.current = strength;
+
+  useEffect(() => {
+    strengthRef.current = strength;
+  }, [strength]);
 
   useFrame((_, delta) => {
     pointer.tick(delta, strengthRef.current);

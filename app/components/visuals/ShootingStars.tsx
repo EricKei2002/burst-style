@@ -36,7 +36,7 @@ const ShootingStar = () => {
         velocity.current.set(
           (Math.random() - 0.5) * 50,
           -Math.random() * 50 - 50,
-          0
+          0,
         );
 
         const target = startPos.current.clone().add(velocity.current);

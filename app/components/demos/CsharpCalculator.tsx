@@ -100,30 +100,32 @@ export default function CsharpCalculator() {
           <span className="text-xs text-zinc-400">Calculator.cs [Design]</span>
         </div>
         <div className="flex gap-2">
-           <button 
-             type="button"
-             onClick={() => setViewMode("design")}
-             aria-pressed={viewMode === "design"}
-             aria-label={d.designTabAria}
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
-           >
-             {d.tabDesign}
-           </button>
-           <button 
-             type="button"
-             onClick={() => setViewMode("source")}
-             aria-pressed={viewMode === "source"}
-             aria-label={d.sourceTabAria}
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
-           >
-             {d.tabSource}
-           </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("design")}
+            aria-pressed={viewMode === "design"}
+            aria-label={d.designTabAria}
+            className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
+          >
+            {d.tabDesign}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("source")}
+            aria-pressed={viewMode === "source"}
+            aria-label={d.sourceTabAria}
+            className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
+          >
+            {d.tabSource}
+          </button>
         </div>
       </div>
 
       <div className="relative">
         {/* Design View */}
-        <div className={`p-4 transition-opacity duration-300 ${viewMode === "design" ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+        <div
+          className={`p-4 transition-opacity duration-300 ${viewMode === "design" ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        >
           {/* Display */}
           <div className="mb-4 flex h-16 items-end justify-end rounded-lg bg-[#000000] p-3 text-3xl text-green-400 shadow-inner ring-1 ring-zinc-800">
             {display}
@@ -132,64 +134,189 @@ export default function CsharpCalculator() {
           {/* Keypad */}
           <div className="grid grid-cols-4 gap-2">
             {/* Row 1 */}
-            <button type="button" onClick={clear} aria-label={d.clearAria} className="col-span-2 flex h-10 items-center justify-center rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={clear}
+              aria-label={d.clearAria}
+              className="col-span-2 flex h-10 items-center justify-center rounded bg-red-900/30 text-red-400 hover:bg-red-900/50 active:translate-y-0.5"
+            >
               C
             </button>
-            <button type="button" onClick={() => handleOperator("/")} aria-label={d.divideAria} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={() => handleOperator("/")}
+              aria-label={d.divideAria}
+              className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5"
+            >
               <FiDivide size={16} />
             </button>
-            <button type="button" onClick={() => handleOperator("*")} aria-label={d.multiplyAria} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={() => handleOperator("*")}
+              aria-label={d.multiplyAria}
+              className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5"
+            >
               <FiX size={16} />
             </button>
 
             {/* Row 2 */}
-            <button type="button" onClick={() => handleNumber("7")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">7</button>
-            <button type="button" onClick={() => handleNumber("8")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">8</button>
-            <button type="button" onClick={() => handleNumber("9")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">9</button>
-            <button type="button" onClick={() => handleOperator("-")} aria-label={d.subtractAria} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={() => handleNumber("7")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              7
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("8")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              8
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("9")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              9
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOperator("-")}
+              aria-label={d.subtractAria}
+              className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5"
+            >
               <FiMinus size={16} />
             </button>
 
             {/* Row 3 */}
-            <button type="button" onClick={() => handleNumber("4")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">4</button>
-            <button type="button" onClick={() => handleNumber("5")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">5</button>
-            <button type="button" onClick={() => handleNumber("6")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">6</button>
-            <button type="button" onClick={() => handleOperator("+")} aria-label={d.addAria} className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={() => handleNumber("4")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              4
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("5")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              5
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("6")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              6
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOperator("+")}
+              aria-label={d.addAria}
+              className="flex h-10 items-center justify-center rounded bg-zinc-800 text-zinc-300 hover:bg-zinc-700 active:translate-y-0.5"
+            >
               <FiPlus size={16} />
             </button>
 
             {/* Row 4 */}
-            <button type="button" onClick={() => handleNumber("1")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">1</button>
-            <button type="button" onClick={() => handleNumber("2")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">2</button>
-            <button type="button" onClick={() => handleNumber("3")} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">3</button>
-            <button type="button" onClick={calculate} aria-label={d.equalsAria} className="row-span-2 flex items-center justify-center rounded bg-fuchsia-600/80 text-white hover:bg-fuchsia-600 active:translate-y-0.5">
+            <button
+              type="button"
+              onClick={() => handleNumber("1")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              1
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("2")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              2
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber("3")}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              3
+            </button>
+            <button
+              type="button"
+              onClick={calculate}
+              aria-label={d.equalsAria}
+              className="row-span-2 flex items-center justify-center rounded bg-fuchsia-600/80 text-white hover:bg-fuchsia-600 active:translate-y-0.5"
+            >
               <FaEquals size={16} />
             </button>
 
             {/* Row 5 */}
-            <button type="button" onClick={() => handleNumber("0")} className="col-span-2 flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">0</button>
-            <button type="button" onClick={() => handleNumber(".")} aria-label={d.decimalAria} className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5">.</button>
+            <button
+              type="button"
+              onClick={() => handleNumber("0")}
+              className="col-span-2 flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              0
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNumber(".")}
+              aria-label={d.decimalAria}
+              className="flex h-10 items-center justify-center rounded bg-zinc-900 text-zinc-200 hover:bg-zinc-800 active:translate-y-0.5"
+            >
+              .
+            </button>
           </div>
         </div>
-        
+
         {/* Source View - C# Code */}
-        <div className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
-            <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
-              {csharpCode.split('\n').map((line, i) => (
-                <div key={i}>
-                  <span className="text-zinc-600 select-none mr-3 w-4 inline-block text-right">{i + 1}</span>
-                  <span>
-                    {line.split(/("(?:[^"\\]|\\.)*")|\b(private|void|object|string|double|if|else|switch|case|break)\b|\b(Parse|ToString|Show)\b|(\s+)|([^"\s\w]+)|(\w+)/g).filter(Boolean).map((token, j) => {
-                       if (!token) return null;
-                       if (token.startsWith('"')) return <span key={j} className="text-orange-400">{token}</span>;
-                       if (/^(private|void|object|string|double|if|else|switch|case|break)$/.test(token)) return <span key={j} className="text-blue-400">{token}</span>;
-                       if (/^(Parse|ToString|Show)$/.test(token)) return <span key={j} className="text-yellow-300">{token}</span>;
-                       return <span key={j}>{token}</span>;
+        <div
+          className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}
+        >
+          <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
+            {csharpCode.split("\n").map((line, i) => (
+              <div key={i}>
+                <span className="text-zinc-600 select-none mr-3 w-4 inline-block text-right">
+                  {i + 1}
+                </span>
+                <span>
+                  {line
+                    .split(
+                      /("(?:[^"\\]|\\.)*")|\b(private|void|object|string|double|if|else|switch|case|break)\b|\b(Parse|ToString|Show)\b|(\s+)|([^"\s\w]+)|(\w+)/g,
+                    )
+                    .filter(Boolean)
+                    .map((token, j) => {
+                      if (!token) return null;
+                      if (token.startsWith('"'))
+                        return (
+                          <span key={j} className="text-orange-400">
+                            {token}
+                          </span>
+                        );
+                      if (
+                        /^(private|void|object|string|double|if|else|switch|case|break)$/.test(
+                          token,
+                        )
+                      )
+                        return (
+                          <span key={j} className="text-blue-400">
+                            {token}
+                          </span>
+                        );
+                      if (/^(Parse|ToString|Show)$/.test(token))
+                        return (
+                          <span key={j} className="text-yellow-300">
+                            {token}
+                          </span>
+                        );
+                      return <span key={j}>{token}</span>;
                     })}
-                  </span>
-                </div>
-              ))}
-            </pre>
+                </span>
+              </div>
+            ))}
+          </pre>
         </div>
       </div>
     </div>

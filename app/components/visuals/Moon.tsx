@@ -7,9 +7,9 @@ import { TextureLoader } from "three";
 
 export default function Moon() {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   // 信頼性のためにローカルテクスチャを使用
-  const texture = useLoader(TextureLoader, '/moon.jpg');
+  const texture = useLoader(TextureLoader, "/moon.jpg");
 
   useFrame((state) => {
     if (meshRef.current) {
@@ -29,10 +29,10 @@ export default function Moon() {
   return (
     <mesh ref={meshRef} position={[-25, -5, -20]}>
       <sphereGeometry args={[2.5, 32, 32]} />
-      <meshStandardMaterial 
+      <meshStandardMaterial
         map={texture}
         emissiveMap={texture}
-        color="#ffffff" 
+        color="#ffffff"
         emissive="#ffffff"
         emissiveIntensity={0.4}
         roughness={0.8}

@@ -39,26 +39,32 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
 
       mermaid.initialize({
         startOnLoad: true,
-        theme: 'dark',
-        securityLevel: 'loose',
-        fontFamily: 'monospace',
+        theme: "dark",
+        securityLevel: "loose",
+        fontFamily: "monospace",
         themeVariables: {
-          primaryColor: '#1e1e1e',
-          primaryTextColor: '#e4e4e7',
-          primaryBorderColor: '#3f3f46',
-          lineColor: '#a1a1aa',
-          secondaryColor: '#27272a',
-          tertiaryColor: '#18181b',
-        }
+          primaryColor: "#1e1e1e",
+          primaryTextColor: "#e4e4e7",
+          primaryBorderColor: "#3f3f46",
+          lineColor: "#a1a1aa",
+          secondaryColor: "#27272a",
+          tertiaryColor: "#18181b",
+        },
       });
 
       // Mermaidをレンダリングする関数
-      const render = async (ref: React.RefObject<HTMLDivElement | null>, idSuffix: string) => {
+      const render = async (
+        ref: React.RefObject<HTMLDivElement | null>,
+        idSuffix: string,
+      ) => {
         if (ref.current && !cancelled) {
           try {
-            ref.current.innerHTML = '';
+            ref.current.innerHTML = "";
             const id = `mermaid-${idSuffix}-${Date.now()}`;
-            const { svg } = await mermaid.render(id, documentation.architectureMermaid);
+            const { svg } = await mermaid.render(
+              id,
+              documentation.architectureMermaid,
+            );
             if (!cancelled && ref.current) {
               ref.current.innerHTML = svg;
             }
@@ -69,113 +75,154 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
         }
       };
 
-      await render(mermaidRef, 'thumb');
+      await render(mermaidRef, "thumb");
       if (isExpanded && !cancelled) {
         // モーダルがレンダリングされるのを少し遅延させる
-        setTimeout(() => render(modalRef, 'modal'), 100);
+        setTimeout(() => render(modalRef, "modal"), 100);
       }
     };
 
     loadAndRender();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [documentation.architectureMermaid, isExpanded, htmlUrl]);
 
   return (
     <>
-        <button
-            type="button"
-            aria-label="システム構成図を拡大表示"
-            aria-haspopup="dialog"
-            aria-expanded={isExpanded}
-            className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600 focus-visible:outline-none"
-            onClick={() => setIsExpanded(true)}
-        >
-          <div className="border-b border-zinc-800 bg-[#010409] px-4 py-3 flex items-center justify-between">
-             <div className="flex items-center gap-2">
-                <FiCpu className="text-zinc-400" size={18} />
-                <span className="text-sm font-medium text-zinc-200">システム構成図</span>
-             </div>
-             <span className="text-xs text-zinc-400 group-hover:text-fuchsia-400 translation-colors">クリックして拡大</span>
+      <button
+        type="button"
+        aria-label="システム構成図を拡大表示"
+        aria-haspopup="dialog"
+        aria-expanded={isExpanded}
+        className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600 focus-visible:outline-none"
+        onClick={() => setIsExpanded(true)}
+      >
+        <div className="border-b border-zinc-800 bg-[#010409] px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FiCpu className="text-zinc-400" size={18} />
+            <span className="text-sm font-medium text-zinc-200">
+              システム構成図
+            </span>
           </div>
+          <span className="text-xs text-zinc-400 group-hover:text-fuchsia-400 translation-colors">
+            クリックして拡大
+          </span>
+        </div>
 
-          <div className={`flex flex-col items-center justify-center bg-[#0d1117] ${htmlUrl ? "p-4" : "p-8 min-h-[300px]"}`}>
-              {htmlUrl ? (
+        <div
+          className={`flex flex-col items-center justify-center bg-[#0d1117] ${htmlUrl ? "p-4" : "p-8 min-h-[300px]"}`}
+        >
+          {htmlUrl ? (
+            <iframe
+              src={htmlUrl}
+              title="システム構成図プレビュー"
+              className="h-[620px] w-full rounded-lg border border-zinc-800 pointer-events-none"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+          ) : (
+            <div
+              ref={mermaidRef}
+              className="w-full flex justify-center overflow-x-auto my-4 pointer-events-none"
+            ></div>
+          )}
+          <p className="mt-4 text-xs text-zinc-400 font-mono">
+            システム設計とデータフロー（クリックして拡大・操作可能な図を開く）
+          </p>
+        </div>
+      </button>
+
+      {/* 拡大表示用のモーダル */}
+      {isExpanded && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
+          onClick={() => setIsExpanded(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={htmlUrl ? "システム構成図" : undefined}
+            aria-labelledby={htmlUrl ? undefined : "project-docs-title"}
+            className={
+              htmlUrl
+                ? "relative flex h-[95vh] w-full max-w-[98vw] flex-col overflow-hidden rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl"
+                : "relative w-full max-w-[90vw] max-h-[90vh] overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] p-8 shadow-2xl"
+            }
+            onClick={(e) => e.stopPropagation()}
+          >
+            {htmlUrl ? (
+              <>
+                <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
+                  <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-200">
+                    <FiCpu /> システム構成図
+                  </h3>
+                  <button
+                    onClick={() => setIsExpanded(false)}
+                    className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
+                    aria-label="ダイアグラムを閉じる"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
                 <iframe
                   src={htmlUrl}
-                  title="システム構成図プレビュー"
-                  className="h-[620px] w-full rounded-lg border border-zinc-800 pointer-events-none"
-                  tabIndex={-1}
-                  aria-hidden="true"
+                  title="システム構成図"
+                  className="min-h-0 w-full flex-1 border-0"
                 />
-              ) : (
-                <div ref={mermaidRef} className="w-full flex justify-center overflow-x-auto my-4 pointer-events-none"></div>
-              )}
-              <p className="mt-4 text-xs text-zinc-400 font-mono">
-                システム設計とデータフロー（クリックして拡大・操作可能な図を開く）
-              </p>
-          </div>
-        </button>
-
-        {/* 拡大表示用のモーダル */}
-        {isExpanded && (
-            <div 
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
-                onClick={() => setIsExpanded(false)}
-            >
-                <div
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label={htmlUrl ? "システム構成図" : undefined}
-                    aria-labelledby={htmlUrl ? undefined : "project-docs-title"}
-                    className={
-                        htmlUrl
-                            ? "relative flex h-[95vh] w-full max-w-[98vw] flex-col overflow-hidden rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl"
-                            : "relative w-full max-w-[90vw] max-h-[90vh] overflow-auto rounded-xl border border-zinc-700 bg-[#0d1117] p-8 shadow-2xl"
-                    }
-                    onClick={(e) => e.stopPropagation()}
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  className="absolute top-4 right-4 z-10 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
+                  aria-label="ダイアグラムを閉じる"
                 >
-                    {htmlUrl ? (
-                        <>
-                            <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
-                                <h3 className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-                                    <FiCpu /> システム構成図
-                                </h3>
-                                <button
-                                    onClick={() => setIsExpanded(false)}
-                                    className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
-                                    aria-label="ダイアグラムを閉じる"
-                                >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
-                            <iframe
-                                src={htmlUrl}
-                                title="システム構成図"
-                                className="min-h-0 w-full flex-1 border-0"
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={() => setIsExpanded(false)}
-                                className="absolute top-4 right-4 z-10 p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
-                                aria-label="ダイアグラムを閉じる"
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
 
-                            <h3 id="project-docs-title" className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2">
-                                <FiCpu /> システム構成図
-                            </h3>
+                <h3
+                  id="project-docs-title"
+                  className="text-xl font-bold text-zinc-100 mb-8 flex items-center gap-2"
+                >
+                  <FiCpu /> システム構成図
+                </h3>
 
-                            <div className="flex justify-center w-full overflow-auto">
-                                <div ref={modalRef} className="min-w-full flex justify-center p-4"></div>
-                            </div>
-                        </>
-                    )}
+                <div className="flex justify-center w-full overflow-auto">
+                  <div
+                    ref={modalRef}
+                    className="min-w-full flex justify-center p-4"
+                  ></div>
                 </div>
-            </div>
-        )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

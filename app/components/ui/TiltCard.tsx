@@ -10,12 +10,12 @@ interface TiltCardProps {
   rotationIntensity?: number;
 }
 
-export default function TiltCard({ 
-    children, 
-    className = "", 
-    perspective = 1000,
-    scale = 1.02,
-    rotationIntensity = 10
+export default function TiltCard({
+  children,
+  className = "",
+  perspective = 1000,
+  scale = 1.02,
+  rotationIntensity = 10,
 }: TiltCardProps) {
   void perspective;
   void rotationIntensity;

@@ -115,6 +115,7 @@ export default function WarpStars({
 
   useFrame(() => {
     material.uniforms.uMouse.value.copy(pointer.smoothPointer.current);
+    // eslint-disable-next-line react-hooks/immutability -- r3f: imperative uniform update outside render, avoids re-render every frame
     material.uniforms.uGravity.value = pointer.gravity.current;
     material.uniforms.uTime.value = pointer.time.current;
   });

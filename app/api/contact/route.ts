@@ -37,12 +37,9 @@ function autoReplyHtml(
                                 </p>`;
 
   const footerWait =
-    locale === "ja"
-      ? "接続をお待ちください…"
-      : "Wait for connection...";
+    locale === "ja" ? "接続をお待ちください…" : "Wait for connection...";
 
-  const footerBtn =
-    locale === "ja" ? "宇宙に戻る" : "Return to Universe";
+  const footerBtn = locale === "ja" ? "宇宙に戻る" : "Return to Universe";
 
   return `
                 <!DOCTYPE html>

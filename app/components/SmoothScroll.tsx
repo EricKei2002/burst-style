@@ -5,10 +5,14 @@ import { useEffect, useState } from "react";
 
 const ReactLenis = dynamic(
   () => import("@studio-freight/react-lenis").then((mod) => mod.ReactLenis),
-  { ssr: false }
+  { ssr: false },
 );
 
-export default function SmoothScroll({ children }: { children: React.ReactNode }) {
+export default function SmoothScroll({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [shouldUseLenis, setShouldUseLenis] = useState(false);
 
   useEffect(() => {
@@ -16,7 +20,9 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     const initLenis = () => {
       if (activated) return;
       activated = true;
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
       const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
       setShouldUseLenis(!reducedMotion && !isCoarsePointer);
     };
@@ -30,9 +36,18 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       clearTimeout(timer);
     };
 
-    window.addEventListener("pointerdown", initLenis, { once: true, passive: true });
-    window.addEventListener("mousemove", initLenis, { once: true, passive: true });
-    window.addEventListener("touchstart", initLenis, { once: true, passive: true });
+    window.addEventListener("pointerdown", initLenis, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("mousemove", initLenis, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("touchstart", initLenis, {
+      once: true,
+      passive: true,
+    });
     window.addEventListener("scroll", initLenis, { once: true, passive: true });
     window.addEventListener("keydown", initLenis, { once: true });
 
@@ -52,7 +67,10 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   return (
     <>
       {shouldUseLenis && (
-        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }} />
+        <ReactLenis
+          root
+          options={{ lerp: 0.1, duration: 1.5, smoothWheel: true }}
+        />
       )}
       {children}
     </>

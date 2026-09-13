@@ -5,16 +5,21 @@ const nextConfig: NextConfig = {
   // 本番配信サイズを抑えてLighthouseの転送量指標を改善
   productionBrowserSourceMaps: false,
   experimental: {
-    optimizePackageImports: ['react-icons', 'lucide-react', '@react-three/drei', 'three'],
+    optimizePackageImports: [
+      "react-icons",
+      "lucide-react",
+      "@react-three/drei",
+      "three",
+    ],
     optimizeCss: true,
   },
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/:path*",
         headers: [
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://challenges.cloudflare.com https://vercel.live https://vercel.com",
@@ -33,25 +38,25 @@ const nextConfig: NextConfig = {
           },
           // Best Practices改善: 強力なHSTSポリシー
           {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload',
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
           },
           // セキュリティヘッダー追加
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin',
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
           },
           {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
           },
         ],
       },
@@ -60,14 +65,15 @@ const nextConfig: NextConfig = {
         // プロジェクトページ内のiframeで表示するため、この一覧のファイルだけ
         // 同一オリジンからの埋め込みと、図が使うGoogle Fontsの読み込みを許可する
         // （他は全ページDENY / 厳格なCSPのまま）。
-        source: '/projects/:file(saa-drill|sonta-kun|cutting-works|discord-role-bot|burst-style)-architecture.html',
+        source:
+          "/projects/:file(saa-drill|sonta-kun|cutting-works|discord-role-bot|burst-style)-architecture.html",
         headers: [
           {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
           },
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline'",
@@ -85,10 +91,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-import withBundleAnalyzer from '@next/bundle-analyzer';
+import withBundleAnalyzer from "@next/bundle-analyzer";
 
 const analyzerConfig = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env.ANALYZE === "true",
 });
 
 export default analyzerConfig(nextConfig);

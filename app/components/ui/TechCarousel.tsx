@@ -1,10 +1,25 @@
 "use client";
 
-import { 
-  SiReact, SiNextdotjs, SiTypescript, SiTailwindcss, SiNodedotjs, 
-  SiThreedotjs, SiGithub, SiVercel, SiBun, SiDiscord,
-  SiBlender, SiHtml5, SiCss3, SiJavascript,
-  SiDocker, SiLinux, SiNpm, SiTailscale, SiGithubactions
+import {
+  SiReact,
+  SiNextdotjs,
+  SiTypescript,
+  SiTailwindcss,
+  SiNodedotjs,
+  SiThreedotjs,
+  SiGithub,
+  SiVercel,
+  SiBun,
+  SiDiscord,
+  SiBlender,
+  SiHtml5,
+  SiCss3,
+  SiJavascript,
+  SiDocker,
+  SiLinux,
+  SiNpm,
+  SiTailscale,
+  SiGithubactions,
 } from "react-icons/si";
 
 const techStack = [
@@ -66,7 +81,10 @@ export default function TechCarousel() {
               key={`${tech.name}-${index}`}
               className="group flex items-center gap-3 rounded-md border border-zinc-700/80 bg-zinc-950/95 px-3 py-2 md:gap-6 md:px-4"
             >
-              <tech.icon aria-hidden="true" className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`} />
+              <tech.icon
+                aria-hidden="true"
+                className={`text-5xl md:text-7xl lg:text-8xl ${tech.color} opacity-80 group-hover:opacity-100 transition-opacity`}
+              />
               <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-50 group-hover:text-white transition-colors whitespace-nowrap">
                 {tech.name}
               </span>

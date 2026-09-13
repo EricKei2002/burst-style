@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type TransitionPhase = 'idle' | 'closing' | 'closed' | 'opening';
+type TransitionPhase = "idle" | "closing" | "closed" | "opening";
 
 interface TransitionState {
   phase: TransitionPhase;
@@ -10,7 +10,7 @@ interface TransitionState {
 }
 
 export const useTransitionStore = create<TransitionState>((set) => ({
-  phase: 'idle',
+  phase: "idle",
   setPhase: (phase) => set({ phase }),
   isWarping: false,
   setIsWarping: (isWarping) => set({ isWarping }),

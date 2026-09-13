@@ -157,60 +157,72 @@ export default App;`;
       {/* Title Bar & Tabs */}
       <div className="flex h-8 items-center justify-between bg-zinc-800 px-3 shrink-0">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded-full bg-blue-600 text-[9px] font-bold flex items-center justify-center text-white">TS</div>
+          <div className="h-4 w-4 rounded-full bg-blue-600 text-[9px] font-bold flex items-center justify-center text-white">
+            TS
+          </div>
           <span className="text-xs text-zinc-200">App.tsx</span>
         </div>
         <div className="flex gap-2">
-           <button 
-             type="button"
-             onClick={() => setViewMode("design")}
-             aria-pressed={viewMode === "design"}
-             aria-label={d.previewTabAria}
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
-           >
-             {d.tabPreview}
-           </button>
-           <button 
-             type="button"
-             onClick={() => setViewMode("source")}
-             aria-pressed={viewMode === "source"}
-             aria-label={d.codeTabAria}
-             className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
-           >
-             {d.tabCode}
-           </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("design")}
+            aria-pressed={viewMode === "design"}
+            aria-label={d.previewTabAria}
+            className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "design" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
+          >
+            {d.tabPreview}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("source")}
+            aria-pressed={viewMode === "source"}
+            aria-label={d.codeTabAria}
+            className={`px-2 py-0.5 text-[10px] rounded ${viewMode === "source" ? "bg-zinc-700 text-white" : "text-zinc-300 hover:text-zinc-100"}`}
+          >
+            {d.tabCode}
+          </button>
         </div>
       </div>
 
       <div className="relative flex-1 overflow-hidden">
         {/* Design View - Ported App Logic with styled approximation */}
-        <div className={`absolute inset-0 p-4 overflow-auto transition-opacity duration-300 flex flex-col items-center justify-start ${viewMode === "design" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
-          
+        <div
+          className={`absolute inset-0 p-4 overflow-auto transition-opacity duration-300 flex flex-col items-center justify-start ${viewMode === "design" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}
+        >
           {/* Equivalent to <div className="App"> */}
           <div className="w-full text-center">
-            
-            <h2 className="text-lg mb-4 text-zinc-100 font-bold">{d.heading}</h2>
-            
-            <form onSubmit={handleSubmit} className="mb-6 flex gap-2 justify-center">
-              <label htmlFor="todo-new-task" className="sr-only">{d.newTaskLabel}</label>
-              <input 
+            <h2 className="text-lg mb-4 text-zinc-100 font-bold">
+              {d.heading}
+            </h2>
+
+            <form
+              onSubmit={handleSubmit}
+              className="mb-6 flex gap-2 justify-center"
+            >
+              <label htmlFor="todo-new-task" className="sr-only">
+                {d.newTaskLabel}
+              </label>
+              <input
                 id="todo-new-task"
-                type="text" 
-                onChange={handleChange} 
-                className="p-2 rounded bg-zinc-800 border border-zinc-600 text-zinc-200 text-sm focus:outline-none focus:border-blue-500" 
+                type="text"
+                onChange={handleChange}
+                className="p-2 rounded bg-zinc-800 border border-zinc-600 text-zinc-200 text-sm focus:outline-none focus:border-blue-500"
                 value={inputValue}
                 placeholder={d.placeholder}
               />
-              <input 
-                type="submit" 
-                value={d.submit} 
-                className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-pointer hover:bg-blue-500 transition-colors" 
+              <input
+                type="submit"
+                value={d.submit}
+                className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-pointer hover:bg-blue-500 transition-colors"
               />
             </form>
 
             <ul className="w-full flex flex-col gap-2 p-0 list-none">
               {todos.map((todo) => (
-                <li key={todo.id} className="flex items-center gap-2 w-full bg-zinc-900/50 p-2 rounded border border-zinc-800">
+                <li
+                  key={todo.id}
+                  className="flex items-center gap-2 w-full bg-zinc-900/50 p-2 rounded border border-zinc-800"
+                >
                   <input
                     type="text"
                     onChange={(e) => handleEdit(todo.id, e.target.value)}
@@ -226,7 +238,7 @@ export default App;`;
                     className="cursor-pointer"
                     aria-label={d.todoCompleteAria(todo.id + 1)}
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => handleDelete(todo.id)}
                     aria-label={d.todoDeleteAria(todo.id + 1)}
@@ -237,30 +249,63 @@ export default App;`;
                 </li>
               ))}
             </ul>
-
           </div>
-
         </div>
-        
+
         {/* Source View - Exact Source Code */}
-        <div className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}>
-            <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
-              {tsCode.split('\n').map((line, i) => (
-                <div key={i}>
-                  <span className="text-zinc-600 select-none mr-3 w-4 inline-block text-right">{i + 1}</span>
-                  <span>
-                    {line.split(/("(?:[^"\\]|\\.)*")|\b(interface|const|let|var|return|function|if|else|import|from|export|default|type)\b|\b(string|number|boolean|void|any)\b|(\s+)|([^"\s\w]+)|(\w+)/g).filter(Boolean).map((token, j) => {
-                       if (!token) return null;
-                       if (token.startsWith('"') || token.startsWith("'")) return <span key={j} className="text-orange-400">{token}</span>;
-                       if (/^(interface|const|let|var|return|function|if|else|import|from|export|default|type)$/.test(token)) return <span key={j} className="text-pink-400">{token}</span>;
-                       if (/^(string|number|boolean|void|any|Boolean)$/.test(token)) return <span key={j} className="text-blue-400">{token}</span>;
-                       if (/^[A-Z]/.test(token)) return <span key={j} className="text-yellow-300">{token}</span>;
-                       return <span key={j}>{token}</span>;
+        <div
+          className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}
+        >
+          <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
+            {tsCode.split("\n").map((line, i) => (
+              <div key={i}>
+                <span className="text-zinc-600 select-none mr-3 w-4 inline-block text-right">
+                  {i + 1}
+                </span>
+                <span>
+                  {line
+                    .split(
+                      /("(?:[^"\\]|\\.)*")|\b(interface|const|let|var|return|function|if|else|import|from|export|default|type)\b|\b(string|number|boolean|void|any)\b|(\s+)|([^"\s\w]+)|(\w+)/g,
+                    )
+                    .filter(Boolean)
+                    .map((token, j) => {
+                      if (!token) return null;
+                      if (token.startsWith('"') || token.startsWith("'"))
+                        return (
+                          <span key={j} className="text-orange-400">
+                            {token}
+                          </span>
+                        );
+                      if (
+                        /^(interface|const|let|var|return|function|if|else|import|from|export|default|type)$/.test(
+                          token,
+                        )
+                      )
+                        return (
+                          <span key={j} className="text-pink-400">
+                            {token}
+                          </span>
+                        );
+                      if (
+                        /^(string|number|boolean|void|any|Boolean)$/.test(token)
+                      )
+                        return (
+                          <span key={j} className="text-blue-400">
+                            {token}
+                          </span>
+                        );
+                      if (/^[A-Z]/.test(token))
+                        return (
+                          <span key={j} className="text-yellow-300">
+                            {token}
+                          </span>
+                        );
+                      return <span key={j}>{token}</span>;
                     })}
-                  </span>
-                </div>
-              ))}
-            </pre>
+                </span>
+              </div>
+            ))}
+          </pre>
         </div>
       </div>
     </div>

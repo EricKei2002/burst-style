@@ -20,7 +20,11 @@ const toneClass: Record<GeekBulletTone, string> = {
   red: "text-red-400",
 };
 
-export function GeekEnglishView({ block }: { block: GeekEnglishBlock }): ReactNode {
+export function GeekEnglishView({
+  block,
+}: {
+  block: GeekEnglishBlock;
+}): ReactNode {
   return (
     <div className="space-y-4">
       <p>{block.lead}</p>
@@ -42,7 +46,11 @@ export function GeekEnglishView({ block }: { block: GeekEnglishBlock }): ReactNo
   );
 }
 
-export function ProEnglishView({ block }: { block: ProEnglishBlock }): ReactNode {
+export function ProEnglishView({
+  block,
+}: {
+  block: ProEnglishBlock;
+}): ReactNode {
   return (
     <div className="space-y-4 text-zinc-300">
       {block.paragraphs.map((p, i) => (
@@ -58,7 +66,11 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
     lead: 'v2002.0 Initial Commit: Project "Eric Kei" launched in Wakayama Prefecture.',
     bullets: [
       { tone: "fuchsia", tag: "[Init]", text: 'Created new user "Eric Kei".' },
-      { tone: "blue", tag: "[System]", text: "Core kernel (life) booted successfully." },
+      {
+        tone: "blue",
+        tag: "[System]",
+        text: "Core kernel (life) booted successfully.",
+      },
       {
         tone: "green",
         tag: "[Inherit]",
@@ -203,8 +215,7 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
   },
   {
     lead: "v2026.1 Stable Release: Shipped to production (career). Personal site still runs as an experiment field.",
-    body:
-      "Currently employed as a frontend engineer while pursuing personal projects and studying for AWS SAA certification in my private time.",
+    body: "Currently employed as a frontend engineer while pursuing personal projects and studying for AWS SAA certification in my private time.",
     bullets: [
       {
         tone: "fuchsia",
@@ -214,24 +225,20 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
       {
         tone: "blue",
         tag: "[Keep]",
-        text:
-          "Self-taught stack and personal R&D loop kept on a maintenance channel.",
+        text: "Self-taught stack and personal R&D loop kept on a maintenance channel.",
       },
       {
         tone: "green",
         tag: "[Build]",
-        text:
-          "Built a daily 10-question drill for myself, an AWS Study App (Next.js + Supabase), and actually use it every day as study motivation.",
+        text: "Built a daily 10-question drill for myself, an AWS Study App (Next.js + Supabase), and actually use it every day as study motivation.",
       },
       {
         tone: "red",
         tag: "[Note]",
-        text:
-          "Spec: “curiosity” consumes memory, but paying it down across work and side projects.",
+        text: "Spec: “curiosity” consumes memory, but paying it down across work and side projects.",
       },
     ],
-    footer:
-      "For collabs or a quick ping—same as always, reach me via Contact.",
+    footer: "For collabs or a quick ping—same as always, reach me via Contact.",
   },
 ];
 

@@ -10,10 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import {
-  LOCALE_COOKIE_NAME,
-  LOCALE_STORAGE_KEY,
-} from "./localeConstants";
+import { LOCALE_COOKIE_NAME, LOCALE_STORAGE_KEY } from "./localeConstants";
 import { buildSiteCopy, type Locale } from "./siteCopy";
 
 export type { Locale } from "./siteCopy";
@@ -32,6 +29,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
     if (stored === "en" || stored === "ja") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time post-hydration sync from localStorage/navigator; must run after mount to avoid SSR mismatch
       setLocaleState(stored);
     } else if (navigator.language.toLowerCase().startsWith("ja")) {
       setLocaleState("ja");
@@ -50,10 +48,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     setLocaleState(next);
   }, []);
 
-  const value = useMemo(
-    () => ({ locale, setLocale }),
-    [locale, setLocale],
-  );
+  const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
 
   return (
     <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>

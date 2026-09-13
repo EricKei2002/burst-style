@@ -34,8 +34,12 @@ export const projectsData: Project[] = [
       { name: "Styling: Tailwind CSS v4（ダークUI）" },
       { name: "Auth: Supabase Auth（Google）" },
       { name: "Database: Supabase（Postgres + RPC）" },
-      { name: "AI: Google Gemini API（弱点問題のパーソナライズ生成、ユーザー自身のAPIキー）" },
-      { name: "通知: Web Push（VAPID）+ Vercel Cron（日課リマインダー / AI問題の事前生成）" },
+      {
+        name: "AI: Google Gemini API（弱点問題のパーソナライズ生成、ユーザー自身のAPIキー）",
+      },
+      {
+        name: "通知: Web Push（VAPID）+ Vercel Cron（日課リマインダー / AI問題の事前生成）",
+      },
       { name: "配信: Vercel / PWA（manifest + Service Worker）" },
     ],
     challenges: [

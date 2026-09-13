@@ -24,12 +24,20 @@ export default function MouseTrail() {
 
   useEffect(() => {
     const coarseMql = window.matchMedia("(pointer: coarse)");
-    const reducedMotionMql = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ?? false;
+    const reducedMotionMql = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    const saveData =
+      (navigator as Navigator & { connection?: { saveData?: boolean } })
+        .connection?.saveData ?? false;
     const onChange = (e: MediaQueryListEvent) => setIsTouch(e.matches);
-    
-    setTimeout(() => setIsTouch(coarseMql.matches || reducedMotionMql.matches || saveData), 0);
-    
+
+    setTimeout(
+      () =>
+        setIsTouch(coarseMql.matches || reducedMotionMql.matches || saveData),
+      0,
+    );
+
     coarseMql.addEventListener("change", onChange);
     return () => coarseMql.removeEventListener("change", onChange);
   }, []);
@@ -37,7 +45,8 @@ export default function MouseTrail() {
   useEffect(() => {
     const onVisibilityChange = () => setIsDocumentVisible(!document.hidden);
     document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", onVisibilityChange);
   }, []);
 
   useEffect(() => {
@@ -70,7 +79,7 @@ export default function MouseTrail() {
         y,
         age: 0,
         vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2
+        vy: (Math.random() - 0.5) * 2,
       });
     };
 
@@ -83,7 +92,9 @@ export default function MouseTrail() {
     };
 
     window.addEventListener("resize", handleResize);
-    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
     handleResize();
 
     const update = () => {
@@ -99,14 +110,14 @@ export default function MouseTrail() {
 
         const alpha = 1 - p.age / 42;
         const size = (1 - p.age / 42) * 2.6;
-        
+
         // 色の遷移: 緑からフクシアへ
         // 緑: 34, 197, 94 (およそ tw-green-500)
         // フクシア: 217, 70, 239 (およそ tw-fuchsia-500)
-        
+
         ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`; // メインの緑
         if (p.age > 20) {
-            ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`; // フクシア色へフェード
+          ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`; // フクシア色へフェード
         }
 
         ctx.beginPath();
@@ -132,8 +143,8 @@ export default function MouseTrail() {
   if (isTouch) return null;
 
   return (
-    <canvas 
-      ref={canvasRef} 
+    <canvas
+      ref={canvasRef}
       className="pointer-events-none fixed inset-0 z-50"
       aria-hidden="true"
     />
