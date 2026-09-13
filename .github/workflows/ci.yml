@@ -19,12 +19,11 @@ jobs:
 
       - run: npm ci
 
-      # 既存コードに未解消のlint/format差分があるため現時点では非ブロッキング
-      - run: npm run lint
-        continue-on-error: true
+      # .cursor/ 配下のツール用スクリプトはlint対象に含めない(eslint.config.mjsの
+      # デフォルトignoreには未追加のため、CI側でapp/のみに限定)
+      - run: npx eslint app
 
-      - run: npm run format:check
-        continue-on-error: true
+      - run: npx prettier --check app
 
       - run: npm run build
         env:
