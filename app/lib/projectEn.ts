@@ -9,9 +9,9 @@ type EnOverlay = Pick<
 const EN_BY_SLUG: Record<string, EnOverlay> = {
   drill: {
     description:
-      "A daily 10-question drill for the AWS SAA exam. Google sign-in and Supabase sync progress across devices; installable as a PWA.",
+      "A daily 10-question drill PWA covering multiple study tracks—AWS SAA, WordPress, and more. Google sign-in and Supabase sync progress across devices.",
     detailedDescription:
-      "A daily-practice PWA for the AWS Certified Solutions Architect – Associate exam. Each day's 10 questions are allocated across domains (3 security, 3 resilience, 2 performance, 2 cost) and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics get folded into the next day's set for review. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the exam countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms (IAM, ALB, etc.) to pop open their full name and meaning inline. Questions are original exercises grounded in official AWS docs, not copies of real exam questions.",
+      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect – Associate exam and WordPress admin/dev practice, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics get folded into the next day's set for review. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
     challenges: [
       {
         title: "Deterministic daily question selection",
@@ -23,12 +23,17 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
         description:
           "Users can start solving immediately before signing in—progress is stashed in sessionStorage until Google login completes, then merged into Supabase via RPC (fetch_progress / push_progress). This preserves a 'try 10 questions, then sign in if you like it' flow while still syncing across devices.",
       },
+      {
+        title: "A study-pack architecture for multiple subjects",
+        description:
+          "Pulled questions, glossary, and domain weighting out of the AWS-specific code into a 'study pack' (StudyPack) abstraction. Selection logic, weak-spot tracking, and the AI generation engine stayed subject-agnostic in a shared core, so adding the WordPress pack meant just writing a new pack definition.",
+      },
     ],
     improvements: [
       {
-        title: "Bigger question bank",
+        title: "More study packs",
         description:
-          "Growing the pool beyond its current 100 questions, sourced from official AWS docs and the Well-Architected Framework; past 100 the daily mix shifts toward review.",
+          "Currently AWS SAA and WordPress—planning to add packs for more certifications and technical subjects over time.",
       },
       {
         title: "Deeper study analytics",
