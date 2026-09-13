@@ -18,13 +18,13 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
-    slug: "学習アプリ",
-    title: "AWS学習アプリ",
+    slug: "drill",
+    title: "学習アプリ",
     description:
       "AWS認定試験対策のための毎日10問ドリル。Googleログイン＋Supabaseで進捗を端末間同期、PWA対応。",
     detailedDescription:
       "AWS Certified Solutions Architect – Associate 合格を目指す、毎日10問形式の学習PWAです。セキュリティ3・可用性3・性能2・コスト2という配点比率に沿って出題ドメインを配分し、「未見→誤答→似た論点→古い」の優先順位で決定論的に10問を選出します。解答直後にその場で解説と「持ち帰る一文」を表示し、間違えた論点は弱点データとして記録して弱点ドリル（練習専用画面）で優先的に再出題する設計です（かつてあった復習タブは廃止し、弱点ドリルに導線を一本化）。Googleログイン（Supabase Auth）で連続学習日数・ドメイン別正答率・試験日カウントダウンをアカウントに紐づけて保存し、スマホと自宅PCなど複数端末で同じ記録を引き継げます。学習タブでは略称（IAM、ALBなど）をタップすると正式名称と意味がその場で開くグロッサリー機能も搭載。ユーザーが自分のGemini APIキーを設定すると、AWS公式の最新情報（What's New RSS）も踏まえて弱点分野の問題をその場でAI生成でき、Vercel Cronが毎朝事前生成もしておくため学習時の待ち時間がありません。夜21時にはWeb Push（VAPID）で日課の未消化をリマインドします。問題は公式試験問題の複製ではなく、AWS公式ドキュメント等を根拠にしたオリジナル演習です。",
-    image: "/projects/saa-drill.png",
+    image: "/projects/drill-logo.png",
     siteUrl: "https://drill.burst.style",
     githubUrl: "https://github.com/EricKei2002/saa-drill",
     tags: ["Next.js", "TypeScript", "Supabase", "PWA"],
