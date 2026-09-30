@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 function escapeHtml(s: string): string {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -128,6 +126,9 @@ export async function POST(request: Request) {
     }
 
     if (process.env.RESEND_API_KEY) {
+      // モジュール読み込み時に生成すると、キー未設定のビルド環境(CI)で
+      // ページデータ収集中に "Missing API key" で落ちるため、送信時に生成する
+      const resend = new Resend(process.env.RESEND_API_KEY);
       const subject =
         locale === "ja"
           ? "Burst Style — お問い合わせありがとうございます"
