@@ -42,10 +42,6 @@ export function buildSiteCopy(locale: Locale) {
         en: "Burst Style—where design and engineering meet.",
         ja: "デザインと技術を融合した『Burst Style』の実践。",
       }),
-      viewDetails: (title: string) =>
-        locale === "ja"
-          ? `「${title}」の詳細を見る`
-          : `View details for ${title}`,
     },
     demos: {
       csharp: {
@@ -127,6 +123,11 @@ export function buildSiteCopy(locale: Locale) {
       switchProAria: pick(locale, {
         en: "Switch to Pro Mode",
         ja: "プロモードに切り替え",
+      }),
+      skillsHeading: pick(locale, { en: "Skills", ja: "スキル" }),
+      skillsIntro: pick(locale, {
+        en: "Grouped by how deeply I use them today.",
+        ja: "現在の使用頻度・習熟度ごとに分類しています。",
       }),
       videoPlay: (title: string) =>
         pick(locale, {

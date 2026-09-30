@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ReactNode } from "react";
 import ProfileCard from "../ui/ProfileCard";
 import DecryptedText from "../ui/DecryptedText";
+import SkillMatrix from "../ui/SkillMatrix";
 import CsharpCalculator from "../demos/CsharpCalculator";
 import TodoAppDemo from "../demos/TodoAppDemo";
 import {
@@ -1032,6 +1033,8 @@ export default function AboutSection() {
             ))}
           </div>
         </div>
+
+        <SkillMatrix isProfessional={isProfessional} />
       </div>
     </section>
   );

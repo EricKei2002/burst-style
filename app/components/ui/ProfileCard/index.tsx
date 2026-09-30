@@ -282,7 +282,7 @@ export default function ProfileCard({
                     className="inline-flex items-center gap-2 px-4 py-2 hover:bg-zinc-800/50 text-zinc-200 hover:text-white rounded-lg transition-colors border border-transparent hover:border-zinc-700 w-fit"
                     aria-label="Eric KeiのGitHubプロフィール"
                   >
-                    <FaGithub className="text-xl" />
+                    <FaGithub className="text-xl" aria-hidden="true" />
                   </a>
                   <a
                     href="https://www.wantedly.com/id/eric0216"
@@ -291,7 +291,7 @@ export default function ProfileCard({
                     className="inline-flex items-center gap-2 px-4 py-2 hover:bg-zinc-800/50 text-zinc-200 hover:text-white rounded-lg transition-colors border border-transparent hover:border-zinc-700 w-fit"
                     aria-label="Eric KeiのWantedlyプロフィール"
                   >
-                    <SiWantedly className="text-xl" />
+                    <SiWantedly className="text-xl" aria-hidden="true" />
                   </a>
                 </div>
               </div>

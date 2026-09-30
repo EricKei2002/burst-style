@@ -108,7 +108,6 @@ export default function Projects() {
                     onClick={() =>
                       handleNavigation(`/projects/${project.slug}`)
                     }
-                    aria-label={copy.projects.viewDetails(project.title)}
                     className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none ${
                       isVisible
                         ? "translate-y-0 opacity-100 scale-100"

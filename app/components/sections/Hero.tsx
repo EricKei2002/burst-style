@@ -118,9 +118,10 @@ export default function Top() {
                         ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none"
                         : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
                     }`}
-                    aria-label={copy.hero.enterAria}
                   >
                     /Enter
+                    {/* 読み上げ名に表示テキスト「/Enter」を含めるため、aria-labelではなく補足テキストで説明する */}
+                    <span className="sr-only"> {copy.hero.enterAria}</span>
                   </button>
                 </MagneticButton>
               </div>

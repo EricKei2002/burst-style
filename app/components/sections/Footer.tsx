@@ -53,7 +53,7 @@ export default function Footer() {
                 className="text-zinc-200 hover:text-white transition-colors p-2"
                 aria-label="Eric KeiのGitHubプロフィール"
               >
-                <FaGithub size={20} />
+                <FaGithub size={20} aria-hidden="true" />
               </a>
             </MagneticButton>
 
@@ -65,7 +65,7 @@ export default function Footer() {
                 className="text-zinc-200 hover:text-white transition-colors p-2"
                 aria-label="Eric KeiのWantedlyプロフィール"
               >
-                <SiWantedly size={20} />
+                <SiWantedly size={20} aria-hidden="true" />
               </a>
             </MagneticButton>
           </div>
