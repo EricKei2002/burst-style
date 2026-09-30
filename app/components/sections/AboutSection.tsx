@@ -650,7 +650,7 @@ const timeline: TimelineItem[] = [
             <span>
               勉強を続けるモチベーション設計として、自分用の毎日10問アプリ「
               <a
-                href="https://aws-drill.burst.style"
+                href="https://drill.burst.style"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
@@ -682,7 +682,7 @@ const timeline: TimelineItem[] = [
           Certified Solutions Architect –
           Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
           <a
-            href="https://aws-drill.burst.style"
+            href="https://drill.burst.style"
             target="_blank"
             rel="noopener noreferrer"
             className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
