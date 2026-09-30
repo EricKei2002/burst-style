@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { projectsData } from "../../lib/data";
 import { getServerLocale } from "../../lib/getServerLocale";
 import { getLocalizedProject } from "../../lib/projectEn";
@@ -14,6 +15,39 @@ export function generateStaticParams() {
   return projectsData.map((project) => ({
     slug: project.slug,
   }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const raw = projectsData.find((p) => p.slug === slug);
+  if (!raw) return {};
+
+  const locale = await getServerLocale();
+  const { title, description } = getLocalizedProject(raw, locale);
+  const url = `/projects/${raw.slug}`;
+
+  // og:image / twitter:image は同階層の opengraph-image.tsx から自動で付与される
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      siteName: "Burst Style",
+      url,
+      title: `${title} | Burst Style`,
+      description,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Burst Style`,
+      description,
+    },
+  };
 }
 
 export default async function ProjectPage({
