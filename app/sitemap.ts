@@ -4,7 +4,7 @@ import { projectsData } from "./lib/data";
 // Next.js の動的サイトマップ生成
 // https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://burst.style";
+  const baseUrl = "https://www.burst.style";
 
   // プロジェクト個別ページを動的に生成
   const projectEntries: MetadataRoute.Sitemap = projectsData.map((project) => ({

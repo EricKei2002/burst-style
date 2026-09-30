@@ -48,7 +48,7 @@ function autoReplyHtml(
                     <div style="background: radial-gradient(circle at center, #2e1065 0%, #020617 80%); padding: 40px 20px; text-align: center; min-height: 100vh;">
                         <div style="max-width: 600px; margin: 0 auto; border: 1px solid #ffffff20; border-radius: 16px; overflow: hidden; background-color: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); box-shadow: 0 0 50px rgba(124, 58, 237, 0.3);">
                             <div style="padding: 40px 0 20px 0; background: linear-gradient(to bottom, rgba(124, 58, 237, 0.2), transparent); position: relative;">
-                                <img src="https://burst.style/icon.jpg" alt="Eric Kei" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); object-fit: cover;" />
+                                <img src="https://www.burst.style/icon.jpg" alt="Eric Kei" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); object-fit: cover;" />
                             </div>
                             <div style="padding: 20px 30px 20px 30px; text-align: left;">
                                 <div style="text-align: center; margin-bottom: 20px;">
@@ -67,7 +67,7 @@ function autoReplyHtml(
                                 </div>
                                 <div style="border-top: 1px solid #ffffff10; padding-top: 20px; margin-top: 20px; text-align: center;">
                                     <p style="font-size: 12px; color: #666; margin-bottom: 15px;">${footerWait}</p>
-                                    <a href="https://burst.style" style="color: #e4e4e7; text-decoration: none; font-size: 12px; border: 1px solid #ffffff20; padding: 10px 24px; border-radius: 30px; background: rgba(255,255,255,0.05); transition: all 0.2s;">
+                                    <a href="https://www.burst.style" style="color: #e4e4e7; text-decoration: none; font-size: 12px; border: 1px solid #ffffff20; padding: 10px 24px; border-radius: 30px; background: rgba(255,255,255,0.05); transition: all 0.2s;">
                                         <span style="color: #22c55e;">●</span> ${footerBtn}
                                     </a>
                                     <p style="margin-top: 20px; margin-bottom: 0; font-size: 10px; color: #444;">

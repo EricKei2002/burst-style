@@ -9,7 +9,7 @@ import { LocaleProvider } from "./lib/locale";
 import { LOCALE_STORAGE_KEY } from "./lib/localeConstants";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://burst.style"),
+  metadataBase: new URL("https://www.burst.style"),
   title: {
     default: "Burst Style | Web Developer Portfolio",
     template: "%s | Burst Style",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     alternateLocale: ["ja_JP"],
-    url: "https://burst.style",
+    url: "https://www.burst.style",
     title: "Burst Style | Web Developer Portfolio",
     description:
       "Immersive portfolio by Eric Kei—Next.js, Three.js, and creative engineering. 日本語UI切替あり。",
@@ -59,8 +59,8 @@ const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Eric Kei",
-  url: "https://burst.style",
-  image: "https://burst.style/profile-new.jpg",
+  url: "https://www.burst.style",
+  image: "https://www.burst.style/profile-new.jpg",
   jobTitle: "Frontend Engineer",
   knowsAbout: ["React", "Next.js", "TypeScript", "Three.js", "Web Development"],
   sameAs: [
