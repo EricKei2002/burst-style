@@ -23,6 +23,7 @@ export const skillGroups: SkillGroup[] = [
       "React",
       "Next.js (App Router)",
       "Tailwind CSS",
+      "WordPress",
     ],
   },
   {
