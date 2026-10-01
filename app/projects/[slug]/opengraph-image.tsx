@@ -3,6 +3,10 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 
 import { projectsData } from "../../lib/data";
+import {
+  BurstStyleTerminal,
+  loadMonoFonts,
+} from "../../lib/og/burstStyleTerminal";
 import { getLocalizedProject, getProjectTitleEn } from "../../lib/projectEn";
 
 // プロジェクト個別ページ用のOGP画像（1200x630）
@@ -41,7 +45,9 @@ export default async function ProjectOpengraphImage({
   const raw = projectsData.find((p) => p.slug === slug);
   const title = raw ? getProjectTitleEn(raw) : "Burst Style";
   const description = raw ? getLocalizedProject(raw, "en").description : "";
-  const image = raw ? await loadPublicImage(raw.image) : null;
+  const isSelf = slug === "burst-style";
+  const image = raw && !isSelf ? await loadPublicImage(raw.image) : null;
+  const fonts = isSelf ? await loadMonoFonts() : undefined;
 
   return new ImageResponse(
     <div
@@ -110,6 +116,8 @@ export default async function ProjectOpengraphImage({
         </div>
       </div>
 
+      {isSelf && <BurstStyleTerminal width={480} height={630} borderLeft />}
+
       {image && (
         <div
           style={{
@@ -129,6 +137,6 @@ export default async function ProjectOpengraphImage({
         </div>
       )}
     </div>,
-    size,
+    { ...size, fonts },
   );
 }
