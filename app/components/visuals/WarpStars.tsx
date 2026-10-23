@@ -70,7 +70,8 @@ export default function WarpStars({ isWarping, count = 2000 }: WarpStarsProps) {
     };
   }, [geometry, material]);
 
-  // ワープ時だけ時間進行を加速
+  // ワープ時だけ時間進行を加速（R3F の useFrame 内で uniform を更新）
+  // eslint-disable-next-line react-hooks/immutability -- Three.js ShaderMaterial の uTime 更新
   useFrame((_, delta) => {
     const targetFactor = isWarping ? 24 : 1;
     speedFactorRef.current = THREE.MathUtils.lerp(
