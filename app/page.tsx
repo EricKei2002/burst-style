@@ -18,10 +18,12 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Top />
+      {/* 「今作っているもの」はサーバー描画済みなので遅延させず FV 直下に即時表示する。
+          後続セクションが遅延マウントされても、このセクションの位置は動かない */}
+      <NowSection />
       <DeferredHomeSections
         turnstileSiteKey={turnstileSiteKey}
         turnstileKeySwapped={turnstileKeySwapped}
-        nowSection={<NowSection />}
       />
     </div>
   );
