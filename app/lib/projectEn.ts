@@ -9,9 +9,9 @@ type EnOverlay = Pick<
 const EN_BY_SLUG: Record<string, EnOverlay> = {
   drill: {
     description:
-      "A daily 10-question drill PWA covering multiple study tracks—AWS SAA, WordPress, and more. Google sign-in and Supabase sync progress across devices.",
+      "A daily 10-question drill PWA covering three study tracks—AWS SAA, WordPress, and security. Google sign-in and Supabase sync progress across devices.",
     detailedDescription:
-      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect – Associate exam and WordPress admin/dev practice, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics get folded into the next day's set for review. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
+      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect – Associate exam, WordPress admin/dev practice, and security, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics get folded into the next day's set for review. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS, and the security pack draws on vulnerability-info RSS feeds such as JVN, IPA, and JPCERT/CC), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
     challenges: [
       {
         title: "Deterministic daily question selection",
@@ -26,14 +26,14 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "A study-pack architecture for multiple subjects",
         description:
-          "Pulled questions, glossary, and domain weighting out of the AWS-specific code into a 'study pack' (StudyPack) abstraction. Selection logic, weak-spot tracking, and the AI generation engine stayed subject-agnostic in a shared core, so adding the WordPress pack meant just writing a new pack definition.",
+          "Pulled questions, glossary, and domain weighting out of the AWS-specific code into a 'study pack' (StudyPack) abstraction. Selection logic, weak-spot tracking, and the AI generation engine stayed subject-agnostic in a shared core, so adding the WordPress and security packs meant just writing a new pack definition.",
       },
     ],
     improvements: [
       {
         title: "More study packs",
         description:
-          "Currently AWS SAA and WordPress—planning to add packs for more certifications and technical subjects over time.",
+          "Currently AWS SAA, WordPress, and security—planning to add packs for more certifications and technical subjects over time.",
       },
       {
         title: "Deeper study analytics",
