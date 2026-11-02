@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Projects = dynamic(() => import("./Projects"), { ssr: false });
 const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
@@ -13,12 +13,9 @@ const Footer = dynamic(() => import("./Footer"), { ssr: false });
 export default function DeferredHomeSections({
   turnstileSiteKey,
   turnstileKeySwapped,
-  nowSection,
 }: {
   turnstileSiteKey: string;
   turnstileKeySwapped: boolean;
-  /** サーバーで描画済みの「今作っているもの」セクション（Projects の直後に表示） */
-  nowSection?: ReactNode;
 }) {
   const [enabled, setEnabled] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +71,38 @@ export default function DeferredHomeSections({
     };
   }, [enabled]);
 
+  // ハッシュ付き URL（/#now, /#about など）で開いたとき、初回ロード時点では後続セクションが
+  // 未マウントでページ高が足りず、目的の位置までスクロールできない。マウント後しばらくは
+  // レイアウトの伸びに合わせてハッシュ先へ位置を合わせ直す（ユーザーが操作したら即中止）
+  useEffect(() => {
+    if (!enabled) return;
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+
+    let stopped = false;
+    const align = () => {
+      if (stopped) return;
+      document.getElementById(id)?.scrollIntoView({ block: "start" });
+    };
+    const resizeObserver = new ResizeObserver(align);
+    resizeObserver.observe(document.body);
+
+    const stop = () => {
+      stopped = true;
+      resizeObserver.disconnect();
+      window.removeEventListener("wheel", stop);
+      window.removeEventListener("touchstart", stop);
+      window.removeEventListener("keydown", stop);
+      clearTimeout(timer);
+    };
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    window.addEventListener("keydown", stop);
+    const timer = setTimeout(stop, 2500);
+
+    return stop;
+  }, [enabled]);
+
   if (!enabled) {
     return (
       <div
@@ -87,7 +116,6 @@ export default function DeferredHomeSections({
   return (
     <>
       <Projects />
-      {nowSection}
       <AboutSection />
       <ContactSection
         siteKey={turnstileSiteKey}
