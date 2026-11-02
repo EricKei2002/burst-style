@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 const Projects = dynamic(() => import("./Projects"), { ssr: false });
 const AboutSection = dynamic(() => import("./AboutSection"), { ssr: false });
@@ -13,9 +13,12 @@ const Footer = dynamic(() => import("./Footer"), { ssr: false });
 export default function DeferredHomeSections({
   turnstileSiteKey,
   turnstileKeySwapped,
+  nowSection,
 }: {
   turnstileSiteKey: string;
   turnstileKeySwapped: boolean;
+  /** サーバーで描画済みの「今作っているもの」セクション（Projects の直後に表示） */
+  nowSection?: ReactNode;
 }) {
   const [enabled, setEnabled] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -84,6 +87,7 @@ export default function DeferredHomeSections({
   return (
     <>
       <Projects />
+      {nowSection}
       <AboutSection />
       <ContactSection
         siteKey={turnstileSiteKey}

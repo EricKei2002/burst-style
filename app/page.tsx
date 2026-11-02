@@ -1,12 +1,13 @@
 import Top from "./components/sections/Hero";
 import DeferredHomeSections from "./components/sections/DeferredHomeSections";
+import NowSection from "./components/sections/NowSection";
 import {
   getTurnstileSiteKey,
   looksLikeTurnstileSecretKey,
 } from "./lib/turnstile";
 
-// ビルド時に空だった環境変数がキャッシュされないよう、ホームは動的レンダリング
-export const dynamic = "force-dynamic";
+// 「今作っているもの」の GitHub データに合わせて10分ごとに再生成する（ISR）
+export const revalidate = 600;
 
 export default function Home() {
   const rawTurnstileKey =
@@ -20,6 +21,7 @@ export default function Home() {
       <DeferredHomeSections
         turnstileSiteKey={turnstileSiteKey}
         turnstileKeySwapped={turnstileKeySwapped}
+        nowSection={<NowSection />}
       />
     </div>
   );
