@@ -89,6 +89,7 @@ export const projectsData: Project[] = [
         Registry["パックレジストリ<br/>registry.ts"]
         PackAws["AWS SAAパック<br/>問題・用語・配点比率"]
         PackWp["WordPressパック<br/>問題・用語・配点比率"]
+        PackSec["セキュリティパック<br/>問題・用語・配点比率"]
     end
 
     subgraph Cron ["Vercel Cron（CRON_SECRET認証）"]
@@ -97,7 +98,8 @@ export const projectsData: Project[] = [
     end
 
     Gemini["Google Gemini API<br/>@google/genai"]
-    RSS["AWS What's New RSS<br/>5分キャッシュ（AWSパックのみ）"]
+    RSS["AWS What's New RSS<br/>5分キャッシュ（AWSパック）"]
+    SecRSS["脆弱性情報RSS<br/>JVN・IPA・JPCERT/CC ほか（セキュリティパック）"]
 
     Browser -->|① Googleログイン PKCE, anon key| SupaAuth
     Browser -->|② 進捗の取得/保存 anon key, RPC| Postgres
@@ -108,6 +110,7 @@ export const projectsData: Project[] = [
     GenCore -->|パックID指定| Registry
     Registry --> PackAws
     Registry --> PackWp
+    Registry --> PackSec
     PushAPI -->|JWT検証 Supabase Admin| SupaAuth
     PushAPI -->|購読情報を保存 service role| Postgres
 
@@ -118,6 +121,7 @@ export const projectsData: Project[] = [
 
     GenCore -->|Gemini API 呼び出し| Gemini
     PackAws -.->|新着情報を取得| RSS
+    PackSec -.->|脆弱性情報を取得| SecRSS
 
     PushService -->|Push配信| SW
     SW -->|通知表示 → /todayへ遷移| Browser
