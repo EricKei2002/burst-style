@@ -102,6 +102,15 @@ export function buildSiteCopy(locale: Locale) {
           }),
       },
     },
+    now: {
+      label: "> git log --recent",
+      heading: pick(locale, { en: "Now Building", ja: "今作っているもの" }),
+      intro: pick(locale, {
+        en: "Recently updated public repositories, pulled live from GitHub.",
+        ja: "GitHub から取得した、最近更新した公開リポジトリです。",
+      }),
+      noCommits: pick(locale, { en: "No commits yet", ja: "コミットなし" }),
+    },
     about: {
       intro: pick(locale, {
         en: "Background and milestones in a timeline—how I grew into the work I do now.",

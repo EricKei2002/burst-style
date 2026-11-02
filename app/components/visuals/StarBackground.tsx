@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import dynamic from "next/dynamic";
 import StarfieldGravity from "./StarfieldGravity";
 
-// Components
-const TheSun = dynamic(() => import("./TheSun"), { ssr: false });
-const Moon = dynamic(() => import("./Moon"), { ssr: false });
-const Earth = dynamic(() => import("./Earth"), { ssr: false });
-const ShootingStars = dynamic(() => import("./ShootingStars"), { ssr: false });
+// Canvas 内（R3F の独自 reconciler）では next/dynamic を使わない。
+// Next 16.4 の next/dynamic は ReactDOM 専用の use(browser()) でバイアウトするため、
+// R3F の reconciler 上では React error #438 になりページ全体が落ちる。
+// React.lazy + Suspense なら R3F でも動き、このファイル自体が ssr:false で読まれるため SSR も発生しない。
+const TheSun = lazy(() => import("./TheSun"));
+const Moon = lazy(() => import("./Moon"));
+const Earth = lazy(() => import("./Earth"));
+const ShootingStars = lazy(() => import("./ShootingStars"));
 
 export default function StarBackground() {
   const observerRef = useRef<HTMLDivElement>(null);
@@ -125,15 +127,19 @@ export default function StarBackground() {
           dpr={isMobile ? [0.75, 1] : [1, 1.1]}
         >
           <ambientLight intensity={0.1} />
-          {showCelestialBodies && showCelestialsNow && <TheSun />}
-          {showCelestialBodies && showCelestialsNow && <Moon />}
-          {showCelestialBodies && showCelestialsNow && <Earth />}
+          <Suspense fallback={null}>
+            {showCelestialBodies && showCelestialsNow && <TheSun />}
+            {showCelestialBodies && showCelestialsNow && <Moon />}
+            {showCelestialBodies && showCelestialsNow && <Earth />}
+          </Suspense>
 
           <StarfieldGravity
             count={starCount}
             strength={isMobile ? 0.38 : 0.68}
           />
-          {showCelestialsNow && <ShootingStars />}
+          <Suspense fallback={null}>
+            {showCelestialsNow && <ShootingStars />}
+          </Suspense>
         </Canvas>
       )}
     </div>

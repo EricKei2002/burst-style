@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { getServerLocale } from "./lib/getServerLocale";
-import { pick } from "./lib/siteCopy";
+import NotFoundText from "./components/ui/NotFoundText";
 
 export const metadata: Metadata = {
   title: "404 — Signal Lost",
   robots: { index: false },
 };
 
-export default async function NotFound() {
-  const locale = await getServerLocale();
-
+// ルートの not-found は全ページのツリーに含まれるため、ここで cookies() を
+// 使うとトップページまで動的レンダリングになる。文言の切替はクライアント側で行う
+export default function NotFound() {
   return (
     <section className="relative flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-xl rounded-2xl border border-zinc-800 bg-black/60 p-8 font-mono backdrop-blur-sm sm:p-10">
@@ -28,17 +27,17 @@ export default async function NotFound() {
           <p>&gt; ping requested_coordinates</p>
           <p className="text-red-400">
             &gt;{" "}
-            {pick(locale, {
-              en: "No response. This sector is empty space.",
-              ja: "応答なし。この座標には何も存在しません。",
-            })}
+            <NotFoundText
+              en="No response. This sector is empty space."
+              ja="応答なし。この座標には何も存在しません。"
+            />
           </p>
           <p>
             &gt;{" "}
-            {pick(locale, {
-              en: "The page may have moved or never existed.",
-              ja: "ページが移動したか、URLが間違っている可能性があります。",
-            })}
+            <NotFoundText
+              en="The page may have moved or never existed."
+              ja="ページが移動したか、URLが間違っている可能性があります。"
+            />
           </p>
         </div>
 
@@ -47,13 +46,13 @@ export default async function NotFound() {
             href="/"
             className="flex items-center justify-center rounded-lg border border-fuchsia-500/30 bg-fuchsia-600/10 px-5 py-3 text-xs tracking-wider text-fuchsia-300 uppercase transition-colors hover:bg-fuchsia-600/20"
           >
-            {pick(locale, { en: "< Return to base", ja: "< トップへ戻る" })}
+            <NotFoundText en="< Return to base" ja="< トップへ戻る" />
           </Link>
           <Link
             href="/#projects"
             className="flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 px-5 py-3 text-xs tracking-wider text-zinc-300 uppercase transition-colors hover:bg-zinc-700"
           >
-            {pick(locale, { en: "View projects", ja: "プロジェクトを見る" })}
+            <NotFoundText en="View projects" ja="プロジェクトを見る" />
           </Link>
         </div>
       </div>
