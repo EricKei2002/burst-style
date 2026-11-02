@@ -1,5 +1,5 @@
 // GitHub の直近の公開リポジトリとコミットを取得する共有ロジック。
-// GET /api/now とトップページの「今作っているもの」セクションの両方から使う。
+// GET /api/now とトップページの「Now Building」セクションの両方から使う。
 // fetch に next.revalidate を付けているため、同じURLへのリクエストは
 // Next のデータキャッシュで共有され、GitHub API への呼び出しは重複しない。
 

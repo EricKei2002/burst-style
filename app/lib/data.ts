@@ -19,7 +19,7 @@ export interface Project {
 export const projectsData: Project[] = [
   {
     slug: "drill",
-    title: "学習アプリ",
+    title: "Drill",
     description:
       "毎日10問で定着させる学習ドリルPWA。AWS SAA・WordPressなど複数分野に対応し、Googleログイン＋Supabaseで進捗を端末間同期。",
     detailedDescription:

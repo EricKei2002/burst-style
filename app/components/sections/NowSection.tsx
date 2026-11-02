@@ -1,7 +1,7 @@
 import { getNow } from "../../lib/now";
 import NowSectionView, { type NowItem } from "./NowSectionView";
 
-// GitHub から取得した直近のリポジトリを「今作っているもの」として表示する。
+// GitHub から取得した直近のリポジトリを「Now Building」として表示する。
 // 取得失敗・0件のときはセクションごと出さない。
 export default async function NowSection() {
   const { status, repos, updatedAt } = await getNow();

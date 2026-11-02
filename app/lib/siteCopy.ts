@@ -104,7 +104,7 @@ export function buildSiteCopy(locale: Locale) {
     },
     now: {
       label: "> git log --recent",
-      heading: pick(locale, { en: "Now Building", ja: "今作っているもの" }),
+      heading: pick(locale, { en: "Now Building", ja: "Now Building" }),
       intro: pick(locale, {
         en: "Recently updated public repositories, pulled live from GitHub.",
         ja: "GitHub から取得した、最近更新した公開リポジトリです。",
