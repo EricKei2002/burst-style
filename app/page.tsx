@@ -6,7 +6,7 @@ import {
   looksLikeTurnstileSecretKey,
 } from "./lib/turnstile";
 
-// 「今作っているもの」の GitHub データに合わせて10分ごとに再生成する（ISR）
+// 「Now Building」の GitHub データに合わせて10分ごとに再生成する（ISR）
 export const revalidate = 600;
 
 export default function Home() {
@@ -18,7 +18,7 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Top />
-      {/* 「今作っているもの」はサーバー描画済みなので遅延させず FV 直下に即時表示する。
+      {/* 「Now Building」はサーバー描画済みなので遅延させず FV 直下に即時表示する。
           後続セクションが遅延マウントされても、このセクションの位置は動かない */}
       <NowSection />
       <DeferredHomeSections

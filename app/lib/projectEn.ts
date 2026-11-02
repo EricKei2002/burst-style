@@ -176,7 +176,6 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
 
 // OGP画像など日本語フォントを使えない場所で使う英語タイトル（未登録なら元のタイトル）
 const TITLE_EN_BY_SLUG: Record<string, string> = {
-  drill: "Study Drill",
   "discord-role-bot": "Discord Intro Verification Bot",
   "sonta-kun": "Sonta-kun",
 };
