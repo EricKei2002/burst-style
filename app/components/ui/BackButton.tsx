@@ -6,12 +6,11 @@ import { useTransitionStore } from "../../lib/store";
 import MagneticButton from "./MagneticButton";
 export default function BackButton() {
   const router = useRouter();
-  const { setPhase, setIsWarping } = useTransitionStore();
+  const { setPhase } = useTransitionStore();
 
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
     setPhase("closing");
-    setIsWarping(true); // ワープ開始
 
     setTimeout(() => {
       setPhase("closed");

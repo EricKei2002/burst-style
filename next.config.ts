@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: [
       "react-icons",
-      "lucide-react",
       "@react-three/drei",
       "three",
     ],

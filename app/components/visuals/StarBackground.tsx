@@ -80,11 +80,6 @@ export default function StarBackground() {
   }, [isVisible, starCount]);
 
   useEffect(() => {
-    if (!isReady) return;
-    window.dispatchEvent(new CustomEvent("burst:stars-ready"));
-  }, [isReady]);
-
-  useEffect(() => {
     if (!isReady || !showCelestialBodies) return;
 
     const activate = () => setShowCelestialsNow(true);

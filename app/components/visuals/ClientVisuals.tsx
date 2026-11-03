@@ -96,11 +96,6 @@ export default function ClientVisuals() {
     return <SpaceshipInterior />;
   }
 
-  // Projectsページは動画背景を即座に表示（状態管理不要）
-  if (isProjectPage) {
-    return <SpaceshipInterior />;
-  }
-
   if (!config.ready) return null;
 
   return (
