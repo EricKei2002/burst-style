@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { FaGithub } from "react-icons/fa";
 import { SiWantedly } from "react-icons/si";
@@ -14,7 +14,6 @@ interface ProfileCardProps {
   name?: string;
   title?: string;
   className?: string;
-  enableTilt?: boolean;
   innerGradient?: string;
   behindGlowColor?: string;
   backgroundImageUrl?: string;
@@ -37,7 +36,6 @@ export default function ProfileCard({
   name = "Eric Kei",
   title = "Creative Developer",
   className = "",
-  enableTilt = true,
   innerGradient = DEFAULT_INNER_GRADIENT,
   behindGlowColor = "rgba(232, 121, 249, 0.4)", // フクシア色の色合い
   backgroundImageUrl,
@@ -46,8 +44,10 @@ export default function ProfileCard({
   const wrapRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
 
-  const tiltEngine = useMemo(() => {
-    if (!enableTilt) return null;
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
     let rafId: number | null = null;
     let running = false;
     let lastTs = 0;
@@ -56,13 +56,11 @@ export default function ProfileCard({
     let targetX = 0;
     let targetY = 0;
 
-    // 物理演算用の定数
     const DEFAULT_TAU = 0.14;
 
     const setVarsFromXY = (x: number, y: number) => {
       const shell = shellRef.current;
-      const wrap = wrapRef.current;
-      if (!shell || !wrap) return;
+      if (!shell) return;
 
       const width = shell.clientWidth || 1;
       const height = shell.clientHeight || 1;
@@ -72,13 +70,12 @@ export default function ProfileCard({
       const centerX = percentX - 50;
       const centerY = percentY - 50;
 
-      // CSS変数のマッピング
       const cssVars: Record<string, string> = {
         "--pointer-x": `${percentX}%`,
         "--pointer-y": `${percentY}%`,
         "--background-x": `${adjust(percentX, 0, 100, 35, 65)}%`,
         "--background-y": `${adjust(percentY, 0, 100, 35, 65)}%`,
-        "--rotate-x": `${round(-(centerX / 15))}deg`, // 感度を調整
+        "--rotate-x": `${round(-(centerX / 15))}deg`,
         "--rotate-y": `${round(centerY / 10)}deg`,
       };
 
@@ -93,7 +90,6 @@ export default function ProfileCard({
       const dt = (ts - lastTs) / 1000;
       lastTs = ts;
 
-      // スムーズな補間
       const k = 1 - Math.exp(-dt / DEFAULT_TAU);
       currentX += (targetX - currentX) * k;
       currentY += (targetY - currentY) * k;
@@ -116,22 +112,11 @@ export default function ProfileCard({
       rafId = requestAnimationFrame(step);
     };
 
-    return {
-      setTarget(x: number, y: number) {
-        targetX = x;
-        targetY = y;
-        start();
-      },
-      cleanup() {
-        if (rafId) cancelAnimationFrame(rafId);
-        running = false;
-      },
+    const setTarget = (x: number, y: number) => {
+      targetX = x;
+      targetY = y;
+      start();
     };
-  }, [enableTilt]);
-
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap || !tiltEngine) return;
 
     const handleMove = (e: MouseEvent | TouchEvent) => {
       const el = wrap.getBoundingClientRect();
@@ -146,21 +131,16 @@ export default function ProfileCard({
         cy = e.touches[0].clientY;
       }
 
-      const x = cx - el.left;
-      const y = cy - el.top;
-
-      tiltEngine.setTarget(x, y);
+      setTarget(cx - el.left, cy - el.top);
     };
 
     const handleLeave = () => {
       const el = wrap.getBoundingClientRect();
-      // 中心にリセット
-      tiltEngine.setTarget(el.width / 2, el.height / 2);
+      setTarget(el.width / 2, el.height / 2);
     };
 
-    // 初期の中心位置
     const el = wrap.getBoundingClientRect();
-    tiltEngine.setTarget(el.width / 2, el.height / 2);
+    setTarget(el.width / 2, el.height / 2);
 
     wrap.addEventListener("mousemove", handleMove);
     wrap.addEventListener("mouseleave", handleLeave);
@@ -174,9 +154,10 @@ export default function ProfileCard({
       wrap.removeEventListener("touchstart", handleMove);
       wrap.removeEventListener("touchmove", handleMove);
       wrap.removeEventListener("touchend", handleLeave);
-      tiltEngine.cleanup();
+      if (rafId) cancelAnimationFrame(rafId);
+      running = false;
     };
-  }, [tiltEngine]);
+  }, []);
 
   return (
     <div

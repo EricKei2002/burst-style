@@ -16,9 +16,6 @@ const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
 
 export default function Top() {
   const copy = useSiteCopy();
-  const containerRef = useRef<HTMLElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const flashRef = useRef<HTMLDivElement>(null);
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
@@ -72,23 +69,13 @@ export default function Top() {
   return (
     <section
       id="top"
-      ref={containerRef}
       className="relative flex min-h-screen w-full flex-col overflow-hidden"
     >
       <Header />
 
       <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
-        <div
-          ref={flashRef}
-          className="pointer-events-none fixed inset-0 z-60 bg-white opacity-0 mix-blend-overlay"
-        ></div>
-
-        {/* 前景のテキストコンテンツ */}
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div
-            ref={textRef}
-            className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5"
-          >
+          <div className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
               <div className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
