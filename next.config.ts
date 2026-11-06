@@ -5,12 +5,7 @@ const nextConfig: NextConfig = {
   // 本番配信サイズを抑えてLighthouseの転送量指標を改善
   productionBrowserSourceMaps: false,
   experimental: {
-    optimizePackageImports: [
-      "react-icons",
-      "lucide-react",
-      "@react-three/drei",
-      "three",
-    ],
+    optimizePackageImports: ["react-icons", "three"],
     optimizeCss: true,
   },
   async headers() {
