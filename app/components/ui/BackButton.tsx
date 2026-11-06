@@ -21,7 +21,7 @@ export default function BackButton() {
 
   return (
     <div className="fixed top-6 left-6 z-50 mix-blend-difference">
-      <MagneticButton strength={0.3}>
+      <MagneticButton>
         <Link
           href="/#projects"
           onClick={handleBack}
