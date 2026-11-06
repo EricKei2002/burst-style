@@ -1,12 +1,10 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { SPACESHIP_AISLE_VIDEO_SRC } from "../../lib/spaceshipVideo";
 
 export default function SpaceshipInterior() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
 
   useEffect(() => {
     if (videoRef.current) {
@@ -14,16 +12,8 @@ export default function SpaceshipInterior() {
     }
   }, []);
 
-  if (!isProjectPage) {
-    return null;
-  }
-
   return (
     <div className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden">
-      {/* 
-        ビデオ背景
-        ファイル名内の特殊文字を安全に処理するためにencodeURIを使用 
-      */}
       <video
         ref={videoRef}
         autoPlay
@@ -32,14 +22,10 @@ export default function SpaceshipInterior() {
         playsInline
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       >
-        <source
-          src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`}
-          type="video/mp4"
-        />
+        <source src={SPACESHIP_AISLE_VIDEO_SRC} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      {/* 映画のようなフィールと、圧縮アーティファクトを隠すためのオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />
     </div>
