@@ -1,25 +1,50 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { SPACESHIP_AISLE_VIDEO_SRC } from "../../lib/spaceshipVideo";
+import { takeSpaceshipWarmupVideo } from "../../lib/spaceshipVideoPreload";
 
 export default function SpaceshipInterior() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 1.0;
+    const container = containerRef.current;
+    const warm = takeSpaceshipWarmupVideo();
+    if (!container || !warm) {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = 1.0;
+      }
+      return;
     }
+
+    const fallback = container.querySelector("video[data-spaceship-fallback]");
+    fallback?.remove();
+
+    warm.className = "absolute inset-0 h-full w-full object-cover opacity-100";
+    warm.style.cssText = "";
+    warm.autoplay = true;
+    warm.loop = true;
+    warm.muted = true;
+    warm.playsInline = true;
+    warm.playbackRate = 1.0;
+    container.prepend(warm);
+    void warm.play().catch(() => {});
   }, []);
 
   return (
-    <div className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden">
+    <div
+      ref={containerRef}
+      className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden"
+    >
       <video
         ref={videoRef}
+        data-spaceship-fallback
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       >
         <source src={SPACESHIP_AISLE_VIDEO_SRC} type="video/mp4" />

@@ -9,6 +9,8 @@ import TiltCard from "../ui/TiltCard";
 import { projectsData } from "../../lib/data";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import { getLocalizedProject } from "../../lib/projectEn";
+import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "../../lib/hangarTransitionTiming";
+import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { useTransitionStore } from "../../lib/store";
 
 export default function Projects() {
@@ -20,13 +22,13 @@ export default function Projects() {
   const [isVisible, setIsVisible] = useState(false);
 
   const handleNavigation = (url: string) => {
+    preloadSpaceshipAisleVideo();
     setPhase("closing");
 
-    // 扉が閉まるのを待ちます（CSSの期間は700ms）
     setTimeout(() => {
       setPhase("closed");
       router.push(url);
-    }, 900);
+    }, HANGAR_NAVIGATE_AFTER_CLOSE_MS);
   };
 
   useEffect(() => {
@@ -105,6 +107,10 @@ export default function Projects() {
                 <TiltCard className="h-full" rotationIntensity={5}>
                   <button
                     type="button"
+                    onPointerEnter={() => {
+                      preloadSpaceshipAisleVideo();
+                      router.prefetch(`/projects/${project.slug}`);
+                    }}
                     onClick={() =>
                       handleNavigation(`/projects/${project.slug}`)
                     }
