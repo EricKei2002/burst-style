@@ -3,6 +3,7 @@ import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
+import SpaceshipVideoWarmup from "./components/visuals/SpaceshipVideoWarmup";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
 import { LocaleProvider } from "./lib/locale";
@@ -89,6 +90,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
+        <SpaceshipVideoWarmup />
         <HangarDoorTransition />
         <SmoothScroll>
           <LocaleProvider>
