@@ -9,7 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // プロジェクト個別ページを動的に生成
   const projectEntries: MetadataRoute.Sitemap = projectsData.map((project) => ({
     url: `${baseUrl}/projects/${project.slug}`,
-    lastModified: new Date(),
     changeFrequency: "monthly",
     priority: 0.7,
   }));
@@ -17,7 +16,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 1.0,
     },
