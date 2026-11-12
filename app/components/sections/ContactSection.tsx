@@ -145,7 +145,7 @@ export default function ContactSection({
               : "translate-y-10 scale-[0.98] opacity-0"
           }`}
         >
-          <TiltCard rotationIntensity={2} className="w-full">
+          <TiltCard className="w-full">
             <div className="relative w-full rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 sm:p-12 overflow-hidden backdrop-blur-sm">
               <div className="absolute top-0 right-0 p-4 opacity-20">
                 <div className="w-16 h-16 border-t border-r border-fuchsia-500 rounded-tr-xl" />
@@ -281,7 +281,7 @@ export default function ContactSection({
                         &gt; {errorMessage}
                       </p>
                     )}
-                    <MagneticButton strength={0.3} className="inline-block">
+                    <MagneticButton className="inline-block">
                       <button
                         type="submit"
                         disabled={isSubmitting}

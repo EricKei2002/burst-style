@@ -102,9 +102,8 @@ export default function Projects() {
               <MagneticButton
                 key={project.slug}
                 className={`h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
-                strength={0.2}
               >
-                <TiltCard className="h-full" rotationIntensity={5}>
+                <TiltCard className="h-full">
                   <button
                     type="button"
                     onPointerEnter={() => {
