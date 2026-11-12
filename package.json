@@ -14,11 +14,8 @@
     "measure:transition": "node scripts/measure-project-transition.mjs"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
     "@marsidev/react-turnstile": "^1.4.1",
-    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.4.2",
-    "@react-three/postprocessing": "^3.0.4",
     "@studio-freight/react-lenis": "^0.0.47",
     "@types/three": "^0.182.0",
     "critters": "^0.0.23",
