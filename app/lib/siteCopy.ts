@@ -110,6 +110,23 @@ export function buildSiteCopy(locale: Locale) {
         ja: "GitHub から取得した、最近更新した公開リポジトリです。",
       }),
       noCommits: pick(locale, { en: "No commits yet", ja: "コミットなし" }),
+      privateBadge: pick(locale, { en: "Private", ja: "非公開" }),
+      curated: {
+        "saa-drill": {
+          name: "SAA Drill",
+          summary: pick(locale, {
+            en: "AWS Solutions Architect – Associate (SAA) practice drill. Next.js 16 on Vercel.",
+            ja: "AWS SAA（Solutions Architect Associate）向けの演習ドリル。Next.js 16 / Vercel。",
+          }),
+        },
+        liveai: {
+          name: "LiveAI",
+          summary: pick(locale, {
+            en: "An AI project currently in development.",
+            ja: "開発中の AI プロジェクトです。",
+          }),
+        },
+      },
     },
     about: {
       intro: pick(locale, {

@@ -1,26 +1,38 @@
+import { GITHUB_REPO_NAMES_EXCLUDED_FROM_NOW } from "../../lib/nowCurated";
 import { getNow } from "../../lib/now";
-import NowSectionView, { type NowItem } from "./NowSectionView";
+import type { NowItem } from "../../lib/nowTypes";
+import NowSectionView from "./NowSectionView";
 
 // GitHub から取得した直近のリポジトリを「Now Building」として表示する。
-// 取得失敗・0件のときはセクションごと出さない。
+// 取得失敗・0件でも、固定の curated 項目があればセクションを表示する。
 export default async function NowSection() {
   const { status, repos, updatedAt } = await getNow();
-  if (status !== "ok") return null;
 
-  const items: NowItem[] = repos.map((repo) => {
-    const latest = repo.commits[0];
-    return {
-      name: repo.name,
-      url: repo.url,
-      language: repo.language,
-      commitMessage: latest?.message ?? null,
-      commitUrl: latest?.url ?? null,
-      date: latest?.date || repo.pushedAt,
-    };
-  });
+  const githubItems: NowItem[] =
+    status === "ok"
+      ? repos
+          .filter(
+            (repo) =>
+              !GITHUB_REPO_NAMES_EXCLUDED_FROM_NOW.has(repo.name.toLowerCase()),
+          )
+          .map((repo) => {
+            const latest = repo.commits[0];
+            return {
+              id: `github:${repo.fullName}`,
+              name: repo.name,
+              href: repo.url,
+              badge: repo.language,
+              summary: latest?.message ?? null,
+              summaryHref: latest?.url ?? null,
+              date: latest?.date || repo.pushedAt,
+            };
+          })
+      : [];
 
-  // 相対時刻はレンダリング時点（getNow の updatedAt）を基準にする。
-  // ISR で最大10分ずれるのは許容。クライアントでも同じ基準時刻を使い、
-  // ハイドレーションの不一致を防ぐ
-  return <NowSectionView items={items} renderedAt={Date.parse(updatedAt)} />;
+  return (
+    <NowSectionView
+      githubItems={githubItems}
+      renderedAt={Date.parse(updatedAt)}
+    />
+  );
 }
