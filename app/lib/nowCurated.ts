@@ -9,9 +9,11 @@ export type NowCuratedMeta = {
   /** 右上の # バッジ（技術タグ）。非公開のみのときは null */
   techBadge: string | null;
   status: "private" | null;
-  /** 相対時刻表示用（ISO 8601） */
-  updatedAt: string;
-  /** GitHub の recently pushed 一覧から除外するリポジトリ名（重複防止） */
+  /** 公開リポジトリの pushed_at 取得用 */
+  githubRepoFullName?: string;
+  /** GITHUB_TOKEN があれば pushed_at を取得する非公開リポジトリ */
+  privateGithubRepoFullName?: string;
+  /** GitHub の recently pushed 一覧カードから除外（curated で表示するため） */
   excludeGithubRepoName?: string;
 };
 
@@ -19,9 +21,9 @@ export const NOW_CURATED_META: readonly NowCuratedMeta[] = [
   {
     id: "saa-drill",
     href: "https://drill.burst.style",
-    techBadge: "Next.js",
+    techBadge: "TypeScript",
     status: null,
-    updatedAt: "2026-03-15T12:00:00.000Z",
+    githubRepoFullName: "EricKei2002/saa-drill",
     excludeGithubRepoName: "saa-drill",
   },
   {
@@ -29,7 +31,7 @@ export const NOW_CURATED_META: readonly NowCuratedMeta[] = [
     href: null,
     techBadge: null,
     status: "private",
-    updatedAt: "2026-02-01T09:00:00.000Z",
+    privateGithubRepoFullName: "EricKei2002/liveai",
   },
 ] as const;
 

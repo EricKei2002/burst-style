@@ -1,3 +1,5 @@
+import { NOW_CURATED_META, type NowCuratedId } from "./nowCurated";
+
 // GitHub の直近の公開リポジトリとコミットを取得する共有ロジック。
 // GET /api/now とトップページの「Now Building」セクションの両方から使う。
 // fetch に next.revalidate を付けているため、同じURLへのリクエストは
@@ -55,15 +57,28 @@ type GitHubCommit = {
   };
 };
 
-function githubFetch(path: string): Promise<Response> {
+function githubFetch(path: string, token?: string): Promise<Response> {
   return fetch(`${GITHUB_API}${path}`, {
     headers: {
       Accept: "application/vnd.github+json",
       "User-Agent": "burst-style",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     next: { revalidate: NOW_REVALIDATE_SECONDS },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
+}
+
+async function fetchRepoPushedAt(
+  fullName: string,
+  token?: string,
+): Promise<string | null> {
+  const res = await githubFetch(`/repos/${fullName}`, token);
+  if (!res.ok) {
+    return null;
+  }
+  const data: { pushed_at?: string } = await res.json();
+  return data.pushed_at ?? null;
 }
 
 async function fetchRepos(): Promise<GitHubRepo[]> {
@@ -126,4 +141,34 @@ export async function getNow(): Promise<NowResponse> {
     console.error("Now API Error:", error);
     return { status: "error", updatedAt, repos: [] };
   }
+}
+
+export type CuratedPushedAtById = Partial<Record<NowCuratedId, string | null>>;
+
+/** curated 項目の最終 push 日時（一覧に無ければ単体 API、失敗時は null） */
+export async function resolveCuratedPushedAt(
+  repos: NowRepo[],
+): Promise<CuratedPushedAtById> {
+  const out: CuratedPushedAtById = {};
+  const token = process.env.GITHUB_TOKEN?.trim();
+
+  for (const meta of NOW_CURATED_META) {
+    if (meta.githubRepoFullName) {
+      const repoName = meta.githubRepoFullName.split("/").pop()!.toLowerCase();
+      const fromList = repos.find((r) => r.name.toLowerCase() === repoName);
+      out[meta.id] =
+        fromList?.pushedAt ??
+        (await fetchRepoPushedAt(meta.githubRepoFullName));
+      continue;
+    }
+    if (meta.privateGithubRepoFullName) {
+      out[meta.id] = token
+        ? await fetchRepoPushedAt(meta.privateGithubRepoFullName, token)
+        : null;
+      continue;
+    }
+    out[meta.id] = null;
+  }
+
+  return out;
 }

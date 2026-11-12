@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 
+import type { CuratedPushedAtById } from "../../lib/now";
 import { buildCuratedNowItems } from "../../lib/buildCuratedNowItems";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import type { Locale } from "../../lib/siteCopy";
@@ -37,18 +38,20 @@ const titleClassName =
 
 export default function NowSectionView({
   githubItems,
+  curatedPushedAt,
   renderedAt,
 }: {
   githubItems: NowItem[];
+  curatedPushedAt: CuratedPushedAtById;
   renderedAt: number;
 }) {
   const { locale } = useLocale();
   const copy = useSiteCopy();
 
   const items = useMemo(() => {
-    const curated = buildCuratedNowItems(locale);
+    const curated = buildCuratedNowItems(locale, curatedPushedAt);
     return [...curated, ...githubItems];
-  }, [locale, githubItems]);
+  }, [locale, githubItems, curatedPushedAt]);
 
   return (
     <section id="now" className="relative w-full py-24 sm:py-32">
@@ -68,7 +71,9 @@ export default function NowSectionView({
 
         <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
-            const relative = formatRelative(item.date, renderedAt, locale);
+            const relative = item.date
+              ? formatRelative(item.date, renderedAt, locale)
+              : "";
             return (
               <li
                 key={item.id}
@@ -116,7 +121,7 @@ export default function NowSectionView({
                   )}
                 </p>
 
-                {relative && (
+                {item.date && relative && (
                   <time
                     dateTime={item.date}
                     className="mt-auto font-mono text-xs text-zinc-400"
