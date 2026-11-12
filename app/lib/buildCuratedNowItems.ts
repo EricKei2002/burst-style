@@ -1,8 +1,12 @@
+import type { CuratedPushedAtById } from "./now";
 import { NOW_CURATED_META, type NowCuratedId } from "./nowCurated";
 import { buildSiteCopy, type Locale } from "./siteCopy";
 import type { NowItem } from "./nowTypes";
 
-export function buildCuratedNowItems(locale: Locale): NowItem[] {
+export function buildCuratedNowItems(
+  locale: Locale,
+  pushedAtById: CuratedPushedAtById,
+): NowItem[] {
   const copy = buildSiteCopy(locale);
 
   return NOW_CURATED_META.map((meta) => {
@@ -21,7 +25,7 @@ export function buildCuratedNowItems(locale: Locale): NowItem[] {
       badge,
       summary: text.summary,
       summaryHref: null,
-      date: meta.updatedAt,
+      date: pushedAtById[meta.id] ?? null,
     };
   });
 }

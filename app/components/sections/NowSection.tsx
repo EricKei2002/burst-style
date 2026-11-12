@@ -1,5 +1,5 @@
+import { getNow, resolveCuratedPushedAt } from "../../lib/now";
 import { GITHUB_REPO_NAMES_EXCLUDED_FROM_NOW } from "../../lib/nowCurated";
-import { getNow } from "../../lib/now";
 import type { NowItem } from "../../lib/nowTypes";
 import NowSectionView from "./NowSectionView";
 
@@ -7,6 +7,7 @@ import NowSectionView from "./NowSectionView";
 // 取得失敗・0件でも、固定の curated 項目があればセクションを表示する。
 export default async function NowSection() {
   const { status, repos, updatedAt } = await getNow();
+  const curatedPushedAt = await resolveCuratedPushedAt(repos);
 
   const githubItems: NowItem[] =
     status === "ok"
@@ -32,6 +33,7 @@ export default async function NowSection() {
   return (
     <NowSectionView
       githubItems={githubItems}
+      curatedPushedAt={curatedPushedAt}
       renderedAt={Date.parse(updatedAt)}
     />
   );

@@ -5,5 +5,6 @@ export type NowItem = {
   badge: string | null;
   summary: string | null;
   summaryHref: string | null;
-  date: string;
+  /** 相対時刻表示用。取得できない場合は null */
+  date: string | null;
 };
