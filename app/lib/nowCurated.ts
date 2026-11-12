@@ -20,7 +20,7 @@ export type NowCuratedMeta = {
 export const NOW_CURATED_META: readonly NowCuratedMeta[] = [
   {
     id: "saa-drill",
-    href: "https://drill.burst.style",
+    href: "https://github.com/EricKei2002/saa-drill",
     techBadge: "TypeScript",
     status: null,
     githubRepoFullName: "EricKei2002/saa-drill",
