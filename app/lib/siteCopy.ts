@@ -235,5 +235,3 @@ export function buildSiteCopy(locale: Locale) {
     },
   };
 }
-
-export type SiteCopy = ReturnType<typeof buildSiteCopy>;
