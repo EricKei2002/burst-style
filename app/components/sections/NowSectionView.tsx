@@ -8,8 +8,6 @@ import { useLocale, useSiteCopy } from "../../lib/locale";
 import type { Locale } from "../../lib/siteCopy";
 import type { NowItem } from "../../lib/nowTypes";
 
-export type { NowItem } from "../../lib/nowTypes";
-
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["year", 60 * 60 * 24 * 365],
   ["month", 60 * 60 * 24 * 30],
