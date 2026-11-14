@@ -36,7 +36,6 @@ export default function HangarDoorTransition() {
     }
   }, [pathname, phase, setPhase]);
 
-  // 視覚状態の計算
   const isClosed = phase === "closing" || phase === "closed";
 
   const leftDoorClass = isClosed ? "translate-x-0" : "-translate-x-full";

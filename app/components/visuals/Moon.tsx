@@ -8,21 +8,18 @@ import { TextureLoader } from "three";
 export default function Moon() {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // 信頼性のためにローカルテクスチャを使用
   const texture = useLoader(TextureLoader, "/moon.jpg");
 
   useFrame((state) => {
     if (meshRef.current) {
-      // 軌道ロジック: 太陽と反対 (PIの位相シフト)
-      const t = state.clock.elapsedTime * 0.2 + Math.PI; // 同じ速度、反対の位相
-      // コンテンツ中央への侵入を減らすため、揺れ幅を抑えて奥行きを増やす
+      const t = state.clock.elapsedTime * 0.2 + Math.PI; // 太陽と反対位相 (π)
       const radius = 18;
 
       meshRef.current.position.x = Math.sin(t) * radius;
-      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10; // 同じ垂直波
+      meshRef.current.position.y = Math.cos(t * 0.5) * 15 + 10;
       meshRef.current.position.z = Math.cos(t) * radius - 35;
 
-      meshRef.current.rotation.y += 0.005; // 目に見える回転
+      meshRef.current.rotation.y += 0.005;
     }
   });
 
