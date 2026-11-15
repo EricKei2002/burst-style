@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import {
+  parseContactLocale,
+  validateContactForm,
+} from "./validateContactForm";
 
 function escapeHtml(s: string): string {
   return String(s)
@@ -80,14 +84,46 @@ function autoReplyHtml(
             `;
 }
 
+function deliveryErrorResponse(locale: "en" | "ja") {
+  return NextResponse.json(
+    {
+      success: false,
+      error:
+        locale === "ja"
+          ? "送信処理に失敗しました。しばらくしてからもう一度お試しください。"
+          : "Failed to deliver your message. Please try again later.",
+    },
+    { status: 502 },
+  );
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const name = (formData.get("name") as string) ?? "";
-    const email = (formData.get("email") as string) ?? "";
-    const message = (formData.get("message") as string) ?? "";
-    const localeRaw = formData.get("locale") as string | null;
-    const locale: "en" | "ja" = localeRaw === "ja" ? "ja" : "en";
+    const locale = parseContactLocale(formData.get("locale") as string | null);
+
+    const validation = validateContactForm({
+      name: (formData.get("name") as string) ?? "",
+      email: (formData.get("email") as string) ?? "",
+      message: (formData.get("message") as string) ?? "",
+      locale,
+    });
+
+    if (!validation.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            locale === "ja"
+              ? "入力内容に問題があります。"
+              : "Please fix the highlighted fields.",
+          fieldErrors: validation.fieldErrors,
+        },
+        { status: 400 },
+      );
+    }
+
+    const { name, email, message } = validation.data;
     const turnstileToken = formData.get("cf-turnstile-response") as string;
 
     if (process.env.TURNSTILE_SECRET_KEY) {
@@ -107,7 +143,13 @@ export async function POST(request: Request) {
       if (!turnstileResult.success) {
         console.error("Turnstile verification failed:", turnstileResult);
         return NextResponse.json(
-          { success: false, error: "Security check failed" },
+          {
+            success: false,
+            error:
+              locale === "ja"
+                ? "セキュリティ確認に失敗しました。"
+                : "Security check failed",
+          },
           { status: 400 },
         );
       }
@@ -116,13 +158,29 @@ export async function POST(request: Request) {
     const formspreeEndpoint = process.env.FORMSPREE_ENDPOINT;
 
     if (formspreeEndpoint) {
-      await fetch(formspreeEndpoint, {
+      const formspreeBody = new FormData();
+      formspreeBody.append("name", name);
+      formspreeBody.append("email", email);
+      formspreeBody.append("message", message);
+      formspreeBody.append("locale", locale);
+
+      const formspreeResponse = await fetch(formspreeEndpoint, {
         method: "POST",
-        body: formData,
+        body: formspreeBody,
         headers: {
           Accept: "application/json",
         },
-      }).catch((err) => console.error("Formspree error:", err));
+      });
+
+      if (!formspreeResponse.ok) {
+        const detail = await formspreeResponse.text().catch(() => "");
+        console.error(
+          "Formspree error:",
+          formspreeResponse.status,
+          detail.slice(0, 500),
+        );
+        return deliveryErrorResponse(locale);
+      }
     }
 
     if (process.env.RESEND_API_KEY) {
@@ -134,13 +192,18 @@ export async function POST(request: Request) {
           ? "Burst Style — お問い合わせありがとうございます"
           : "Thank you for contacting Burst Style";
 
-      await resend.emails.send({
+      const { error: resendError } = await resend.emails.send({
         from: "Eric Kei <Contact@burst.style>",
         to: email,
         replyTo: "yamamotokei587@gmail.com",
         subject,
         html: autoReplyHtml(locale, name, message),
       });
+
+      if (resendError) {
+        console.error("Resend error:", resendError);
+        return deliveryErrorResponse(locale);
+      }
     }
 
     return NextResponse.json({ success: true });
