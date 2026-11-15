@@ -12,11 +12,7 @@ export const CONTACT_LIMITS = {
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function msg(
-  locale: ContactLocale,
-  en: string,
-  ja: string,
-): string {
+function msg(locale: ContactLocale, en: string, ja: string): string {
   return locale === "ja" ? ja : en;
 }
 
@@ -31,7 +27,9 @@ export type ContactValidationResult =
   | { ok: true; data: ValidatedContactFields }
   | { ok: false; fieldErrors: Partial<Record<ContactField, string>> };
 
-export function parseContactLocale(raw: string | null | undefined): ContactLocale {
+export function parseContactLocale(
+  raw: string | null | undefined,
+): ContactLocale {
   return raw === "ja" ? "ja" : "en";
 }
 

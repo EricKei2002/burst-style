@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
-import {
-  CONTACT_LIMITS,
-  validateContactForm,
-} from "./validateContactForm";
+import { CONTACT_LIMITS, validateContactForm } from "./validateContactForm";
 
 function testRejectsEmptyFields() {
   const result = validateContactForm({

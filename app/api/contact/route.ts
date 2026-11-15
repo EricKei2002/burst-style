@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import {
-  parseContactLocale,
-  validateContactForm,
-} from "./validateContactForm";
+import { parseContactLocale, validateContactForm } from "./validateContactForm";
 
 function escapeHtml(s: string): string {
   return String(s)
