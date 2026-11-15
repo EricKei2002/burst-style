@@ -13,8 +13,6 @@ import {
 import { LOCALE_COOKIE_NAME, LOCALE_STORAGE_KEY } from "./localeConstants";
 import { buildSiteCopy, type Locale } from "./siteCopy";
 
-export type { Locale } from "./siteCopy";
-
 type LocaleContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
