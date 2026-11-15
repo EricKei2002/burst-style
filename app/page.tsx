@@ -1,6 +1,10 @@
 import Top from "./components/sections/Hero";
-import DeferredHomeSections from "./components/sections/DeferredHomeSections";
+import HomeHashScrollAlign from "./components/sections/HomeHashScrollAlign";
 import NowSection from "./components/sections/NowSection";
+import Projects from "./components/sections/Projects";
+import AboutSection from "./components/sections/AboutSection";
+import ContactSection from "./components/sections/ContactSection";
+import Footer from "./components/sections/Footer";
 import {
   getTurnstileSiteKey,
   looksLikeTurnstileSecretKey,
@@ -18,13 +22,16 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       <Top />
-      {/* 「Now Building」はサーバー描画済みなので遅延させず FV 直下に即時表示する。
-          後続セクションが遅延マウントされても、このセクションの位置は動かない */}
+      {/* 「Now Building」はサーバー描画済みなので遅延させず FV 直下に即時表示する */}
       <NowSection />
-      <DeferredHomeSections
-        turnstileSiteKey={turnstileSiteKey}
-        turnstileKeySwapped={turnstileKeySwapped}
+      <Projects />
+      <AboutSection />
+      <ContactSection
+        siteKey={turnstileSiteKey}
+        keySwapped={turnstileKeySwapped}
       />
+      <Footer />
+      <HomeHashScrollAlign />
     </div>
   );
 }
