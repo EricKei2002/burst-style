@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 // GSAP/ScrollTrigger は useEffect 内で動的にインポート（初期バンドルから除外）
 import { ReactNode } from "react";
 import ProfileCard from "../ui/ProfileCard";
 import DecryptedText from "../ui/DecryptedText";
 import SkillMatrix from "../ui/SkillMatrix";
-import CsharpCalculator from "../demos/CsharpCalculator";
-import TodoAppDemo from "../demos/TodoAppDemo";
+
+const CsharpCalculator = dynamic(() => import("../demos/CsharpCalculator"), {
+  ssr: false,
+});
+const TodoAppDemo = dynamic(() => import("../demos/TodoAppDemo"), {
+  ssr: false,
+});
 import {
   ABOUT_TIMELINE_GEEK_EN,
   ABOUT_TIMELINE_PRO_EN,
