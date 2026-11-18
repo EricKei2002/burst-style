@@ -19,22 +19,18 @@ export default function ProjectIntro() {
     }
   };
 
-  const handleSkip = () => {
-    setPhase("fading");
-  };
-
   if (phase === "done") return null;
 
   return (
     <div
       role="presentation"
       aria-hidden="true"
-      onClick={handleSkip}
       onTransitionEnd={handleTransitionEnd}
       style={{
         transition: "opacity 0.8s ease-out",
         opacity: phase === "fading" ? 0 : 1,
-        pointerEvents: phase === "fading" ? "none" : "auto",
+        // 演出は見た目だけ。下のコンテンツへの最初のクリックを奪わない
+        pointerEvents: "none",
       }}
       className="fixed inset-0 z-9999 cursor-pointer overflow-hidden bg-transparent"
     >
