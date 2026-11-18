@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
+import { isHomePath } from "../../lib/planets";
+import {
+  HOME_SECTION_EVENT,
+  isHomeSection,
+  type HomeSection,
+} from "../../lib/homeSections";
 import dynamic from "next/dynamic";
 import {
   getSkyPhase,
@@ -59,7 +65,17 @@ function formatTime(date: Date): string {
  */
 export default function LocalSky() {
   const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
+  const [homeSection, setHomeSection] = useState<HomeSection>("home");
+  useEffect(() => {
+    const sync = () => {
+      const value = document.documentElement.dataset.homeSection ?? null;
+      setHomeSection(isHomeSection(value) ? value : "home");
+    };
+    sync();
+    window.addEventListener(HOME_SECTION_EVENT, sync);
+    return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
+  }, [pathname]);
+  const showEarthSky = isHomePath(pathname) && homeSection === "home";
   const [sky, setSky] = useState<SkyState | null>(null);
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
   /** 丸めた位置（API から）。取れるまでは時計ベース */
@@ -186,7 +202,7 @@ export default function LocalSky() {
 
   return (
     <>
-      {!isProjectPage && (
+      {showEarthSky && (
         <>
           <div
             className="local-sky-veil"

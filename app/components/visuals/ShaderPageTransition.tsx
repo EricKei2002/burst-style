@@ -3,11 +3,21 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
+  SHADER_FLY_CLOSE_MS,
+  SHADER_FLY_OPEN_MS,
   SHADER_WARP_CLOSE_MS,
   SHADER_WARP_OPEN_MS,
   SHADER_WARP_REVEAL_MS,
   prefersReducedMotion,
 } from "../../lib/pageTransitionTiming";
+import { sectionFromLocation } from "../../lib/homeSections";
+import {
+  isHomePath,
+  planetById,
+  planetForView,
+  rgbVec,
+  type WarpJourney,
+} from "../../lib/planets";
 import {
   loadShaderTransitionModule,
   onShaderTransitionIntent,
@@ -18,9 +28,41 @@ type ShaderWarpHandle = {
   playClose(durationMs: number): void;
   playOpen(durationMs: number): void;
   playReveal(durationMs: number): void;
+  setJourney(
+    journey: WarpJourney,
+    atmo: [number, number, number],
+    horizon: [number, number, number],
+    fromAtmo?: [number, number, number],
+    fromHorizon?: [number, number, number],
+  ): void;
   hide(): void;
   dispose(): void;
 };
+
+function applyWarpLook(
+  overlay: ShaderWarpHandle,
+  journey: WarpJourney,
+  planetId: string | null,
+  fromPlanetId: string | null = null,
+) {
+  const planet = planetById(planetId);
+  const from = planetById(fromPlanetId ?? planetId);
+  overlay.setJourney(
+    journey,
+    rgbVec(planet.haze),
+    rgbVec(planet.accent),
+    rgbVec(from.haze),
+    rgbVec(from.accent),
+  );
+}
+
+function closeMsFor(journey: WarpJourney): number {
+  return journey === "fly-between" ? SHADER_FLY_CLOSE_MS : SHADER_WARP_CLOSE_MS;
+}
+
+function openMsFor(journey: WarpJourney): number {
+  return journey === "fly-between" ? SHADER_FLY_OPEN_MS : SHADER_WARP_OPEN_MS;
+}
 
 /** 初回描画のあと、この時間以内の空き時間でシェーダーを読み込む（8秒は待たない） */
 const IDLE_LOAD_TIMEOUT_MS = 1500;
@@ -149,24 +191,37 @@ export default function ShaderPageTransition() {
     };
   }, []);
 
+  const warpJourney = useTransitionStore((s) => s.warpJourney);
+  const warpPlanetId = useTransitionStore((s) => s.warpPlanetId);
+  const warpFromPlanetId = useTransitionStore((s) => s.warpFromPlanetId);
+
   // ストアの phase に合わせてワープを再生する
   useEffect(() => {
     const overlay = overlayRef.current;
     if (!overlay || overlayKind !== "shader") {
       return;
     }
-    if (phase === "closing") {
-      overlay.playClose(SHADER_WARP_CLOSE_MS);
-    } else if (phase === "opening") {
-      overlay.playOpen(SHADER_WARP_OPEN_MS);
+    applyWarpLook(overlay, warpJourney, warpPlanetId, warpFromPlanetId);
+  }, [overlayKind, warpJourney, warpPlanetId, warpFromPlanetId]);
+
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay || overlayKind !== "shader") {
+      return;
     }
-  }, [phase, overlayKind]);
+    if (phase === "closing") {
+      overlay.playClose(closeMsFor(warpJourney));
+    } else if (phase === "opening") {
+      overlay.playOpen(openMsFor(warpJourney));
+    }
+  }, [phase, overlayKind, warpJourney]);
 
   // 戻る/進む：履歴は遅らせず、覆った最高潮から開く演出を見せる
   useEffect(() => {
     if (prevPathname.current === pathname) {
       return;
     }
+    const prevPath = prevPathname.current;
     prevPathname.current = pathname;
     const overlay = overlayRef.current;
     const currentPhase = useTransitionStore.getState().phase;
@@ -180,6 +235,21 @@ export default function ShaderPageTransition() {
     ) {
       return;
     }
+    const toSection = isHomePath(pathname)
+      ? (sectionFromLocation(window.location.hash, window.location.search) ??
+        "home")
+      : null;
+    const fromPlanet = planetForView(
+      prevPath,
+      prevPath.startsWith("/projects/") ? "projects" : "home",
+    );
+    const toPlanet = planetForView(pathname, toSection);
+    let journey: WarpJourney = "neutral";
+    if (!fromPlanet && toPlanet) journey = "enter-planet";
+    else if (fromPlanet && !toPlanet) journey = "leave-space";
+    else if (fromPlanet && toPlanet) journey = "fly-between";
+    const planet = journey === "leave-space" ? fromPlanet : toPlanet;
+    applyWarpLook(overlay, journey, planet?.id ?? null, fromPlanet?.id ?? null);
     overlay.playReveal(SHADER_WARP_REVEAL_MS);
     if (currentPhase !== "idle") {
       useTransitionStore.getState().setPhase("idle");

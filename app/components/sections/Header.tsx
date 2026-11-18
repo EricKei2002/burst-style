@@ -7,6 +7,7 @@ import {
   sectionPageLabel,
   type HomeSection,
 } from "../../lib/homeSections";
+import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 
 const SECTION_HREF: Record<HomeSection, string> = {
   home: "/",
@@ -46,6 +47,10 @@ export default function Header({
         </div>
         <nav
           aria-label="Primary navigation"
+          onPointerEnter={() => {
+            preloadShaderTransition();
+            void import("../visuals/PlanetInterior");
+          }}
           className="relative w-full rounded-xl border border-green-300/40 bg-zinc-950/95 px-3 py-1 font-mono text-xs tracking-wide text-left text-green-100 sm:min-h-[68px] sm:px-4 sm:py-2.5 sm:text-sm lg:max-w-[760px]"
         >
           <div className="flex min-h-10 items-center justify-between gap-2 sm:min-h-0 sm:justify-start">

@@ -22,6 +22,18 @@ import {
   swipeDirection,
   type HomeSection,
 } from "../../lib/homeSections";
+import {
+  planetForHomeSection,
+  warpJourneyForSections,
+} from "../../lib/planets";
+import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
+import {
+  beginSectionWarpOpen,
+  endSectionWarp,
+  scheduleSectionWarpOpen,
+  startSectionWarp,
+  useTransitionStore,
+} from "../../lib/store";
 
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
 const LEAVE_MS = 90;
@@ -86,6 +98,11 @@ export default function HomeSections(props: Props) {
   );
   const scrollPositions = useRef<Partial<Record<HomeSection, number>>>({});
   const leaveTimer = useRef<number | undefined>(undefined);
+  const warpCloseTimer = useRef<number | undefined>(undefined);
+  const warpOpenTimer = useRef<number | undefined>(undefined);
+  const warpIdleTimer = useRef<number | undefined>(undefined);
+  const warpInFlight = useRef(false);
+  const warpSwapped = useRef(false);
   const localeRef = useRef(locale);
 
   useEffect(() => {
@@ -100,45 +117,107 @@ export default function HomeSections(props: Props) {
     heading.focus({ preventScroll: true });
   }, []);
 
+  const clearWarpTimers = useCallback(() => {
+    window.clearTimeout(warpCloseTimer.current);
+    window.clearTimeout(warpOpenTimer.current);
+    window.clearTimeout(warpIdleTimer.current);
+  }, []);
+
   const show = useCallback(
     (next: HomeSection, { focus, animate, announce }: ShowOptions) => {
       if (next === targetRef.current) {
         if (focus) focusHeading(next);
         return;
       }
+      const from = displayedRef.current;
       targetRef.current = next;
       window.clearTimeout(leaveTimer.current);
 
       // 連打しても、最後に選んだセクションへ 1 回だけ切り替える
       const swap = () => {
+        const dest = targetRef.current;
         const displayed = displayedRef.current;
-        if (displayed !== next) {
+        if (displayed !== dest) {
           scrollPositions.current[displayed] = window.scrollY;
         }
-        displayedRef.current = next;
-        document.documentElement.dataset.homeSection = next;
+        displayedRef.current = dest;
+        document.documentElement.dataset.homeSection = dest;
         setLeaving(null);
-        setActive(next);
+        setActive(dest);
         if (announce) {
-          const label = HOME_SECTION_LABELS[next];
+          const label = HOME_SECTION_LABELS[dest];
           setMessage(
             localeRef.current === "ja"
-              ? `${label} を表示しました（${HOME_SECTIONS.indexOf(next) + 1} / ${HOME_SECTIONS.length}）`
-              : `Showing ${label} (${HOME_SECTIONS.indexOf(next) + 1} of ${HOME_SECTIONS.length})`,
+              ? `${label} を表示しました（${HOME_SECTIONS.indexOf(dest) + 1} / ${HOME_SECTIONS.length}）`
+              : `Showing ${label} (${HOME_SECTIONS.indexOf(dest) + 1} of ${HOME_SECTIONS.length})`,
           );
         }
         requestAnimationFrame(() => {
           window.scrollTo({
-            top: scrollPositions.current[next] ?? 0,
+            top: scrollPositions.current[dest] ?? 0,
             behavior: "instant",
           });
-          if (focus) focusHeading(next);
+          if (focus) focusHeading(dest);
           window.dispatchEvent(
-            new CustomEvent(HOME_SECTION_EVENT, { detail: { section: next } }),
+            new CustomEvent(HOME_SECTION_EVENT, { detail: { section: dest } }),
           );
         });
       };
 
+      const useShader =
+        animate &&
+        !prefersReducedMotion() &&
+        useTransitionStore.getState().shaderReady;
+
+      const warpOpts = (origin: HomeSection, dest: HomeSection) => {
+        const journey = warpJourneyForSections(origin, dest);
+        const destPlanet = planetForHomeSection(dest);
+        const fromPlanet = planetForHomeSection(origin);
+        return {
+          journey,
+          planetId: destPlanet?.id ?? fromPlanet?.id ?? null,
+          fromPlanetId: fromPlanet?.id ?? null,
+        };
+      };
+
+      if (useShader) {
+        preloadShaderTransition();
+        if (warpInFlight.current && !warpSwapped.current) {
+          const opts = warpOpts(from, next);
+          useTransitionStore
+            .getState()
+            .setWarpContext(opts.journey, opts.planetId, opts.fromPlanetId);
+          return;
+        }
+        if (warpInFlight.current && warpSwapped.current) {
+          clearWarpTimers();
+          endSectionWarp();
+          warpInFlight.current = false;
+        }
+        const opts = warpOpts(from, next);
+        const delay = startSectionWarp(opts);
+        const journey = opts.journey;
+        warpInFlight.current = true;
+        warpSwapped.current = false;
+        warpCloseTimer.current = window.setTimeout(() => {
+          swap();
+          warpSwapped.current = true;
+          useTransitionStore.getState().setPhase("closed");
+          const { openAt, idleAt } = scheduleSectionWarpOpen(journey);
+          warpOpenTimer.current = window.setTimeout(() => {
+            beginSectionWarpOpen();
+            warpIdleTimer.current = window.setTimeout(() => {
+              endSectionWarp();
+              warpInFlight.current = false;
+              warpSwapped.current = false;
+            }, idleAt);
+          }, openAt);
+        }, delay);
+        return;
+      }
+
+      clearWarpTimers();
+      warpInFlight.current = false;
       if (!animate || prefersReducedMotion()) {
         setLeaving(null);
         swap();
@@ -148,7 +227,7 @@ export default function HomeSections(props: Props) {
       setLeaving(displayedRef.current);
       leaveTimer.current = window.setTimeout(swap, LEAVE_MS);
     },
-    [focusHeading],
+    [clearWarpTimers, focusHeading],
   );
 
   /** URL を書き換えてから切り替える（メニュー・キー・スワイプ共通） */
@@ -192,7 +271,12 @@ export default function HomeSections(props: Props) {
         );
       });
     }
-    return () => window.clearTimeout(leaveTimer.current);
+    return () => {
+      window.clearTimeout(leaveTimer.current);
+      window.clearTimeout(warpCloseTimer.current);
+      window.clearTimeout(warpOpenTimer.current);
+      window.clearTimeout(warpIdleTimer.current);
+    };
   }, []);
 
   // 戻る・進む（pushState の履歴は popstate、手入力のハッシュ変更は hashchange）

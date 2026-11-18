@@ -9,6 +9,7 @@ import {
   Scene,
   ShaderMaterial,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from "three";
 
@@ -19,6 +20,14 @@ export interface ShaderWarpOverlay {
   playOpen(durationMs: number): void;
   /** 戻る/進む用。覆った最高潮から開いて見せる（履歴は遅らせない） */
   playReveal(durationMs: number): void;
+  /** 突入 / 離脱 / 通常ワープ。次の再生から効く */
+  setJourney(
+    journey: "enter-planet" | "leave-space" | "fly-between" | "neutral",
+    atmo: [number, number, number],
+    horizon: [number, number, number],
+    fromAtmo?: [number, number, number],
+    fromHorizon?: [number, number, number],
+  ): void;
   /** 即座に非表示にして描画ループを止める */
   hide(): void;
   dispose(): void;
@@ -37,6 +46,11 @@ const fragmentShader = /* glsl */ `
   uniform float uWarp;
   uniform float uCover;
   uniform float uFlash;
+  uniform vec3 uAtmo;
+  uniform vec3 uHorizon;
+  uniform vec3 uAtmoPrev;
+  uniform vec3 uHorizonPrev;
+  uniform float uJourney;
 
   const float TAU = 6.2831853;
   const vec3 BG = vec3(0.039);
@@ -142,8 +156,28 @@ const fragmentShader = /* glsl */ `
       edgeCol * edge * 0.65 +
       coreCol * core +
       ringCol * ring * 0.55;
+
+    // 惑星への突入 / 宇宙への離脱 / 惑星同士の飛び移り
+    float down = smoothstep(0.2, -0.85, p.y);
+    float enter = step(0.5, uJourney) * step(uJourney, 1.5);
+    float leave = step(0.5, -uJourney);
+    float fly = step(1.5, uJourney);
+    float morph = smoothstep(0.12, 0.78, uCover);
+    vec3 atmoCol = mix(uAtmoPrev, uAtmo, mix(enter + leave, morph, fly));
+    vec3 horizCol = mix(uHorizonPrev, uHorizon, mix(enter + leave, morph, fly));
+    float atmoAmt = uCover * (
+      enter * mix(0.25, 1.0, down) +
+      leave * mix(0.15, 0.9, down) * (1.0 - uWarp * 0.45) +
+      fly * mix(0.45, 1.0, down)
+    );
+    col = mix(col, atmoCol * (0.45 + 0.55 * down), clamp(atmoAmt, 0.0, 0.92));
+    float horiz = exp(-pow(p.y + 0.38, 2.0) * 22.0) * uCover * min(abs(uJourney), 1.0);
+    col += horizCol * horiz * (0.4 + 0.7 * uFlash);
+    coreCol = mix(coreCol, horizCol, (enter + fly) * 0.7);
+    col += coreCol * core * (enter + fly) * 0.35;
+
     float alpha = clamp(
-      m + max(max(streaks.r, streaks.g), streaks.b) + edge * 0.5 + core + ring * 0.5,
+      m + max(max(streaks.r, streaks.g), streaks.b) + edge * 0.5 + core + ring * 0.5 + atmoAmt + horiz,
       0.0,
       1.0
     );
@@ -203,6 +237,11 @@ export function createShaderWarpOverlay(
     uWarp: { value: 0 },
     uCover: { value: 0 },
     uFlash: { value: 0 },
+    uAtmo: { value: new Vector3(0.15, 0.82, 0.88) },
+    uHorizon: { value: new Vector3(0.9, 0.2, 0.85) },
+    uAtmoPrev: { value: new Vector3(0.15, 0.82, 0.88) },
+    uHorizonPrev: { value: new Vector3(0.9, 0.2, 0.85) },
+    uJourney: { value: 0 },
   };
   const material = new ShaderMaterial({
     vertexShader,
@@ -356,6 +395,22 @@ export function createShaderWarpOverlay(
     },
     playReveal(durationMs) {
       start("revealing", durationMs);
+    },
+    setJourney(journey, atmo, horizon, fromAtmo, fromHorizon) {
+      uniforms.uJourney.value =
+        journey === "enter-planet"
+          ? 1
+          : journey === "leave-space"
+            ? -1
+            : journey === "fly-between"
+              ? 2
+              : 0;
+      uniforms.uAtmo.value.set(atmo[0], atmo[1], atmo[2]);
+      uniforms.uHorizon.value.set(horizon[0], horizon[1], horizon[2]);
+      const prevA = fromAtmo ?? atmo;
+      const prevH = fromHorizon ?? horizon;
+      uniforms.uAtmoPrev.value.set(prevA[0], prevA[1], prevA[2]);
+      uniforms.uHorizonPrev.value.set(prevH[0], prevH[1], prevH[2]);
     },
     hide() {
       goIdle();

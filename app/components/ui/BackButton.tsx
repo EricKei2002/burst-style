@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
-import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
 import MagneticButton from "./MagneticButton";
 export default function BackButton() {
@@ -12,10 +11,13 @@ export default function BackButton() {
 
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
-    preloadSpaceshipAisleVideo();
     preloadShaderTransition();
-    // 未準備なら短く待ってからワープ。使えなければハンガー扉。
-    void beginLeaveTransition().then((navigateDelayMs) => {
+    // 詳細から Projects セクションへ。同じ惑星の中に留まる。
+    void beginLeaveTransition({
+      journey: "fly-between",
+      planetId: "projects",
+      fromPlanetId: "projects",
+    }).then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
         router.push("/#projects");
