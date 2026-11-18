@@ -51,7 +51,7 @@ export default function SpaceshipInterior() {
         Your browser does not support the video tag.
       </video>
 
-      <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />
     </div>
   );

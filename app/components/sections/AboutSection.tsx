@@ -919,7 +919,7 @@ export default function AboutSection() {
                     {/* アニメーションコンテンツ切り替え */}
                     <div className="relative min-h-[60px]">
                       {isProfessional && item.professionalDescription ? (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="transition duration-300 starting:translate-y-2 starting:opacity-0">
                           {locale === "en" ? (
                             <ProEnglishView
                               block={ABOUT_TIMELINE_PRO_EN[index]!}
@@ -929,7 +929,7 @@ export default function AboutSection() {
                           )}
                         </div>
                       ) : (
-                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                        <div className="transition duration-300 starting:translate-y-2 starting:opacity-0">
                           {locale === "en" ? (
                             <GeekEnglishView
                               block={ABOUT_TIMELINE_GEEK_EN[index]!}

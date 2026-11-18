@@ -38,7 +38,7 @@ export default function ProjectIntro() {
       }}
       className="fixed inset-0 z-9999 cursor-pointer overflow-hidden bg-transparent"
     >
-      <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 bg-radial from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
     </div>
   );
