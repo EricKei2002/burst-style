@@ -255,7 +255,11 @@ export default function LocalSky() {
             />
           )}
           {weather === "rain" && (
-            <RainCanvas lite={env.lite} paused={env.hidden} />
+            <>
+              {/* 濡れた地面と光の映り込み（動かない。reduced-motion・低スペックでもこれだけは出す） */}
+              <div className="local-sky-wet" aria-hidden="true" />
+              <RainCanvas lite={env.lite} paused={env.hidden} />
+            </>
           )}
           {weather === "snow" && (
             // 雪はゆっくり落ちる小さい粒。動きを減らす設定では CSS で非表示

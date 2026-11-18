@@ -245,6 +245,50 @@
   pointer-events: none;
   animation: local-sky-fade-in 1.5s ease both;
 }
+/* 雨の夜の濡れた地面: 画面下に、濡れた路面の鈍い光沢と、街灯がにじんで縦に伸びた映り込み。
+   点や粒の光は描かない。動かないので reduced-motion・低スペックでもそのまま出す */
+.local-sky-wet {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 26vh;
+  z-index: -37;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      3.5% 70% at 16% 100%,
+      rgba(255, 176, 96, 0.12),
+      transparent 72%
+    ),
+    radial-gradient(
+      2.5% 60% at 44% 100%,
+      rgba(150, 185, 255, 0.1),
+      transparent 72%
+    ),
+    radial-gradient(
+      3% 66% at 71% 100%,
+      rgba(255, 150, 190, 0.08),
+      transparent 72%
+    ),
+    radial-gradient(
+      2.5% 55% at 90% 100%,
+      rgba(255, 200, 140, 0.08),
+      transparent 72%
+    ),
+    repeating-linear-gradient(
+      to top,
+      rgba(170, 185, 205, 0.05) 0 1px,
+      transparent 1px 7px
+    ),
+    linear-gradient(
+      to top,
+      rgba(86, 100, 120, 0.3),
+      rgba(60, 70, 86, 0.12) 50%,
+      transparent
+    );
+  mask-image: linear-gradient(to top, #000 45%, transparent);
+  animation: local-sky-fade-in 1.5s ease both;
+}
+
 /* 雨雲: 上から青灰色の雲をかぶせて、星空ではなく雨の夜に見せる */
 .local-sky-haze[data-kind="rain"] {
   background:
