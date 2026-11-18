@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
-import RainCanvas from "./RainCanvas";
+import dynamic from "next/dynamic";
 import {
   getSkyPhase,
   isSkyPhase,
@@ -19,6 +19,9 @@ import {
   rgbaString,
   type SkyLook,
 } from "../../lib/solar";
+
+// 雨粒の Canvas は雨のときだけ要る。最初の JS から外し、雨になってから読み込む
+const RainCanvas = dynamic(() => import("./RainCanvas"), { ssr: false });
 
 type SkyState = {
   phase: SkyPhase;

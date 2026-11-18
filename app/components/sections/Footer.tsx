@@ -1,7 +1,6 @@
 "use client";
 
-import { FaGithub } from "react-icons/fa";
-import { SiWantedly } from "react-icons/si";
+import { GithubIcon, WantedlyIcon } from "../ui/BrandIcons";
 
 import MagneticButton from "../ui/MagneticButton";
 import DecryptedText from "../ui/DecryptedText";
@@ -56,7 +55,7 @@ export default function Footer() {
                 className="text-zinc-200 hover:text-white transition-colors p-2"
                 aria-label="Eric KeiのGitHubプロフィール"
               >
-                <FaGithub size={20} aria-hidden="true" />
+                <GithubIcon size={20} />
               </a>
             </MagneticButton>
 
@@ -68,7 +67,7 @@ export default function Footer() {
                 className="text-zinc-200 hover:text-white transition-colors p-2"
                 aria-label="Eric KeiのWantedlyプロフィール"
               >
-                <SiWantedly size={20} aria-hidden="true" />
+                <WantedlyIcon size={20} />
               </a>
             </MagneticButton>
           </div>
