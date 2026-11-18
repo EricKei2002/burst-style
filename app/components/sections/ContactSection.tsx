@@ -365,7 +365,7 @@ export default function ContactSection({
                   </div>
                 </form>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in duration-500">
+                <div className="flex flex-col items-center justify-center py-12 text-center transition-opacity duration-500 starting:opacity-0">
                   <div className="w-16 h-16 bg-fuchsia-500/30 text-fuchsia-200 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
                     <svg
                       width="32"

@@ -1,30 +1,15 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: Helvetica, Arial, sans-serif;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* サイトは常にダーク表示。フォーム部品やスクロールバーも暗い配色にする */
+:root {
+  color-scheme: dark;
 }
 
 /* Lighthouseのコントラスト不足対策 */
@@ -57,10 +42,7 @@ body {
 @media (max-width: 767px) {
   /* GSAPのopacity:0アニメーションをバイパスしてLCP改善 */
   .title-char,
-  .char,
   .desc-char,
-  .command-prompt,
-  .ls-char,
   .loading-text {
     opacity: 1 !important;
   }
@@ -77,10 +59,7 @@ body {
   }
 
   .title-char,
-  .char,
   .desc-char,
-  .command-prompt,
-  .ls-char,
   .loading-text {
     opacity: 1 !important;
     transform: none !important;
