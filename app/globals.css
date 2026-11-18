@@ -39,6 +39,19 @@
   box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.9);
 }
 
+/* 日本語表示のときだけ、文節単位の改行と禁則を効かせる（対応ブラウザのみ。未対応では無視される） */
+:lang(ja) body {
+  word-break: auto-phrase;
+  line-break: strict;
+  text-wrap: pretty;
+}
+
+/* 見出しは行の長さをそろえ、和文の約物を詰める（palt は和文グリフにだけ効く） */
+:lang(ja) :is(h1, h2, h3) {
+  text-wrap: balance;
+  font-feature-settings: "palt";
+}
+
 @media (max-width: 767px) {
   /* GSAPのopacity:0アニメーションをバイパスしてLCP改善 */
   .title-char,

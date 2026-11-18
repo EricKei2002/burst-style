@@ -31,7 +31,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
         aria-label="システム構成図を拡大表示"
         aria-haspopup="dialog"
         aria-expanded={isExpanded}
-        className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600 focus-visible:outline-none"
+        className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600"
         onClick={() => setIsExpanded(true)}
       >
         <div className="border-b border-zinc-800 bg-[#010409] px-4 py-3 flex items-center justify-between">
@@ -41,7 +41,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
               システム構成図
             </span>
           </div>
-          <span className="text-xs text-zinc-400 group-hover:text-fuchsia-400 translation-colors">
+          <span className="text-xs text-zinc-400 group-hover:text-fuchsia-400 transition-colors">
             クリックして拡大
           </span>
         </div>
@@ -50,7 +50,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
           <iframe
             src={htmlUrl}
             title="システム構成図プレビュー"
-            className="h-[620px] w-full rounded-lg border border-zinc-800 pointer-events-none"
+            className="h-[60svh] sm:h-[620px] w-full rounded-lg border border-zinc-800 pointer-events-none"
             tabIndex={-1}
             aria-hidden="true"
           />
@@ -77,6 +77,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
                 <FiCpu /> システム構成図
               </h3>
               <button
+                autoFocus
                 onClick={() => setIsExpanded(false)}
                 className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 rounded-full transition-colors"
                 aria-label="ダイアグラムを閉じる"

@@ -32,7 +32,7 @@ function formatRelative(date: string, base: number, locale: Locale): string {
 }
 
 const titleClassName =
-  "truncate font-mono text-lg font-bold text-white transition-colors focus-visible:outline-none";
+  "truncate font-mono text-lg font-bold text-white transition-colors";
 
 export default function NowSectionView({
   githubItems,
@@ -106,7 +106,7 @@ export default function NowSectionView({
                       href={item.summaryHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="break-words transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none"
+                      className="break-words transition-colors hover:text-white focus-visible:text-white"
                     >
                       {item.summary}
                     </a>
