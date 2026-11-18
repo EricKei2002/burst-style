@@ -33,7 +33,7 @@ export default function Header({
   const index = HOME_SECTIONS.indexOf(active);
 
   const linkClass =
-    "relative inline-flex h-full w-full items-center justify-center rounded-md px-1.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
+    "relative inline-flex h-full w-full items-center justify-center rounded-md px-1.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 max-sm:active:bg-fuchsia-500/10 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
 
   return (
     <header className="sticky inset-x-0 top-0 z-30 sm:mt-5">
@@ -149,7 +149,7 @@ function LangButtons({
   copy: ReturnType<typeof useSiteCopy>;
 }) {
   const buttonClass = (selected: boolean) =>
-    `rounded px-2 py-1 text-[11px] font-semibold transition-colors ${
+    `rounded px-2 py-1 text-[11px] font-semibold transition-[color,background-color,scale] duration-150 ease-out motion-safe:active:scale-[0.96] ${
       selected
         ? "bg-green-500/25 text-green-50"
         : "text-green-200/80 hover:text-green-100"

@@ -10,6 +10,8 @@
 /* サイトは常にダーク表示。フォーム部品やスクロールバーも暗い配色にする */
 :root {
   color-scheme: dark;
+  /* セクション入場用。Tailwind の --ease-out は上書きしない */
+  --home-panel-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* Lighthouseのコントラスト不足対策 */
@@ -365,9 +367,10 @@
 :root[data-home-section="contact"] .home-panel[data-section="contact"] {
   display: block;
 }
-/* 初回表示（LCP）にはアニメーションを掛けず、切り替えたあとだけ短くフェードさせる */
-.home-sections.is-animated .home-panel {
-  animation: home-panel-in 0.2s ease-out backwards;
+/* 初回表示（LCP）にはアニメーションを掛けず、切り替えたあとだけ短くフェードさせる。
+   消えていくパネルには入場アニメを掛けない（初回切り替えで出入りがぶつからないように） */
+.home-sections.is-animated .home-panel:not(.is-leaving) {
+  animation: home-panel-in 0.2s var(--home-panel-ease-out) backwards;
 }
 .home-panel.is-leaving {
   opacity: 0;
@@ -380,7 +383,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .home-sections.is-animated .home-panel {
+  .home-sections.is-animated .home-panel:not(.is-leaving) {
     animation: none;
   }
   .home-panel.is-leaving {

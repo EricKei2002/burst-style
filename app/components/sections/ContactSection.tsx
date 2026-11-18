@@ -146,7 +146,7 @@ export default function ContactSection({
                       aria-describedby={
                         fieldErrors.name ? "name-error" : undefined
                       }
-                      className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-all font-sans ${
+                      className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.name
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
                           : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
@@ -179,7 +179,7 @@ export default function ContactSection({
                       aria-describedby={
                         fieldErrors.email ? "email-error" : undefined
                       }
-                      className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-all font-sans ${
+                      className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.email
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
                           : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
@@ -213,7 +213,7 @@ export default function ContactSection({
                     aria-describedby={
                       fieldErrors.message ? "message-error" : undefined
                     }
-                    className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-all resize-none font-sans ${
+                    className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 resize-none font-sans ${
                       fieldErrors.message
                         ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
                         : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
@@ -290,7 +290,7 @@ export default function ContactSection({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-colors hover:bg-fuchsia-500/20 hover:text-fuchsia-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-[color,background-color,scale] duration-150 ease-out hover:bg-fuchsia-500/20 hover:text-fuchsia-100 motion-safe:enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="relative z-10 flex items-center gap-2">
                         {isSubmitting
