@@ -1,37 +1,44 @@
 import {
-  AdditiveBlending,
-  BackSide,
-  BoxGeometry,
   BufferAttribute,
   BufferGeometry,
   Color,
   ConeGeometry,
-  CylinderGeometry,
   DirectionalLight,
   DynamicDrawUsage,
-  EdgesGeometry,
   Group,
   HemisphereLight,
+  InstancedBufferAttribute,
   InstancedMesh,
-  LineBasicMaterial,
-  LineSegments,
   MathUtils,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
+  NeutralToneMapping,
   Object3D,
+  PCFShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
+  PMREMGenerator,
   PointLight,
   Points,
   PointsMaterial,
   Scene,
-  SphereGeometry,
   Vector3,
   WebGLRenderer,
-  type Material,
+  type Texture,
 } from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import type { WarpJourney } from "../../lib/planets";
+import { createPlanetBody } from "./planetBody";
+import { fbm, ridged } from "./proceduralNoise";
+import { createShipModel } from "./shipModel";
+import {
+  createCloudAtlas,
+  createCloudMaterial,
+  createGlowShellMaterial,
+  createSoftDot,
+  createSoftPointsMaterial,
+} from "./spaceshipFx";
 
 export interface ShaderWarpOverlay {
   /** 加速しながら覆う。終わったら覆ったまま巡航し、playOpen / hide を待つ */
@@ -73,7 +80,14 @@ function detectQuality(): {
   dprCap: number;
   stars: number;
   clouds: number;
+  cloudTex: number;
   exhaust: number;
+  /** 1 フレームにエンジン 1 基あたり出す排気粒の数 */
+  exEmit: number;
+  /** 影マップの解像度（0 なら影なし） */
+  shadowMap: number;
+  /** 地表メッシュの分割数 */
+  groundSeg: number;
 } {
   const nav = navigator as NavHints;
   const coarse = window.matchMedia("(pointer: coarse)").matches;
@@ -85,23 +99,41 @@ function detectQuality(): {
   const lowEnd =
     saveData || (typeof mem === "number" && mem <= 4) || cores <= 4;
   if (lowEnd) {
-    return { quality: "low", dprCap: 1, stars: 280, clouds: 18, exhaust: 28 };
+    return {
+      quality: "low",
+      dprCap: 1,
+      stars: 280,
+      clouds: 14,
+      cloudTex: 128,
+      exhaust: 64,
+      exEmit: 1,
+      shadowMap: 0,
+      groundSeg: 40,
+    };
   }
   if (mobile) {
     return {
       quality: "medium",
       dprCap: 1.25,
       stars: 700,
-      clouds: 36,
-      exhaust: 56,
+      clouds: 30,
+      cloudTex: 256,
+      exhaust: 130,
+      exEmit: 1,
+      shadowMap: 512,
+      groundSeg: 72,
     };
   }
   return {
     quality: "high",
     dprCap: 1.5,
     stars: 1600,
-    clouds: 72,
-    exhaust: 110,
+    clouds: 60,
+    cloudTex: 256,
+    exhaust: 260,
+    exEmit: 2,
+    shadowMap: 1024,
+    groundSeg: 128,
   };
 }
 
@@ -120,186 +152,38 @@ function track<T extends { dispose(): void }>(
   return item;
 }
 
-function createShip(
+/** 降下先 / 離陸元の地表。fBm と尾根ノイズで起伏させた高分割の面 */
+function createGround(
+  seg: number,
   disposables: { dispose(): void }[],
-  quality: Quality,
-): {
-  group: Group;
-  engines: Vector3[];
-} {
-  const group = new Group();
-  const body = new MeshStandardMaterial({
-    color: 0x1c2230,
-    metalness: 0.88,
-    roughness: 0.28,
-  });
-  const dark = new MeshStandardMaterial({
-    color: 0x0b0d14,
-    metalness: 0.7,
-    roughness: 0.4,
-  });
-  const glass = new MeshStandardMaterial({
-    color: 0x083344,
-    metalness: 0.2,
-    roughness: 0.08,
-    emissive: 0x22d3ee,
-    emissiveIntensity: 0.45,
-  });
-  const accent = new MeshStandardMaterial({
-    color: 0x22d3ee,
-    metalness: 0.35,
-    roughness: 0.25,
-    emissive: 0x0891b2,
-    emissiveIntensity: 0.7,
-  });
-  const mark = new MeshStandardMaterial({
-    color: 0xe879f9,
-    metalness: 0.35,
-    roughness: 0.3,
-    emissive: 0xa21caf,
-    emissiveIntensity: 0.55,
-  });
-  const glow = new MeshBasicMaterial({
-    color: 0x67e8f9,
-    transparent: true,
-    opacity: 0.85,
-    blending: AdditiveBlending,
-    depthWrite: false,
-  });
-  for (const mat of [body, dark, glass, accent, mark, glow]) {
-    track(disposables, mat);
+): { mesh: Mesh; mat: MeshStandardMaterial } {
+  const geo = track(disposables, new PlaneGeometry(90, 90, seg, seg));
+  const pos = geo.attributes.position as BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const hills = fbm(x * 0.05, y * 0.05, 3, 5);
+    const ridge = ridged(x * 0.03 + 7, y * 0.03, 11, 4);
+    pos.setZ(i, (hills - 0.5) * 2.2 + ridge * ridge * 3.4);
   }
-
-  const add = (
-    geo: BufferGeometry,
-    mat: Material,
-    x = 0,
-    y = 0,
-    z = 0,
-    rx = 0,
-    ry = 0,
-    rz = 0,
-    edges = false,
-  ) => {
-    track(disposables, geo);
-    const mesh = new Mesh(geo, mat);
-    mesh.position.set(x, y, z);
-    mesh.rotation.set(rx, ry, rz);
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
-    group.add(mesh);
-    if (edges && quality !== "low") {
-      const edgeGeo = track(disposables, new EdgesGeometry(geo, 18));
-      const line = new LineSegments(
-        edgeGeo,
-        track(
-          disposables,
-          new LineBasicMaterial({
-            color: 0x8ba0b8,
-            transparent: true,
-            opacity: 0.42,
-          }),
-        ),
-      );
-      mesh.add(line);
-    }
-    return mesh;
-  };
-
-  // 機首を -Z（カメラ前方）へ
-  const fuselage = track(
+  geo.computeVertexNormals();
+  const mat = track(
     disposables,
-    new CylinderGeometry(0.07, 0.16, 1.05, quality === "low" ? 6 : 8, 1, false),
+    new MeshStandardMaterial({
+      color: 0x1a2030,
+      roughness: 0.92,
+      metalness: 0.04,
+    }),
   );
-  add(fuselage, body, 0, 0, 0, Math.PI / 2, 0, 0, true);
-
-  const nose = track(
-    disposables,
-    new ConeGeometry(0.07, 0.38, quality === "low" ? 6 : 8),
-  );
-  add(nose, body, 0, 0, -0.7, Math.PI / 2, 0, 0, true);
-
-  const canopy = track(
-    disposables,
-    new SphereGeometry(0.09, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2),
-  );
-  add(canopy, glass, 0, 0.07, -0.18, Math.PI, 0, 0);
-
-  const wing = track(disposables, new BoxGeometry(1.35, 0.03, 0.48));
-  add(wing, body, 0, -0.02, 0.08, 0, 0, 0, true);
-  const wingSolid = track(
-    disposables,
-    new CylinderGeometry(0.015, 0.05, 1.28, 4),
-  );
-  add(wingSolid, dark, 0, -0.03, 0.12, 0, 0, Math.PI / 2);
-
-  add(
-    track(disposables, new CylinderGeometry(0.02, 0.05, 0.36, 4)),
-    body,
-    0,
-    0.16,
-    0.28,
-    0.35,
-    0,
-    0,
-    true,
-  );
-
-  add(
-    track(disposables, new CylinderGeometry(0.018, 0.018, 0.22, 5)),
-    accent,
-    0.52,
-    -0.02,
-    0.02,
-    0,
-    0,
-    Math.PI / 2,
-  );
-  add(
-    track(disposables, new CylinderGeometry(0.018, 0.018, 0.22, 5)),
-    mark,
-    -0.52,
-    -0.02,
-    0.02,
-    0,
-    0,
-    Math.PI / 2,
-  );
-
-  // 双発エンジン
-  const engineShell = (x: number) => {
-    add(
-      track(disposables, new CylinderGeometry(0.055, 0.07, 0.28, 8)),
-      dark,
-      x,
-      -0.02,
-      0.58,
-      Math.PI / 2,
-    );
-    add(
-      track(disposables, new CylinderGeometry(0.032, 0.032, 0.08, 8)),
-      glow,
-      x,
-      -0.02,
-      0.72,
-      Math.PI / 2,
-    );
-  };
-  engineShell(0.13);
-  engineShell(-0.13);
-
-  const chin = track(disposables, new CylinderGeometry(0.012, 0.012, 0.5, 4));
-  add(chin, accent, 0, -0.08, -0.15, Math.PI / 2);
-
-  return {
-    group,
-    engines: [new Vector3(0.13, -0.02, 0.74), new Vector3(-0.13, -0.02, 0.74)],
-  };
+  const mesh = new Mesh(geo, mat);
+  mesh.rotation.x = -Math.PI / 2;
+  return { mesh, mat };
 }
 
 function createStars(
   count: number,
   disposables: { dispose(): void }[],
+  dot: Texture,
 ): Points {
   const geo = new BufferGeometry();
   const pos = new Float32Array(count * 3);
@@ -314,11 +198,13 @@ function createStars(
     disposables,
     new PointsMaterial({
       color: 0xe8f4ff,
-      size: 0.18,
+      size: 0.26,
+      map: dot,
       sizeAttenuation: true,
       transparent: true,
       opacity: 0.9,
       depthWrite: false,
+      toneMapped: false,
     }),
   );
   return new Points(geo, mat);
@@ -441,6 +327,13 @@ export function createShaderWarpOverlay(
     "position:absolute;inset:0;width:100%;height:100%;display:block;visibility:hidden;pointer-events:none";
   renderer.setClearColor(0x000000, 0);
   renderer.autoClear = true;
+  // PBR のハイライトを白飛びさせず、ブランド色の色相は保つ
+  renderer.toneMapping = NeutralToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  if (cfg.shadowMap > 0) {
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = PCFShadowMap;
+  }
   host.appendChild(canvas);
 
   const disposables: { dispose(): void }[] = [];
@@ -448,12 +341,43 @@ export function createShaderWarpOverlay(
   const camera = new PerspectiveCamera(55, 1, 0.08, 400);
   camera.position.set(0, 0.42, 3.35);
 
-  const hemi = new HemisphereLight(0x9bd7ff, 0x1a1020, 0.7);
+  // 環境光：手続き生成の部屋を PMREM で畳み込み、金属・ガラスに映り込ませる
+  let envTex: Texture | null = null;
+  try {
+    const pmrem = new PMREMGenerator(renderer);
+    const room = new RoomEnvironment();
+    envTex = pmrem.fromScene(room, 0.04).texture;
+    room.dispose();
+    pmrem.dispose();
+    scene.environment = envTex;
+    scene.environmentIntensity = 0.55;
+    track(disposables, envTex);
+  } catch {
+    // 環境マップなしでもライトとリムで見える
+  }
+
+  const hemi = new HemisphereLight(0x9bd7ff, 0x1a1020, 0.55);
   scene.add(hemi);
-  const key = new DirectionalLight(0xffffff, 1.15);
+  const key = new DirectionalLight(0xffffff, 2.2);
   key.position.set(2.4, 3.2, 2.2);
+  if (cfg.shadowMap > 0) {
+    // 機体だけを囲む狭い影カメラ（翼→ナセル、背骨→胴体の自己影）
+    key.castShadow = true;
+    key.shadow.mapSize.set(cfg.shadowMap, cfg.shadowMap);
+    const sc = key.shadow.camera;
+    sc.left = -1.3;
+    sc.right = 1.3;
+    sc.top = 1.3;
+    sc.bottom = -1.3;
+    sc.near = 0.5;
+    sc.far = 9;
+    key.shadow.bias = -0.0004;
+    key.shadow.normalBias = 0.012;
+    key.shadow.radius = cfg.quality === "high" ? 3 : 1.5;
+  }
   scene.add(key);
-  const rim = new DirectionalLight(0x67e8f9, 1.4);
+  scene.add(key.target);
+  const rim = new DirectionalLight(0x67e8f9, 2.4);
   rim.position.set(-2.8, 0.6, -3.4);
   scene.add(rim);
   const heatLight = new PointLight(0xff6a1a, 0, 12, 2);
@@ -462,138 +386,221 @@ export function createShaderWarpOverlay(
   engineLight.position.set(0, 0, 1.1);
   scene.add(engineLight);
 
-  const ship = createShip(disposables, cfg.quality);
+  const rimColor = { value: new Color(0x67e8f9) };
+  const softDot = track(disposables, createSoftDot(32));
+  const ship = createShipModel(cfg.quality, rimColor, softDot, disposables);
+  // 居住リングと放熱板が画面に収まる大きさ（スマホ縦でも放熱板の先が切れない）
+  ship.group.scale.setScalar(0.9);
   scene.add(ship.group);
 
-  const stars = createStars(cfg.stars, disposables);
+  const stars = createStars(cfg.stars, disposables, softDot);
   scene.add(stars);
 
-  const planetGeo = track(
-    disposables,
-    new SphereGeometry(
-      8,
-      cfg.quality === "low" ? 20 : 36,
-      cfg.quality === "low" ? 14 : 24,
-    ),
-  );
-  const planetMat = track(
-    disposables,
-    new MeshStandardMaterial({
-      color: 0x226688,
-      roughness: 0.86,
-      metalness: 0.08,
-    }),
-  );
-  const planet = new Mesh(planetGeo, planetMat);
+  // 目的地の惑星：高分割の球に、シェーダーの大陸・起伏・雲の殻・大気
+  const planetBody = createPlanetBody({
+    radius: 8,
+    kind: "planet",
+    quality: cfg.quality,
+    seed: 2.3,
+    cloudLayers: cfg.quality === "high" ? 2 : 1,
+  });
+  disposables.push(planetBody);
+  const planet = planetBody.group;
   planet.position.set(0, -2, -60);
   scene.add(planet);
+  // 惑星を回る衛星（低品質では省く）
+  const moonBody =
+    cfg.quality === "low"
+      ? null
+      : createPlanetBody({
+          radius: 1.5,
+          kind: "moon",
+          quality: cfg.quality === "high" ? "medium" : "low",
+          seed: 5.1,
+        });
+  if (moonBody) {
+    disposables.push(moonBody);
+    moonBody.group.position.set(-15, 6, 6);
+    planet.add(moonBody.group);
+    moonBody.setColors(
+      new Color(0.16, 0.15, 0.15),
+      new Color(0.55, 0.53, 0.5),
+      new Color(0.5, 0.6, 0.7),
+    );
+  }
+  const planetLow = new Color();
+  const GRAY = new Color(0.32, 0.3, 0.3);
+  const planetHigh = new Color();
 
-  const atmoGeo = track(
-    disposables,
-    new SphereGeometry(
-      8.55,
-      cfg.quality === "low" ? 16 : 28,
-      cfg.quality === "low" ? 12 : 20,
-    ),
-  );
-  const atmoMat = track(
-    disposables,
-    new MeshBasicMaterial({
-      color: 0x4ecfff,
-      transparent: true,
-      opacity: 0.22,
-      side: BackSide,
-      depthWrite: false,
-      blending: AdditiveBlending,
-    }),
-  );
-  const atmoShell = new Mesh(atmoGeo, atmoMat);
-  planet.add(atmoShell);
-
-  const groundGeo = track(disposables, new PlaneGeometry(80, 80, 1, 1));
-  const groundMat = track(
-    disposables,
-    new MeshStandardMaterial({
-      color: 0x1a2030,
-      roughness: 1,
-      metalness: 0,
-    }),
-  );
-  const ground = new Mesh(groundGeo, groundMat);
-  ground.rotation.x = -Math.PI / 2;
+  const groundParts = createGround(cfg.groundSeg, disposables);
+  const ground = groundParts.mesh;
+  const groundMat = groundParts.mat;
   ground.position.set(0, -6, -12);
   scene.add(ground);
 
-  // 雲（カメラ前方の薄い板をインスタンス）
-  const cloudGeo = track(disposables, new PlaneGeometry(3.4, 1.6));
-  const cloudMat = track(
-    disposables,
-    new MeshBasicMaterial({
-      color: 0xf2f4ff,
-      transparent: true,
-      opacity: 0.18,
-      depthWrite: false,
-    }),
+  // 雲：ノイズで削った柔らかいパフ（2x2 アトラス）のビルボード。
+  // 近づくと溶けるので、突き抜けるときも板の縁が見えない。
+  const cloudAtlas = track(disposables, createCloudAtlas(cfg.cloudTex));
+  const cloudGeo = track(disposables, new PlaneGeometry(3.6, 2.3));
+  const cloudAlphaAttr = new InstancedBufferAttribute(
+    new Float32Array(cfg.clouds),
+    1,
   );
+  const cloudVariantAttr = new InstancedBufferAttribute(
+    new Float32Array(cfg.clouds),
+    1,
+  );
+  cloudAlphaAttr.setUsage(DynamicDrawUsage);
+  cloudVariantAttr.setUsage(DynamicDrawUsage);
+  cloudGeo.setAttribute("aAlpha", cloudAlphaAttr);
+  cloudGeo.setAttribute("aVariant", cloudVariantAttr);
+  const cloudMat = track(disposables, createCloudMaterial(cloudAtlas));
   const clouds = new InstancedMesh(cloudGeo, cloudMat, cfg.clouds);
   clouds.instanceMatrix.setUsage(DynamicDrawUsage);
+  clouds.frustumCulled = false;
   scene.add(clouds);
   const dummy = new Object3D();
-  const cloudPos: { x: number; y: number; z: number; s: number }[] = [];
+  type CloudPuff = {
+    x: number;
+    y: number;
+    z: number;
+    s: number;
+    roll: number;
+    variant: number;
+    alpha: number;
+  };
+  const cloudPos: CloudPuff[] = [];
+  const respawnCloud = (c: CloudPuff, z: number) => {
+    c.x = (Math.random() - 0.5) * 30;
+    c.y = (Math.random() - 0.5) * 10;
+    c.z = z;
+    c.s = 0.8 + Math.random() * 2;
+    c.roll = (Math.random() - 0.5) * 0.5;
+    c.variant = Math.floor(Math.random() * 4);
+    c.alpha = 0.55 + Math.random() * 0.45;
+  };
   const seedClouds = () => {
     cloudPos.length = 0;
     for (let i = 0; i < cfg.clouds; i++) {
-      cloudPos.push({
-        x: (Math.random() - 0.5) * 28,
-        y: (Math.random() - 0.5) * 10,
-        z: -4 - Math.random() * 70,
-        s: 0.7 + Math.random() * 1.8,
-      });
+      const c: CloudPuff = {
+        x: 0,
+        y: 0,
+        z: 0,
+        s: 1,
+        roll: 0,
+        variant: 0,
+        alpha: 1,
+      };
+      respawnCloud(c, -4 - Math.random() * 70);
+      cloudPos.push(c);
     }
   };
   seedClouds();
+  const byDepth = (a: CloudPuff, b: CloudPuff) => a.z - b.z;
 
-  // 排気の軌跡
+  // 排気：丸いソフト粒子（加算）。古い粒ほど広がって薄くなり、尾を引く
   const exGeo = new BufferGeometry();
-  const exPos = new Float32Array(cfg.exhaust * 3);
-  const exCol = new Float32Array(cfg.exhaust * 3);
-  exGeo.setAttribute("position", new BufferAttribute(exPos, 3));
-  exGeo.setAttribute("color", new BufferAttribute(exCol, 3));
-  track(disposables, exGeo);
-  const exMat = track(
-    disposables,
-    new PointsMaterial({
-      size: 0.055,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.9,
-      blending: AdditiveBlending,
-      depthWrite: false,
-      sizeAttenuation: true,
-    }),
+  // ノズルの数に比例して粒を確保する（多発でも尾が途中で切れない）
+  const exCount = Math.round(
+    cfg.exhaust * Math.max(1, ship.engines.length / 2),
   );
+  const exPos = new Float32Array(exCount * 3);
+  const exVel = new Float32Array(exCount * 3);
+  const exCol = new Float32Array(exCount * 3);
+  const exLife = new Float32Array(exCount).fill(1);
+  const exSize = new Float32Array(exCount);
+  const exSpan = new Float32Array(exCount).fill(1);
+  const exPosAttr = new BufferAttribute(exPos, 3);
+  const exColAttr = new BufferAttribute(exCol, 3);
+  const exLifeAttr = new BufferAttribute(exLife, 1);
+  const exSizeAttr = new BufferAttribute(exSize, 1);
+  for (const attr of [exPosAttr, exColAttr, exLifeAttr, exSizeAttr]) {
+    attr.setUsage(DynamicDrawUsage);
+  }
+  exGeo.setAttribute("position", exPosAttr);
+  exGeo.setAttribute("aColor", exColAttr);
+  exGeo.setAttribute("aLife", exLifeAttr);
+  exGeo.setAttribute("aSize", exSizeAttr);
+  track(disposables, exGeo);
+  const exMat = track(disposables, createSoftPointsMaterial());
   const exhaust = new Points(exGeo, exMat);
+  exhaust.frustumCulled = false;
   scene.add(exhaust);
   let exHead = 0;
+  const prevEngine = ship.engines.map(() => new Vector3());
+  let prevEngineValid = false;
 
-  // 大気圏突入のプラズマ鞘
+  // ノズルの芯の光（機体に追従するソフト粒）
+  const coreGeo = new BufferGeometry();
+  const corePos = new Float32Array(ship.engines.length * 3);
+  ship.engines.forEach((e, i) => {
+    corePos[i * 3] = e.x;
+    corePos[i * 3 + 1] = e.y;
+    corePos[i * 3 + 2] = e.z + 0.02;
+  });
+  coreGeo.setAttribute("position", new BufferAttribute(corePos, 3));
+  coreGeo.setAttribute(
+    "aColor",
+    new BufferAttribute(
+      new Float32Array(ship.engines.flatMap(() => [0.45, 0.9, 1])),
+      3,
+    ),
+  );
+  coreGeo.setAttribute(
+    "aLife",
+    new BufferAttribute(new Float32Array(ship.engines.length), 1),
+  );
+  coreGeo.setAttribute(
+    "aSize",
+    // 多発では芯の光が重なって白飛びしないよう小さく
+    new BufferAttribute(
+      new Float32Array(ship.engines.length).fill(
+        ship.engines.length > 2 ? 0.26 : 0.42,
+      ),
+      1,
+    ),
+  );
+  track(disposables, coreGeo);
+  const coreMat = track(disposables, createSoftPointsMaterial());
+  const engineCore = new Points(coreGeo, coreMat);
+  engineCore.frustumCulled = false;
+  ship.group.add(engineCore);
+
+  // ノズルから伸びる炎（縁はフレネルで溶ける）
+  const plumeGeo = track(
+    disposables,
+    new ConeGeometry(0.048, 0.6, cfg.quality === "low" ? 8 : 14, 1, true),
+  );
+  const plumeMat = track(
+    disposables,
+    createGlowShellMaterial({ color: 0x22d3ee, mode: 0 }),
+  );
+  plumeMat.uniforms.uCore.value.setRGB(0.85, 0.97, 1);
+  const plumes: Group[] = ship.engines.map((e) => {
+    const holder = new Group();
+    holder.position.set(e.x, e.y, e.z - 0.01);
+    const cone = new Mesh(plumeGeo, plumeMat);
+    // 先端（+Y）を後方 +Z へ
+    cone.rotation.x = Math.PI / 2;
+    cone.position.z = 0.3;
+    holder.add(cone);
+    ship.group.add(holder);
+    return holder;
+  });
+
+  // 大気圏突入のプラズマ鞘：機首を先端に機体を包むように後方へ広がる
   const plasmaGeo = track(
     disposables,
-    new ConeGeometry(0.42, 1.5, 12, 1, true),
+    new ConeGeometry(1.25, 2.1, cfg.quality === "low" ? 16 : 40, 1, true),
   );
   const plasmaMat = track(
     disposables,
-    new MeshBasicMaterial({
-      color: 0xff7a2a,
-      transparent: true,
-      opacity: 0,
-      blending: AdditiveBlending,
-      depthWrite: false,
-    }),
+    createGlowShellMaterial({ color: 0xff7a2a, mode: 1 }),
   );
+  plasmaMat.uniforms.uCore.value.setRGB(1, 0.92, 0.72);
   const plasma = new Mesh(plasmaGeo, plasmaMat);
-  plasma.rotation.x = Math.PI / 2;
-  plasma.position.set(0, 0, -0.95);
+  plasma.rotation.x = -Math.PI / 2;
+  plasma.position.set(0, 0.01, -0.08);
   ship.group.add(plasma);
 
   const veilGeo = track(disposables, new PlaneGeometry(2, 2));
@@ -605,6 +612,8 @@ export function createShaderWarpOverlay(
       opacity: 0,
       depthTest: false,
       depthWrite: false,
+      // 大気色そのままでページを覆う（トーンマップで色がずれない）
+      toneMapped: false,
     }),
   );
   const veil = new Mesh(veilGeo, veilMat);
@@ -638,6 +647,8 @@ export function createShaderWarpOverlay(
     const dpr = Math.min(window.devicePixelRatio || 1, cfg.dprCap);
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
+    exMat.uniforms.uViewportH.value = h * dpr;
+    coreMat.uniforms.uViewportH.value = h * dpr;
     camera.aspect = Math.max(0.5, w / Math.max(1, h));
     camera.updateProjectionMatrix();
     const vh = 2 * Math.tan((camera.fov * Math.PI) / 360) * 0.25;
@@ -674,55 +685,107 @@ export function createShaderWarpOverlay(
   const currentAtmo = new Color();
   const currentHoriz = new Color();
 
+  const hot = new Color(1, 0.48, 0.16);
+  const cool = new Color(0.36, 0.86, 1);
+  const exTint = new Color();
+  const shipBack = new Vector3();
+  const lerpVec = new Vector3();
+
   const layoutClouds = (
     speed: number,
     dt: number,
     density: number,
     climb: number,
+    heat: number,
   ) => {
     for (let i = 0; i < cloudPos.length; i++) {
       const c = cloudPos[i];
       c.z += speed * dt;
       c.y += climb * dt;
-      if (c.z > 4) {
-        c.z = -8 - Math.random() * 50;
-        c.x = (Math.random() - 0.5) * 28;
-        c.y = (Math.random() - 0.5) * 10;
+      if (c.z > 4 || Math.abs(c.y) > 16) {
+        // 遠方（フェードの外側）で生まれ直すので、ポップインしない
+        respawnCloud(c, -46 - Math.random() * 28);
       }
+    }
+    // 半透明の重なりが破綻しないよう奥から描く
+    cloudPos.sort(byDepth);
+    const grow = 0.75 + density * 0.9;
+    for (let i = 0; i < cloudPos.length; i++) {
+      const c = cloudPos[i];
       dummy.position.set(c.x, c.y, c.z);
       dummy.lookAt(camera.position);
-      dummy.scale.set(c.s * (0.7 + density), c.s * 0.5 * (0.7 + density), 1);
+      dummy.rotateZ(c.roll);
+      dummy.scale.set(c.s * grow, c.s * grow, 1);
       dummy.updateMatrix();
       clouds.setMatrixAt(i, dummy.matrix);
+      cloudAlphaAttr.setX(i, c.alpha);
+      cloudVariantAttr.setX(i, c.variant);
     }
     clouds.instanceMatrix.needsUpdate = true;
-    cloudMat.opacity = 0.08 + density * 0.32;
+    cloudAlphaAttr.needsUpdate = true;
+    cloudVariantAttr.needsUpdate = true;
+    const u = cloudMat.uniforms;
+    u.uOpacity.value = Math.min(0.95, 0.14 + density * 0.8);
+    // 日の当たる上面は白寄り、陰は地平色へ。突入中は下面が炎で照らされる
+    (u.uLit.value as Color).setRGB(1, 1, 1).lerp(currentAtmo, 0.18);
+    (u.uShade.value as Color)
+      .copy(currentHoriz)
+      .multiplyScalar(0.38)
+      .lerp(currentAtmo, 0.3);
+    (u.uGlow.value as Color).copy(hot).multiplyScalar(heat * 0.6);
   };
 
-  const writeExhaust = (heat: number, throttle: number) => {
-    if (throttle <= 0.02) return;
-    for (const local of ship.engines) {
-      worldEngine.copy(local);
-      ship.group.localToWorld(worldEngine);
-      const i = exHead % cfg.exhaust;
-      exPos[i * 3] = worldEngine.x + (Math.random() - 0.5) * 0.04;
-      exPos[i * 3 + 1] = worldEngine.y + (Math.random() - 0.5) * 0.04;
-      exPos[i * 3 + 2] = worldEngine.z + Math.random() * 0.06;
-      const hot = heat > 0.35;
-      exCol[i * 3] = hot ? 1 : 0.45;
-      exCol[i * 3 + 1] = hot ? 0.45 + Math.random() * 0.2 : 0.9;
-      exCol[i * 3 + 2] = hot ? 0.12 : 1;
-      exHead += 1;
+  const writeExhaust = (heat: number, throttle: number, dt: number) => {
+    // 既存の粒を進める（フレームレートに依存しない）
+    for (let i = 0; i < exCount; i++) {
+      if (exLife[i] >= 1) continue;
+      exLife[i] = Math.min(1, exLife[i] + dt / exSpan[i]);
+      exPos[i * 3] += exVel[i * 3] * dt;
+      exPos[i * 3 + 1] += exVel[i * 3 + 1] * dt;
+      exPos[i * 3 + 2] += exVel[i * 3 + 2] * dt;
     }
-    // 古い点を少し後方へ流し、色を落とす
-    for (let i = 0; i < cfg.exhaust; i++) {
-      exPos[i * 3 + 2] += 0.06;
-      exCol[i * 3] *= 0.96;
-      exCol[i * 3 + 1] *= 0.96;
-      exCol[i * 3 + 2] *= 0.96;
+    if (throttle > 0.02) {
+      shipBack.set(0, 0, 1).applyQuaternion(ship.group.quaternion);
+      const speed = 1.6 + throttle * 2.6;
+      exTint.copy(cool).lerp(hot, smoothstep(0.2, 0.6, heat));
+      const spanScale = cfg.quality === "low" ? 0.6 : 1;
+      ship.engines.forEach((local, e) => {
+        worldEngine.copy(local);
+        ship.group.localToWorld(worldEngine);
+        for (let k = 0; k < cfg.exEmit; k++) {
+          const i = exHead % exCount;
+          exHead += 1;
+          // 前フレームの位置との間に撒いて、点ではなく連続した尾にする
+          const f = (k + Math.random()) / cfg.exEmit;
+          if (prevEngineValid) {
+            lerpVec.copy(prevEngine[e]).lerp(worldEngine, f);
+          } else {
+            lerpVec.copy(worldEngine);
+          }
+          exPos[i * 3] = lerpVec.x + (Math.random() - 0.5) * 0.02;
+          exPos[i * 3 + 1] = lerpVec.y + (Math.random() - 0.5) * 0.02;
+          exPos[i * 3 + 2] = lerpVec.z + Math.random() * 0.03;
+          exVel[i * 3] = shipBack.x * speed + (Math.random() - 0.5) * 0.18;
+          exVel[i * 3 + 1] = shipBack.y * speed + (Math.random() - 0.5) * 0.18;
+          exVel[i * 3 + 2] = shipBack.z * speed + Math.random() * 0.4;
+          const j = 0.85 + Math.random() * 0.15;
+          exCol[i * 3] = exTint.r * j;
+          exCol[i * 3 + 1] = exTint.g * j;
+          exCol[i * 3 + 2] = exTint.b * j;
+          exSize[i] = (0.045 + Math.random() * 0.03) * (1 + heat * 0.4);
+          exSpan[i] = (0.4 + Math.random() * 0.35) * spanScale;
+          exLife[i] = 0;
+        }
+        prevEngine[e].copy(worldEngine);
+      });
+      prevEngineValid = true;
+    } else {
+      prevEngineValid = false;
     }
-    (exGeo.attributes.position as BufferAttribute).needsUpdate = true;
-    (exGeo.attributes.color as BufferAttribute).needsUpdate = true;
+    exPosAttr.needsUpdate = true;
+    exColAttr.needsUpdate = true;
+    exLifeAttr.needsUpdate = true;
+    exSizeAttr.needsUpdate = true;
   };
 
   const frame = (now: number) => {
@@ -769,6 +832,17 @@ export function createShaderWarpOverlay(
         flash = 0.6 * (1 - smoothstep(0, 0.22, u));
       }
     }
+
+    // 閉じ始めの約 0.6 秒は機体をはっきり見せる。覆いと雲を遅らせ、
+    // 閉じ終わり（duration の 96%）までには必ず全面を覆う
+    const earlyHold =
+      mode === "closing"
+        ? smoothstep(
+            Math.min(600, duration * 0.55),
+            duration * 0.96,
+            now - startAt,
+          )
+        : 1;
 
     const code = journeyCode(journey);
     const enter = code === 1 ? 1 : 0;
@@ -837,10 +911,22 @@ export function createShaderWarpOverlay(
       ground.visible = false;
     }
     planet.rotation.y = travel * 0.02;
-    planetMat.color.copy(currentHoriz);
-    atmoMat.color.copy(currentAtmo);
-    groundMat.color.copy(currentHoriz).multiplyScalar(0.35);
-    atmoMat.opacity = 0.16 + cover * 0.2;
+    // 低地は地平色を暗く、高地は地平色と大気色の中間
+    // 強い光が当たるので彩度と明度を抑え、色は大気と雲に任せる
+    planetLow.copy(currentHoriz).multiplyScalar(0.07).lerp(currentAtmo, 0.06);
+    planetHigh
+      .copy(currentHoriz)
+      .lerp(currentAtmo, 0.3)
+      .lerp(GRAY, 0.35)
+      .multiplyScalar(0.38);
+    planetBody.setColors(planetLow, planetHigh, currentAtmo);
+    planetBody.setAtmosphere(0.75 + cover * 0.25);
+    planetBody.update(now / 1000);
+    if (moonBody) moonBody.update(now / 1000);
+    groundMat.color
+      .copy(currentHoriz)
+      .multiplyScalar(0.55)
+      .lerp(currentAtmo, 0.15);
 
     const heat =
       enter *
@@ -864,15 +950,30 @@ export function createShaderWarpOverlay(
       (enter + fly * 0.8 + leave) *
       (smoothstep(0.25, 0.6, Math.min(stage, 1)) *
         (1 - smoothstep(0.78, 1.15, stage)) +
-        punch * 0.35);
+        punch * 0.35) *
+      (0.45 + 0.55 * earlyHold);
     const climbDir = leave ? 8 : enter ? -2 : 0;
-    layoutClouds(8 + warp * 55, dt, cloudDensity, climbDir * dt * 20);
     clouds.visible = cloudDensity > 0.04;
+    if (clouds.visible) {
+      layoutClouds(8 + warp * 55, dt, cloudDensity, climbDir * dt * 20, heat);
+    }
 
-    plasmaMat.opacity =
-      heat * (0.35 + 0.5 * (0.5 + 0.5 * Math.sin(now * 0.04)));
-    plasmaMat.color.setRGB(1, 0.42 + (1 - heat) * 0.3, 0.1 + leave * 0.4);
-    plasma.scale.set(1 + heat * 0.5, 1 + heat * 0.9, 1);
+    const secs = now / 1000;
+    plasma.visible = heat > 0.01;
+    plasmaMat.uniforms.uTime.value = secs;
+    plasmaMat.uniforms.uOpacity.value =
+      heat * (0.7 + 0.3 * (0.5 + 0.5 * Math.sin(now * 0.04)));
+    (plasmaMat.uniforms.uColor.value as Color).setRGB(
+      1,
+      0.38 + (1 - heat) * 0.3,
+      0.1 + leave * 0.4,
+    );
+    plasma.scale.set(1 + heat * 0.18, 1 + heat * 0.35, 1 + heat * 0.18);
+    // 機体の縁は大気色、突入中は炎の色で照らされる
+    rimColor.value
+      .copy(currentAtmo)
+      .multiplyScalar(0.55)
+      .lerp(hot, clamp01(heat * 1.2));
     heatLight.intensity = heat * 4.5;
     heatLight.color.setRGB(1, 0.4, 0.12);
     heatLight.position.set(0, 0.1, -1.2);
@@ -908,7 +1009,16 @@ export function createShaderWarpOverlay(
       0,
     );
 
-    writeExhaust(heat, 0.4 + warp);
+    ship.group.updateMatrixWorld(true);
+    const throttle = 0.4 + warp;
+    writeExhaust(heat, throttle, dt);
+    const flicker = 0.88 + 0.12 * Math.sin(now * 0.09) * Math.sin(now * 0.031);
+    plumeMat.uniforms.uTime.value = secs;
+    plumeMat.uniforms.uOpacity.value = (0.5 + throttle * 0.35) * flicker;
+    for (const p of plumes) {
+      p.scale.set(1, 1, 0.55 + throttle * 0.7 + (flicker - 0.88) * 1.5);
+    }
+    coreMat.uniforms.uOpacity.value = (0.75 + warp * 0.25) * flicker;
 
     // 星は宇宙にいるときだけ
     const inSpace =
@@ -937,7 +1047,7 @@ export function createShaderWarpOverlay(
 
     veilMat.color.copy(currentAtmo).lerp(currentHoriz, 0.4 + flash * 0.2);
     // 中盤は機体・炎・雲を見せ、閉じ終わり近くでページを完全に覆う
-    const veilAmt = smoothstep(0.58, 0.97, cover);
+    const veilAmt = smoothstep(0.58, 0.97, cover) * earlyHold;
     veilMat.opacity = clamp01(veilAmt * 0.96 + flash * 0.06);
     renderer.setClearColor(currentAtmo, clamp01(veilAmt * 0.88));
 
@@ -977,6 +1087,8 @@ export function createShaderWarpOverlay(
       window.addEventListener("resize", resize);
       lastFrame = startAt;
       seedClouds();
+      exLife.fill(1);
+      prevEngineValid = false;
     }
     canvas.style.visibility = "visible";
     hud.show();
