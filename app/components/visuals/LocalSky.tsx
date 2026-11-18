@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import RainCanvas from "./RainCanvas";
 import {
@@ -11,13 +11,32 @@ import {
   type SkyPhase,
   type SkyWeather,
 } from "../../lib/localSky";
+import {
+  getSkyLook,
+  lookForPhase,
+  paletteForLook,
+  phaseForLook,
+  rgbaString,
+  type SkyLook,
+} from "../../lib/solar";
 
 type SkyState = {
   phase: SkyPhase;
+  look: SkyLook;
   weather: SkyWeather | null;
   city: string | null;
   time: string;
 };
+
+/** 太陽高度から補間した空の色（下端のグラデーション）をベールの CSS 変数にする */
+function veilStyle(look: SkyLook): CSSProperties {
+  const palette = paletteForLook(look);
+  return {
+    "--sky-low": rgbaString(palette.low),
+    "--sky-mid": rgbaString(palette.mid),
+    "--sky-wash": rgbaString(palette.wash),
+  } as CSSProperties;
+}
 
 function formatTime(date: Date): string {
   return date.toLocaleTimeString("en-GB", {
@@ -28,7 +47,8 @@ function formatTime(date: Date): string {
 }
 
 /**
- * 見ている人の現地時間（ブラウザの時刻）と天気（/api/local-sky）を、
+ * 見ている人の位置（Vercel の IP 位置ヘッダーを丸めたもの）から太陽高度を計算し、空の色を連続的に変える
+ * （位置が取れないときはブラウザの時計で 4 段階）。天気（/api/local-sky）とあわせて、
  * 星空背景の色味（朝・昼・夕方は画面下端のグラデーション）、雨・雪・もや、
  * 画面左端の小さな計器表示に反映する。どれも本文の後ろ（z-index が負）に置き、
  * クリックは通し、読み上げからは隠す。マウント後に描くので LCP には関わらない。
@@ -39,6 +59,8 @@ export default function LocalSky() {
   const isProjectPage = pathname.startsWith("/projects/");
   const [sky, setSky] = useState<SkyState | null>(null);
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
+  /** 丸めた位置（API から）。取れるまでは時計ベース */
+  const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
 
   // 低スペック端末・データセーバーでは軽い表示、タブが見えていないときは止める、説明文の言語
   useEffect(() => {
@@ -76,8 +98,15 @@ export default function LocalSky() {
 
     const tick = () => {
       const now = new Date();
+      const coords = coordsRef.current;
+      const look = phaseOverride
+        ? lookForPhase(phaseOverride)
+        : coords
+          ? getSkyLook(now, coords.lat, coords.lon)
+          : lookForPhase(getSkyPhase(now.getHours()));
       setSky((prev) => ({
-        phase: phaseOverride ?? getSkyPhase(now.getHours()),
+        look,
+        phase: phaseForLook(look),
         weather: weatherForced ? weatherOverride : (prev?.weather ?? null),
         city: prev?.city ?? null,
         time: formatTime(now),
@@ -97,6 +126,10 @@ export default function LocalSky() {
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as LocalSkyResponse;
         if (cancelled) return;
+        if (data.lat !== null && data.lon !== null) {
+          coordsRef.current = { lat: data.lat, lon: data.lon };
+          tick();
+        }
         setSky((prev) =>
           prev
             ? {
@@ -129,6 +162,11 @@ export default function LocalSky() {
     if (!sky) return;
     const root = document.documentElement;
     root.dataset.sky = sky.phase;
+    // 星の明るさは太陽高度から（StarBackground の .star-bg が読む）
+    root.style.setProperty(
+      "--sky-star-opacity",
+      paletteForLook(sky.look).star.toFixed(3),
+    );
     if (sky.weather) root.dataset.weather = sky.weather;
     else delete root.dataset.weather;
   }, [sky]);
@@ -146,7 +184,11 @@ export default function LocalSky() {
     <>
       {!isProjectPage && (
         <>
-          <div className="local-sky-veil" aria-hidden="true" />
+          <div
+            className="local-sky-veil"
+            aria-hidden="true"
+            style={veilStyle(sky.look)}
+          />
           {sky.weather && sky.weather !== "clear" && (
             <div
               className="local-sky-haze"

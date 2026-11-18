@@ -66,33 +66,29 @@
   }
 }
 
-/* ---- Local sky（現地時間と天気を星空へ反映）---- */
+/* ---- Local sky（太陽高度と天気を星空へ反映）----
+   --sky-low / --sky-mid / --sky-wash は LocalSky が太陽高度から補間して .local-sky-veil の style に置く
+   （@property で登録し、ベールの上だけで滑らかに移す。ページ全体を再計算させないよう継承はしない）。
+   --sky-star-opacity は <html> に置く */
+@property --sky-low {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --sky-mid {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --sky-wash {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
 :root {
   --sky-star-opacity: 1;
   --sky-weather-dim: 1;
   --sky-haze: 0;
-  /* 画面下端の色（下から low → mid → 上は透明） */
-  --sky-low: transparent;
-  --sky-mid: transparent;
-  --sky-wash: transparent;
-}
-:root[data-sky="morning"] {
-  --sky-star-opacity: 0.85;
-  --sky-low: rgba(255, 168, 205, 0.28);
-  --sky-mid: rgba(150, 196, 255, 0.2);
-  --sky-wash: rgba(150, 196, 255, 0.05);
-}
-:root[data-sky="day"] {
-  --sky-star-opacity: 0.75;
-  --sky-low: rgba(110, 170, 245, 0.3);
-  --sky-mid: rgba(80, 135, 225, 0.16);
-  --sky-wash: rgba(70, 120, 210, 0.1);
-}
-:root[data-sky="evening"] {
-  --sky-star-opacity: 0.9;
-  --sky-low: rgba(255, 128, 40, 0.34);
-  --sky-mid: rgba(150, 60, 190, 0.22);
-  --sky-wash: rgba(90, 40, 140, 0.06);
 }
 :root[data-weather="cloudy"] {
   --sky-weather-dim: 0.55;
@@ -127,7 +123,10 @@
       transparent 58%
     ),
     var(--sky-wash);
-  transition: opacity 3s ease;
+  transition:
+    --sky-low 3s ease,
+    --sky-mid 3s ease,
+    --sky-wash 3s ease;
 }
 
 /* 曇り・雨・雪のもや。ゆっくり横に流れる */

@@ -43,7 +43,13 @@ export async function GET(request: Request) {
   const lat = Number(readHeader(headers, "x-vercel-ip-latitude"));
   const lon = Number(readHeader(headers, "x-vercel-ip-longitude"));
 
-  const body: LocalSkyResponse = { city, timezone, weather: null };
+  const body: LocalSkyResponse = {
+    city,
+    timezone,
+    weather: null,
+    lat: null,
+    lon: null,
+  };
 
   const hasCoords =
     readHeader(headers, "x-vercel-ip-latitude") !== null &&
@@ -52,6 +58,9 @@ export async function GET(request: Request) {
     Number.isFinite(lon);
 
   if (hasCoords) {
+    // 太陽高度の計算に使う。丸めた値だけを返し、ログには残さない
+    body.lat = roundCoord(lat);
+    body.lon = roundCoord(lon);
     const url = new URL("https://api.open-meteo.com/v1/forecast");
     url.searchParams.set("latitude", String(roundCoord(lat)));
     url.searchParams.set("longitude", String(roundCoord(lon)));

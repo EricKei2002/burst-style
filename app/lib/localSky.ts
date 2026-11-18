@@ -13,6 +13,9 @@ export type LocalSkyResponse = {
   timezone: string | null;
   /** 天気（ヘッダー無し・取得失敗時は null → 時間だけで表示） */
   weather: SkyWeather | null;
+  /** 太陽高度の計算用に小数 1 桁（約 10km）へ丸めた位置。取れなければ null（ブラウザの時計で 4 段階） */
+  lat: number | null;
+  lon: number | null;
 };
 
 /** ブラウザの現地時刻（時）から 4 段階に分ける */
