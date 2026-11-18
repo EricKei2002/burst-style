@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import MagneticButton from "../ui/MagneticButton";
 import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../lib/data";
@@ -12,15 +10,14 @@ import { useLocale, useSiteCopy } from "../../lib/locale";
 import { getLocalizedProject } from "../../lib/projectEn";
 import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "../../lib/hangarTransitionTiming";
 import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
+import { sectionPageLabel } from "../../lib/homeSections";
 import { useTransitionStore } from "../../lib/store";
 
 export default function Projects() {
   const { locale } = useLocale();
   const copy = useSiteCopy();
-  const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
-  const { setPhase, phase } = useTransitionStore();
-  const [isVisible, setIsVisible] = useState(false);
+  const { setPhase } = useTransitionStore();
 
   const handleNavigation = (url: string) => {
     preloadSpaceshipAisleVideo();
@@ -32,60 +29,21 @@ export default function Projects() {
     }, HANGAR_NAVIGATE_AFTER_CLOSE_MS);
   };
 
-  useEffect(() => {
-    const target = sectionRef.current;
-    if (!target) return;
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (reducedMotion || phase !== "idle") {
-      const timer = setTimeout(() => setIsVisible(true), 0);
-      return () => clearTimeout(timer);
-    }
-
-    if (isVisible) return;
-
-    const reveal = () => setIsVisible(true);
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) reveal();
-      },
-      // セクション全体が長いため 20% だと発火しないことがある
-      { rootMargin: "0px 0px 120px 0px", threshold: 0 },
-    );
-
-    observer.observe(target);
-    const fallback = setTimeout(reveal, 1200);
-
-    return () => {
-      observer.disconnect();
-      clearTimeout(fallback);
-    };
-  }, [phase, isVisible]);
-
   return (
-    <section
-      id="projects"
-      ref={sectionRef}
-      className="relative w-full py-24 sm:py-32"
-    >
+    <section id="projects" className="relative w-full py-24 sm:py-32">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* ヘッダー */}
         <div className="mb-16 max-w-2xl rounded-2xl border border-white/10 bg-black/85 p-6 backdrop-blur-sm">
-          <div className="mb-4 flex items-center gap-2 text-fuchsia-100">
-            <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-sm font-semibold tracking-wider uppercase">
-              01. Selected Works
-            </span>
-          </div>
+          <p className="mb-4 font-mono text-sm text-fuchsia-200">
+            <span aria-hidden="true">[{sectionPageLabel("projects")}] </span>
+            ~/projects
+          </p>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
             Projects
           </h2>
           <p className="text-zinc-50 leading-relaxed">
             {copy.projects.introLine1}
-            <br />
+            <br className="hidden sm:block" />
             {copy.projects.introLine2}
           </p>
         </div>
@@ -100,99 +58,81 @@ export default function Projects() {
               index === projectsData.length - 1 &&
               projectsData.length % 2 === 1;
             return (
-              <MagneticButton
+              <TiltCard
                 key={project.slug}
                 className={`h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
               >
-                <TiltCard className="h-full">
-                  <Link
-                    href={`/projects/${project.slug}`}
-                    prefetch={false}
-                    onPointerEnter={() => {
-                      preloadSpaceshipAisleVideo();
-                      router.prefetch(`/projects/${project.slug}`);
-                    }}
-                    onClick={(e) => {
-                      // 新しいタブで開くなどの修飾クリックはブラウザに任せる
-                      if (
-                        e.button !== 0 ||
-                        e.metaKey ||
-                        e.ctrlKey ||
-                        e.shiftKey ||
-                        e.altKey
-                      )
-                        return;
-                      e.preventDefault();
-                      handleNavigation(`/projects/${project.slug}`);
-                    }}
-                    className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/85 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/90 focus-visible:outline-none ${
-                      isVisible
-                        ? "translate-y-0 opacity-100 scale-100"
-                        : "translate-y-8 opacity-0 scale-[0.98]"
-                    }`}
-                  >
-                    {/* 画像コンテナ */}
-                    <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
-                      <div className="absolute inset-0 z-10 bg-zinc-950/20 transition-colors group-hover:bg-transparent" />
-                      <Image
-                        src={project.image}
-                        // 見出し（h3）と同じ文言を二重に読ませない
-                        alt=""
-                        fill
-                        className="object-cover transition duration-700 ease-out group-hover:scale-105"
-                        sizes={
-                          isDanglingLast
-                            ? "(min-width: 1280px) 1216px, 100vw"
-                            : "(min-width: 1280px) 584px, (min-width: 768px) 50vw, 100vw"
-                        }
-                      />
+                <Link
+                  href={`/projects/${project.slug}`}
+                  prefetch={false}
+                  onPointerEnter={() => {
+                    preloadSpaceshipAisleVideo();
+                    router.prefetch(`/projects/${project.slug}`);
+                  }}
+                  onClick={(e) => {
+                    // 新しいタブで開くなどの修飾クリックはブラウザに任せる
+                    if (
+                      e.button !== 0 ||
+                      e.metaKey ||
+                      e.ctrlKey ||
+                      e.shiftKey ||
+                      e.altKey
+                    )
+                      return;
+                    e.preventDefault();
+                    handleNavigation(`/projects/${project.slug}`);
+                  }}
+                  className="project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/85 text-left transition-colors duration-300 ease-out hover:border-fuchsia-400/60 hover:bg-zinc-900/90"
+                >
+                  {/* 画像コンテナ */}
+                  <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
+                    <div className="absolute inset-0 z-10 bg-zinc-950/20 transition-colors group-hover:bg-transparent" />
+                    <Image
+                      src={project.image}
+                      // 見出し（h3）と同じ文言を二重に読ませない
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes={
+                        isDanglingLast
+                          ? "(min-width: 1280px) 1216px, 100vw"
+                          : "(min-width: 1280px) 584px, (min-width: 768px) 50vw, 100vw"
+                      }
+                    />
+                  </div>
+
+                  {/* コンテンツ */}
+                  <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-300 transition-colors">
+                          {project.title}
+                        </h3>
+                        <span
+                          aria-hidden="true"
+                          className="shrink-0 font-mono text-xs text-zinc-300 transition-colors group-hover:text-fuchsia-300"
+                        >
+                          cd ./{project.slug}
+                        </span>
+                      </div>
+                      <p className="mt-4 text-sm leading-relaxed text-zinc-200">
+                        {project.description}
+                      </p>
                     </div>
 
-                    {/* コンテンツ */}
-                    <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
-                      <div>
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-300 transition-colors">
-                            {project.title}
-                          </h3>
-                          <span className="rounded-full border border-zinc-700 bg-zinc-800 p-2 text-zinc-200 transition group-hover:border-fuchsia-500/50 group-hover:text-fuchsia-300">
-                            {/* 装飾用のsvgはスクリーンリーダーに読ませない */}
-                            <svg
-                              aria-hidden="true"
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="transform transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                            >
-                              <line x1="5" y1="12" x2="19" y2="12"></line>
-                              <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                          </span>
-                        </div>
-                        <p className="mt-4 text-sm leading-relaxed text-zinc-200">
-                          {project.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-6 flex flex-wrap gap-2">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-xs font-mono text-fuchsia-200"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {project.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs font-mono text-fuchsia-200"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
                     </div>
-                  </Link>
-                </TiltCard>
-              </MagneticButton>
+                  </div>
+                </Link>
+              </TiltCard>
             );
           })}
         </div>

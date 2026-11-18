@@ -98,7 +98,7 @@ export default async function ProjectPage({
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 rounded-full border border-zinc-700 bg-zinc-800/50 text-xs font-mono text-fuchsia-400"
+                      className="text-xs font-mono text-fuchsia-200"
                     >
                       #{tag}
                     </span>
@@ -112,7 +112,12 @@ export default async function ProjectPage({
             <div className="space-y-12">
               <section>
                 <h2 className="text-xl font-bold text-zinc-100 mb-4 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"></span>
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-fuchsia-300"
+                  >
+                    &gt;
+                  </span>
                   Overview
                 </h2>
                 <p className="text-zinc-300 leading-relaxed dark:text-zinc-300">
@@ -124,7 +129,12 @@ export default async function ProjectPage({
 
               <section>
                 <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-fuchsia-300"
+                  >
+                    &gt;
+                  </span>
                   Challenges & Solutions
                 </h2>
                 <div className="grid gap-6">
@@ -146,20 +156,24 @@ export default async function ProjectPage({
 
               <section>
                 <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-fuchsia-300"
+                  >
+                    &gt;
+                  </span>
                   Future Improvements
                 </h2>
                 <ul className="space-y-4">
                   {project.improvements.map((item, idx) => (
-                    <li
-                      key={idx}
-                      className="flex gap-4 bg-black/40 backdrop-blur-sm p-4 rounded-xl border border-white/5"
-                    >
-                      <div className="flex flex-col items-center">
-                        <div className="h-2 w-2 rounded-full bg-zinc-700 mt-2"></div>
-                        <div className="w-px h-full bg-zinc-800 my-1"></div>
-                      </div>
-                      <div className="pb-0">
+                    <li key={idx} className="flex gap-3">
+                      <span
+                        aria-hidden="true"
+                        className="shrink-0 font-mono text-sm leading-6 text-zinc-400"
+                      >
+                        [ ]
+                      </span>
+                      <div>
                         <h3 className="text-zinc-200 font-medium mb-1">
                           {item.title}
                         </h3>
@@ -175,9 +189,7 @@ export default async function ProjectPage({
 
             <div className="space-y-8">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
-                <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">
-                  Links
-                </h3>
+                <h3 className="text-sm font-medium text-zinc-400">Links</h3>
                 <div className="flex flex-col gap-3">
                   {project.siteUrl && (
                     <a
@@ -229,7 +241,7 @@ export default async function ProjectPage({
               </div>
 
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
-                <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider">
+                <h3 className="text-sm font-medium text-zinc-400">
                   Tech Stack
                 </h3>
                 <ul className="space-y-2">

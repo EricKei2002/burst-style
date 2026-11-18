@@ -22,7 +22,11 @@ import {
   ProEnglishView,
 } from "../../lib/aboutTimelineEn";
 import { useLocale, useSiteCopy } from "../../lib/locale";
-import { HOME_SECTION_EVENT, type HomeSection } from "../../lib/homeSections";
+import {
+  HOME_SECTION_EVENT,
+  sectionPageLabel,
+  type HomeSection,
+} from "../../lib/homeSections";
 
 function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
   const copy = useSiteCopy();
@@ -69,7 +73,7 @@ const ServerSpecs = () => (
     {/* スペック */}
     <div className="relative aspect-3/4 w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 font-mono text-xs sm:text-sm text-zinc-300 flex flex-col justify-center gap-3">
       <div>
-        <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">
+        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-0.5">
           Model
         </div>
         <div className="font-semibold text-fuchsia-400">
@@ -78,21 +82,21 @@ const ServerSpecs = () => (
       </div>
 
       <div>
-        <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">
+        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-0.5">
           OS
         </div>
         <div className="text-zinc-200">Ubuntu 24.04.3 LTS</div>
       </div>
 
       <div>
-        <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">
+        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-0.5">
           Role
         </div>
         <div className="text-zinc-200">Home Server & BOT Host</div>
       </div>
 
       <div>
-        <div className="text-zinc-400 text-[10px] uppercase tracking-wider mb-0.5">
+        <div className="text-zinc-400 text-xs uppercase tracking-wider mb-0.5">
           Running
         </div>
         <div className="flex flex-wrap gap-1.5">
@@ -176,7 +180,7 @@ function TimelineVideoCard({
           <button
             type="button"
             onClick={() => onPlay(videoKey)}
-            className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/20 focus-visible:outline-none"
+            className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/20"
             aria-label={copy.about.videoPlay(title)}
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/60 bg-black/70 px-4 py-2 font-mono text-xs text-fuchsia-300">
@@ -741,23 +745,10 @@ export default function AboutSection() {
       if (reducedMotion || isMobile) {
         gsap.set(".about-header", { y: 0, opacity: 1 });
         gsap.set(".about-card", { y: 0, opacity: 1 });
-        gsap.set(".bg-grid", { yPercent: 0 });
         return;
       }
 
       ctx = gsap.context(() => {
-        // 背景パララックス（About の中をスクロールしている間だけ動く）
-        gsap.to(".bg-grid", {
-          yPercent: 30,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-        });
-
         // プロフィールの成長トランジション
         const mm = gsap.matchMedia();
 
@@ -836,19 +827,15 @@ export default function AboutSection() {
       ref={sectionRef}
       className="relative w-full py-24 sm:py-32 overflow-clip"
     >
-      <div className="bg-grid absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
-
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* ヘッダー */}
         <header className="about-header mb-16 max-w-2xl">
-          <div
-            className={`flex items-center gap-2 mb-4 transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
+          <p
+            className={`mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
           >
-            <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-xs tracking-wider uppercase">
-              02. Who I am
-            </span>
-          </div>
+            <span aria-hidden="true">[{sectionPageLabel("about")}] </span>
+            ~/about
+          </p>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               <DecryptedText text="About Me" animateOnHover speed={30} />
@@ -1021,9 +1008,9 @@ export default function AboutSection() {
                     {item.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded-md border border-zinc-800 bg-black/50 px-2 py-1 text-[10px] font-medium text-zinc-400 uppercase tracking-wide"
+                        className="font-mono text-xs text-fuchsia-200"
                       >
-                        {t}
+                        #{t}
                       </span>
                     ))}
                     {item.githubUrl && (
@@ -1031,7 +1018,7 @@ export default function AboutSection() {
                         href={item.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-[10px] font-medium transition-colors hover:bg-zinc-800 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
+                        className={`flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-zinc-800 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
                       >
                         <svg
                           className="w-3.5 h-3.5"
