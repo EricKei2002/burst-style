@@ -1,5 +1,5 @@
 import Top from "./components/sections/Hero";
-import HomeHashScrollAlign from "./components/sections/HomeHashScrollAlign";
+import HomeSections from "./components/sections/HomeSections";
 import NowSection from "./components/sections/NowSection";
 import Projects from "./components/sections/Projects";
 import AboutSection from "./components/sections/AboutSection";
@@ -21,17 +21,25 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      <Top />
-      {/* 「Now Building」はサーバー描画済みなので遅延させず FV 直下に即時表示する */}
-      <NowSection />
-      <Projects />
-      <AboutSection />
-      <ContactSection
-        siteKey={turnstileSiteKey}
-        keySwapped={turnstileKeySwapped}
+      {/* Home / Projects / About / Contact はメニューで 1 つずつ切り替えて表示する */}
+      <HomeSections
+        home={
+          <>
+            <Top />
+            {/* 「Now Building」はサーバー描画済みなので遅延させず FV 直下に即時表示する */}
+            <NowSection />
+          </>
+        }
+        projects={<Projects />}
+        about={<AboutSection />}
+        contact={
+          <ContactSection
+            siteKey={turnstileSiteKey}
+            keySwapped={turnstileKeySwapped}
+          />
+        }
       />
       <Footer />
-      <HomeHashScrollAlign />
     </div>
   );
 }

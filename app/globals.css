@@ -266,3 +266,38 @@
   writing-mode: vertical-rl;
   rotate: 180deg;
 }
+
+/* ---- トップのセクション切り替え（Home / Projects / About / Contact）---- */
+.home-panel {
+  display: none;
+}
+:root:not([data-home-section]) .home-panel[data-section="home"],
+:root[data-home-section="home"] .home-panel[data-section="home"],
+:root[data-home-section="projects"] .home-panel[data-section="projects"],
+:root[data-home-section="about"] .home-panel[data-section="about"],
+:root[data-home-section="contact"] .home-panel[data-section="contact"] {
+  display: block;
+}
+/* 初回表示（LCP）にはアニメーションを掛けず、メニューで切り替えたあとだけフェードさせる */
+.home-sections.is-animated .home-panel {
+  animation: home-panel-in 0.35s ease-out backwards;
+}
+.home-panel.is-leaving {
+  opacity: 0;
+  transition: opacity 0.18s ease-in;
+}
+@keyframes home-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-sections.is-animated .home-panel {
+    animation: none;
+  }
+  .home-panel.is-leaving {
+    opacity: 1;
+    transition: none;
+  }
+}

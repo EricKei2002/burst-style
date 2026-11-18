@@ -3,7 +3,6 @@
 import { useCallback, useRef, useEffect, useState } from "react";
 import MagneticButton from "../ui/MagneticButton";
 import { useSiteCopy } from "../../lib/locale";
-import Header from "./Header";
 import dynamic from "next/dynamic";
 
 const GlitchText = dynamic(() => import("../ui/GlitchText"), {
@@ -71,8 +70,6 @@ export default function Top() {
       id="top"
       className="relative flex min-h-screen w-full flex-col overflow-hidden"
     >
-      <Header />
-
       <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
           <div className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
