@@ -45,7 +45,7 @@ export default function Footer() {
         {/* 右側: ソーシャルリンク & トップへ戻る */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-4">
-            <MagneticButton strength={0.2}>
+            <MagneticButton>
               <a
                 href="https://github.com/EricKei2002"
                 target="_blank"
@@ -57,7 +57,7 @@ export default function Footer() {
               </a>
             </MagneticButton>
 
-            <MagneticButton strength={0.2}>
+            <MagneticButton>
               <a
                 href="https://www.wantedly.com/id/eric0216"
                 target="_blank"
@@ -72,7 +72,7 @@ export default function Footer() {
 
           <div className="h-8 w-px bg-zinc-800 mx-2 hidden sm:block"></div>
 
-          <MagneticButton strength={0.2}>
+          <MagneticButton>
             <button
               onClick={scrollToTop}
               className="group flex items-center gap-2 text-xs font-mono text-zinc-200 hover:text-fuchsia-200 transition-colors uppercase tracking-wider"

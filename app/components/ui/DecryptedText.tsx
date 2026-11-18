@@ -7,8 +7,6 @@ interface DecryptedTextProps {
   speed?: number;
   maxIterations?: number;
   className?: string;
-  revealDirection?: "start" | "end" | "center";
-  useOriginalCharsOnly?: boolean;
   characters?: string;
   animateOnHover?: boolean;
   sequential?: boolean;
