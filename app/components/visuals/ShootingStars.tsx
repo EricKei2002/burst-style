@@ -3,7 +3,10 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import { getShootingStarDelayFactor } from "../../lib/localSky";
+import {
+  getShootingStarDelayFactor,
+  isPrecipitating,
+} from "../../lib/localSky";
 
 const reducedMotion =
   typeof window !== "undefined" &&
@@ -27,8 +30,8 @@ const ShootingStar = () => {
     if (!meshRef.current) return;
 
     if (!activeRef.current) {
-      // 動きを減らす設定のときは流れ星を出さない
-      if (reducedMotion) return;
+      // 動きを減らす設定のとき・雨や雪のときは流れ星を出さない（雨が星の落下に見えないように）
+      if (reducedMotion || isPrecipitating()) return;
       delayRef.current -= delta;
       if (delayRef.current <= 0) {
         activeRef.current = true;
@@ -56,7 +59,8 @@ const ShootingStar = () => {
     } else {
       meshRef.current.position.addScaledVector(velocity.current, delta);
 
-      if (meshRef.current.position.y < -100) {
+      // 途中で雨や雪になったら、飛んでいる流れ星もすぐ消す
+      if (meshRef.current.position.y < -100 || isPrecipitating()) {
         activeRef.current = false;
         meshRef.current.visible = false;
         meshRef.current.position.set(0, -1000, 0);

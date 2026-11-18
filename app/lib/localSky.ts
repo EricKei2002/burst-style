@@ -70,3 +70,10 @@ export function getShootingStarDelayFactor(): number {
         : 1;
   return phaseFactor * weatherFactor;
 }
+
+/** 雨か雪が降っているか（<html data-weather> から読む）。降っている間は流れ星を出さない */
+export function isPrecipitating(): boolean {
+  if (typeof document === "undefined") return false;
+  const { weather } = document.documentElement.dataset;
+  return weather === "rain" || weather === "snow";
+}

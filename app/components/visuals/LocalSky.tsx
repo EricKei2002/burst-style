@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import RainCanvas from "./RainCanvas";
 import {
   getSkyPhase,
   isSkyPhase,
@@ -149,13 +150,17 @@ export default function LocalSky() {
           {sky.weather && sky.weather !== "clear" && (
             <div
               className="local-sky-haze"
+              data-kind={sky.weather}
               data-lite={env.lite ? "" : undefined}
               data-paused={env.hidden ? "" : undefined}
               aria-hidden="true"
             />
           )}
-          {(sky.weather === "rain" || sky.weather === "snow") && (
-            // 雨は斜めの細い線、雪はゆっくり落ちる粒。動きを減らす設定では CSS で非表示
+          {sky.weather === "rain" && (
+            <RainCanvas lite={env.lite} paused={env.hidden} />
+          )}
+          {sky.weather === "snow" && (
+            // 雪はゆっくり落ちる小さい粒。動きを減らす設定では CSS で非表示
             <div
               className="local-sky-precip"
               data-kind={sky.weather}
