@@ -1,16 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
+
+import type { CuratedPushedAtById } from "../../lib/now";
+import { buildCuratedNowItems } from "../../lib/buildCuratedNowItems";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import type { Locale } from "../../lib/siteCopy";
-
-export type NowItem = {
-  name: string;
-  url: string;
-  language: string | null;
-  commitMessage: string | null;
-  commitUrl: string | null;
-  date: string;
-};
+import type { NowItem } from "../../lib/nowTypes";
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ["year", 60 * 60 * 24 * 365],
@@ -35,15 +31,25 @@ function formatRelative(date: string, base: number, locale: Locale): string {
   return rtf.format(0, "minute");
 }
 
+const titleClassName =
+  "truncate font-mono text-lg font-bold text-white transition-colors focus-visible:outline-none";
+
 export default function NowSectionView({
-  items,
+  githubItems,
+  curatedPushedAt,
   renderedAt,
 }: {
-  items: NowItem[];
+  githubItems: NowItem[];
+  curatedPushedAt: CuratedPushedAtById;
   renderedAt: number;
 }) {
   const { locale } = useLocale();
   const copy = useSiteCopy();
+
+  const items = useMemo(() => {
+    const curated = buildCuratedNowItems(locale, curatedPushedAt);
+    return [...curated, ...githubItems];
+  }, [locale, githubItems, curatedPushedAt]);
 
   return (
     <section id="now" className="relative w-full py-24 sm:py-32">
@@ -63,24 +69,30 @@ export default function NowSectionView({
 
         <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
-            const relative = formatRelative(item.date, renderedAt, locale);
+            const relative = item.date
+              ? formatRelative(item.date, renderedAt, locale)
+              : "";
             return (
               <li
-                key={item.url}
+                key={item.id}
                 className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 backdrop-blur-sm transition-colors hover:border-zinc-600 hover:bg-zinc-900/50"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate font-mono text-lg font-bold text-white transition-colors hover:text-fuchsia-300 focus-visible:text-fuchsia-300 focus-visible:outline-none"
-                  >
-                    {item.name}
-                  </a>
-                  {item.language && (
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${titleClassName} hover:text-fuchsia-300 focus-visible:text-fuchsia-300`}
+                    >
+                      {item.name}
+                    </a>
+                  ) : (
+                    <span className={titleClassName}>{item.name}</span>
+                  )}
+                  {item.badge && (
                     <span className="shrink-0 font-mono text-xs text-fuchsia-200">
-                      #{item.language}
+                      #{item.badge}
                     </span>
                   )}
                 </div>
@@ -89,21 +101,25 @@ export default function NowSectionView({
                   <span aria-hidden="true" className="text-fuchsia-300">
                     {"> "}
                   </span>
-                  {item.commitMessage && item.commitUrl ? (
+                  {item.summary && item.summaryHref ? (
                     <a
-                      href={item.commitUrl}
+                      href={item.summaryHref}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="break-words transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none"
                     >
-                      {item.commitMessage}
+                      {item.summary}
                     </a>
+                  ) : item.summary ? (
+                    <span className="break-words text-zinc-200">
+                      {item.summary}
+                    </span>
                   ) : (
                     <span className="text-zinc-400">{copy.now.noCommits}</span>
                   )}
                 </p>
 
-                {relative && (
+                {item.date && relative && (
                   <time
                     dateTime={item.date}
                     className="mt-auto font-mono text-xs text-zinc-400"

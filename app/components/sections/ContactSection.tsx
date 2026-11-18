@@ -12,6 +12,14 @@ const Turnstile = dynamic(
   { ssr: false },
 );
 
+type ContactField = "name" | "email" | "message";
+
+type ContactApiBody = {
+  success?: boolean;
+  error?: string;
+  fieldErrors?: Partial<Record<ContactField, string>>;
+};
+
 type ContactSectionProps = {
   siteKey: string;
   keySwapped?: boolean;
@@ -31,6 +39,9 @@ export default function ContactSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<ContactField, string>>
+  >({});
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileError, setTurnstileError] = useState<string | null>(null);
 
@@ -81,6 +92,7 @@ export default function ContactSection({
 
     setIsSubmitting(true);
     setErrorMessage("");
+    setFieldErrors({});
 
     try {
       const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -93,14 +105,24 @@ export default function ContactSection({
         body: formData,
       });
 
-      if (response.ok) {
+      let body: ContactApiBody | null = null;
+      try {
+        body = (await response.json()) as ContactApiBody;
+      } catch {
+        body = null;
+      }
+
+      if (response.ok && body?.success === true) {
         setIsSent(true);
         if (formRef.current) formRef.current.reset();
         setTurnstileToken(null);
         setTimeout(() => setIsSent(false), 10000);
+      } else if (response.status === 400 && body?.fieldErrors) {
+        setFieldErrors(body.fieldErrors);
+        setErrorMessage(body.error ?? copy.contact.errTransmit);
       } else {
-        console.error("Submission failed");
-        setErrorMessage(copy.contact.errTransmit);
+        console.error("Submission failed", response.status, body);
+        setErrorMessage(body?.error ?? copy.contact.errTransmit);
       }
     } catch (error) {
       console.error("Submission error:", error);
@@ -179,9 +201,19 @@ export default function ContactSection({
                         id="name"
                         name="name"
                         required
-                        className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                        aria-invalid={fieldErrors.name ? true : undefined}
+                        className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all font-sans ${
+                          fieldErrors.name
+                            ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
+                            : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50"
+                        }`}
                         placeholder={copy.contact.placeholderName}
                       />
+                      {fieldErrors.name ? (
+                        <p className="font-mono text-xs text-red-300/90 ml-1">
+                          {fieldErrors.name}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="space-y-2">
                       <label
@@ -200,9 +232,19 @@ export default function ContactSection({
                         id="email"
                         name="email"
                         required
-                        className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all font-sans"
+                        aria-invalid={fieldErrors.email ? true : undefined}
+                        className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all font-sans ${
+                          fieldErrors.email
+                            ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
+                            : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50"
+                        }`}
                         placeholder={copy.contact.placeholderEmail}
                       />
+                      {fieldErrors.email ? (
+                        <p className="font-mono text-xs text-red-300/90 ml-1">
+                          {fieldErrors.email}
+                        </p>
+                      ) : null}
                     </div>
                   </div>
 
@@ -223,9 +265,19 @@ export default function ContactSection({
                       name="message"
                       required
                       rows={6}
-                      className="w-full bg-zinc-950/70 border border-zinc-600 rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-fuchsia-500/50 focus:ring-1 focus:ring-fuchsia-500/50 transition-all resize-none font-sans"
+                      aria-invalid={fieldErrors.message ? true : undefined}
+                      className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all resize-none font-sans ${
+                        fieldErrors.message
+                          ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
+                          : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50"
+                      }`}
                       placeholder={copy.contact.placeholderMessage}
                     />
+                    {fieldErrors.message ? (
+                      <p className="font-mono text-xs text-red-300/90 ml-1">
+                        {fieldErrors.message}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-col items-center gap-4 pt-2">

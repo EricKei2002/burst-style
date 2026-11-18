@@ -61,8 +61,3 @@ export function takeSpaceshipWarmupVideo(): HTMLVideoElement | null {
   video.removeAttribute("id");
   return video;
 }
-
-/** テスト・計測スクリプト用 */
-export function resetSpaceshipPreloadStateForTests(): void {
-  preloadStarted = false;
-}
