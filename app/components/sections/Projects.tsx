@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -104,15 +105,26 @@ export default function Projects() {
                 className={`h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
               >
                 <TiltCard className="h-full">
-                  <button
-                    type="button"
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    prefetch={false}
                     onPointerEnter={() => {
                       preloadSpaceshipAisleVideo();
                       router.prefetch(`/projects/${project.slug}`);
                     }}
-                    onClick={() =>
-                      handleNavigation(`/projects/${project.slug}`)
-                    }
+                    onClick={(e) => {
+                      // 新しいタブで開くなどの修飾クリックはブラウザに任せる
+                      if (
+                        e.button !== 0 ||
+                        e.metaKey ||
+                        e.ctrlKey ||
+                        e.shiftKey ||
+                        e.altKey
+                      )
+                        return;
+                      e.preventDefault();
+                      handleNavigation(`/projects/${project.slug}`);
+                    }}
                     className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none ${
                       isVisible
                         ? "translate-y-0 opacity-100 scale-100"
@@ -173,7 +185,7 @@ export default function Projects() {
                         ))}
                       </div>
                     </div>
-                  </button>
+                  </Link>
                 </TiltCard>
               </MagneticButton>
             );

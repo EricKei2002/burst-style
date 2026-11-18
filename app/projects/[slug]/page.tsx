@@ -157,9 +157,9 @@ export default async function ProjectPage({
                         <div className="w-px h-full bg-zinc-800 my-1"></div>
                       </div>
                       <div className="pb-0">
-                        <h4 className="text-zinc-200 font-medium mb-1">
+                        <h3 className="text-zinc-200 font-medium mb-1">
                           {item.title}
-                        </h4>
+                        </h3>
                         <p className="text-zinc-300 text-sm leading-relaxed">
                           {item.description}
                         </p>

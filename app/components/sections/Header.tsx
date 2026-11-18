@@ -61,25 +61,13 @@ export default function Header() {
                 {copy.header.langJa}
               </button>
             </div>
-            <a
-              href="#projects"
-              aria-label="Go to Projects section"
-              className={linkClass}
-            >
+            <a href="#projects" className={linkClass}>
               /Projects
             </a>
-            <a
-              href="#about"
-              aria-label="Go to About section"
-              className={linkClass}
-            >
+            <a href="#about" className={linkClass}>
               /About
             </a>
-            <a
-              href="#contact"
-              aria-label="Go to Contact section"
-              className={linkClass}
-            >
+            <a href="#contact" className={linkClass}>
               /Contact
             </a>
           </div>

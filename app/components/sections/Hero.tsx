@@ -77,18 +77,18 @@ export default function Top() {
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
           <div className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
-              <div className="flex items-center justify-center">
+              <span className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
                 <span className="title-char">Hello, I&apos;m</span>
-              </div>
-              <div className="flex items-center justify-center">
-                <div className="font-mono pb-2 inline-block">
+              </span>
+              <span className="flex items-center justify-center">
+                <span className="font-mono pb-2 inline-block">
                   <GlitchText text="Eric Kei." />
-                </div>
+                </span>
                 <span className="animate-pulse font-mono text-fuchsia-300 ml-1 pb-2">
                   _
                 </span>
-              </div>
+              </span>
             </h1>
 
             <div className="max-w-3xl w-full shrink-0 px-4 mt-8 text-left">

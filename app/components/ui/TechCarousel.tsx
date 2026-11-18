@@ -67,10 +67,12 @@ export default function TechCarousel() {
     <>
       <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
       <div className="w-full overflow-hidden py-16 tech-carousel tech-carousel-wrap">
-        <div className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner">
+        <ul className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner">
           {loopStack.map((tech, index) => (
-            <div
+            <li
               key={`${tech.name}-${index}`}
+              // ループ用に複製した後半は読み上げない
+              aria-hidden={index >= techStack.length ? true : undefined}
               className="group flex items-center gap-3 rounded-md border border-zinc-700/80 bg-zinc-950/95 px-3 py-2 md:gap-6 md:px-4"
             >
               <tech.icon
@@ -80,9 +82,9 @@ export default function TechCarousel() {
               <span className="font-mono text-base md:text-xl lg:text-2xl text-zinc-50 group-hover:text-white transition-colors whitespace-nowrap">
                 {tech.name}
               </span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </>
   );

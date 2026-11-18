@@ -2,7 +2,7 @@
 .wrapper {
   perspective: 500px;
   position: relative;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .behind {

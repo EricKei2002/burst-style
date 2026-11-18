@@ -35,6 +35,7 @@ export default function ContactSection({
   const copy = useSiteCopy();
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const successHeadingRef = useRef<HTMLHeadingElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
@@ -82,6 +83,11 @@ export default function ContactSection({
       observer.disconnect();
     };
   }, []);
+
+  // 送信に成功したらフォームが消えるので、結果の見出しへフォーカスを移す
+  useEffect(() => {
+    if (isSent) successHeadingRef.current?.focus();
+  }, [isSent]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,8 +206,12 @@ export default function ContactSection({
                         type="text"
                         id="name"
                         name="name"
+                        autoComplete="name"
                         required
                         aria-invalid={fieldErrors.name ? true : undefined}
+                        aria-describedby={
+                          fieldErrors.name ? "name-error" : undefined
+                        }
                         className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all font-sans ${
                           fieldErrors.name
                             ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
@@ -210,7 +220,10 @@ export default function ContactSection({
                         placeholder={copy.contact.placeholderName}
                       />
                       {fieldErrors.name ? (
-                        <p className="font-mono text-xs text-red-300/90 ml-1">
+                        <p
+                          id="name-error"
+                          className="font-mono text-xs text-red-300/90 ml-1"
+                        >
                           {fieldErrors.name}
                         </p>
                       ) : null}
@@ -231,8 +244,12 @@ export default function ContactSection({
                         type="email"
                         id="email"
                         name="email"
+                        autoComplete="email"
                         required
                         aria-invalid={fieldErrors.email ? true : undefined}
+                        aria-describedby={
+                          fieldErrors.email ? "email-error" : undefined
+                        }
                         className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all font-sans ${
                           fieldErrors.email
                             ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
@@ -241,7 +258,10 @@ export default function ContactSection({
                         placeholder={copy.contact.placeholderEmail}
                       />
                       {fieldErrors.email ? (
-                        <p className="font-mono text-xs text-red-300/90 ml-1">
+                        <p
+                          id="email-error"
+                          className="font-mono text-xs text-red-300/90 ml-1"
+                        >
                           {fieldErrors.email}
                         </p>
                       ) : null}
@@ -266,6 +286,9 @@ export default function ContactSection({
                       required
                       rows={6}
                       aria-invalid={fieldErrors.message ? true : undefined}
+                      aria-describedby={
+                        fieldErrors.message ? "message-error" : undefined
+                      }
                       className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 transition-all resize-none font-sans ${
                         fieldErrors.message
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40"
@@ -274,7 +297,10 @@ export default function ContactSection({
                       placeholder={copy.contact.placeholderMessage}
                     />
                     {fieldErrors.message ? (
-                      <p className="font-mono text-xs text-red-300/90 ml-1">
+                      <p
+                        id="message-error"
+                        className="font-mono text-xs text-red-300/90 ml-1"
+                      >
                         {fieldErrors.message}
                       </p>
                     ) : null}
@@ -329,7 +355,10 @@ export default function ContactSection({
 
                   <div className="flex flex-col items-end gap-4 pt-4">
                     {errorMessage && (
-                      <p className="font-mono text-xs text-red-300 tracking-wider animate-pulse">
+                      <p
+                        role="alert"
+                        className="font-mono text-xs text-red-300 tracking-wider animate-pulse"
+                      >
                         &gt; {errorMessage}
                       </p>
                     )}
@@ -380,7 +409,11 @@ export default function ContactSection({
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
+                  <h3
+                    ref={successHeadingRef}
+                    tabIndex={-1}
+                    className="text-2xl font-bold text-white mb-2 tracking-tight"
+                  >
                     {copy.contact.successTitle}
                   </h3>
                   <p className="text-zinc-200 max-w-md leading-relaxed">

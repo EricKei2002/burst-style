@@ -124,6 +124,7 @@ export default function CsharpCalculator() {
       <div className="relative">
         {/* Design View */}
         <div
+          inert={viewMode !== "design"}
           className={`p-4 transition-opacity duration-300 ${viewMode === "design" ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         >
           {/* Display */}
@@ -273,7 +274,8 @@ export default function CsharpCalculator() {
 
         {/* Source View - C# Code */}
         <div
-          className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto scrollbar-thin scrollbar-thumb-zinc-600 transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}
+          inert={viewMode !== "source"}
+          className={`absolute inset-0 bg-[#1e1e1e] p-4 overflow-auto [scrollbar-width:thin] [scrollbar-color:var(--color-zinc-600)_transparent] transition-opacity duration-300 ${viewMode === "source" ? "opacity-100 z-10" : "opacity-0 pointer-events-none"}`}
         >
           <pre className="text-[10px] leading-relaxed font-mono text-zinc-300 whitespace-pre">
             {csharpCode.split("\n").map((line, i) => (
