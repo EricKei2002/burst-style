@@ -14,13 +14,13 @@ export default function BackButton() {
     e.preventDefault();
     preloadSpaceshipAisleVideo();
     preloadShaderTransition();
-    // シェーダーが使えればワープ、なければハンガー扉（待機時間も合わせる）
-    const navigateDelayMs = beginLeaveTransition();
-
-    setTimeout(() => {
-      setPhase("closed");
-      router.push("/#projects");
-    }, navigateDelayMs);
+    // 未準備なら短く待ってからワープ。使えなければハンガー扉。
+    void beginLeaveTransition().then((navigateDelayMs) => {
+      setTimeout(() => {
+        setPhase("closed");
+        router.push("/#projects");
+      }, navigateDelayMs);
+    });
   };
 
   return (

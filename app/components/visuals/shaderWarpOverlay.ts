@@ -17,6 +17,8 @@ export interface ShaderWarpOverlay {
   playClose(durationMs: number): void;
   /** 覆った状態からワープを抜けて新しいページを見せる */
   playOpen(durationMs: number): void;
+  /** 戻る/進む用。覆った最高潮から開いて見せる（履歴は遅らせない） */
+  playReveal(durationMs: number): void;
   /** 即座に非表示にして描画ループを止める */
   hide(): void;
   dispose(): void;
@@ -80,24 +82,24 @@ const fragmentShader = /* glsl */ `
     float fa = fract(ang) - 0.5;
     float h = hash11(id + seed);
     float h2 = hash11(id * 1.37 + seed * 3.1);
-    float present = step(0.42, hash11(id * 7.13 + seed * 0.71));
+    float present = step(0.22, hash11(id * 7.13 + seed * 0.71));
 
     // 頭の位置。二乗で外側ほど速く（簡易な遠近）
     float z = fract(h2 + uTravel * (0.35 + h * 0.65));
-    float head = z * z * 1.6;
-    float len = mix(0.006, 0.65, uWarp) * (0.15 + head);
+    float head = z * z * 1.7;
+    float len = mix(0.01, 0.82, uWarp) * (0.2 + head);
     float along = smoothstep(head - len, head, r) * (1.0 - step(head, r));
 
     // 角度方向の太さはピクセル基準で揃える
     float px = 1.0 / uResolution.y;
     float arc = abs(fa) * TAU * r / cells;
-    float width = px * (0.8 + 1.4 * h) * (0.6 + head);
-    float line = 1.0 - smoothstep(width * 0.5, width * 1.5, arc);
+    float width = px * (1.6 + 2.4 * h) * (0.75 + head);
+    float line = 1.0 - smoothstep(width * 0.45, width * 1.7, arc);
 
-    float b = present * along * line * (0.35 + 0.65 * z) * smoothstep(0.015, 0.12, r);
+    float b = present * along * line * (0.55 + 0.75 * z) * smoothstep(0.01, 0.1, r);
     vec3 tint = vec3(1.0);
-    tint = mix(tint, CYAN, step(0.86, h));
-    tint = mix(tint, FUCHSIA, step(h, 0.1));
+    tint = mix(tint, CYAN, step(0.78, h));
+    tint = mix(tint, FUCHSIA, step(h, 0.16));
     return tint * b;
   }
 
@@ -107,10 +109,11 @@ const fragmentShader = /* glsl */ `
     float a = atan(p.y, p.x);
 
     vec3 streaks =
-      streakLayer(r, a, 180.0, 0.0) +
-      streakLayer(r, a, 256.0, 11.0) * 0.8 +
-      streakLayer(r, a, 120.0, 23.0) * 1.2;
-    streaks *= smoothstep(0.0, 0.3, uWarp + uCover);
+      streakLayer(r, a, 260.0, 0.0) +
+      streakLayer(r, a, 380.0, 11.0) * 0.95 +
+      streakLayer(r, a, 170.0, 23.0) * 1.35 +
+      streakLayer(r, a, 96.0, 41.0) * 1.6;
+    streaks *= smoothstep(0.0, 0.22, uWarp + uCover);
 
     // ノイズの溶けるベール。外側から覆い、開くときは中心から抜ける
     float rMax = length(0.5 * uResolution / uResolution.y);
@@ -123,17 +126,24 @@ const fragmentShader = /* glsl */ `
     float edge = (1.0 - smoothstep(0.0, 0.07, abs(v - th))) * inTransit;
     vec3 edgeCol = mix(CYAN, FUCHSIA, 0.5 + 0.5 * sin(a * 2.0 + n * 4.0));
 
-    // 覆い切る直前の明るいコア
-    float core = uFlash * (exp(-r * r * 22.0) + 0.3 * exp(-r * r * 3.0));
-    vec3 coreCol = mix(vec3(1.0), CYAN, 0.25);
+    // 最高潮：光が中心へ収束するコアと、中心へ向かう暈
+    float core = uFlash * (
+      1.8 * exp(-r * r * 28.0) +
+      0.7 * exp(-r * r * 6.0) +
+      0.28 * exp(-r * r * 1.4)
+    );
+    float ring = uFlash * (1.0 - smoothstep(0.0, 0.08 + 0.18 * (1.0 - uFlash), abs(r - 0.12 * (1.0 - uFlash))));
+    vec3 coreCol = mix(vec3(1.0), CYAN, 0.18);
+    vec3 ringCol = mix(CYAN, FUCHSIA, 0.45);
 
     vec3 col =
       BG * m +
-      streaks * mix(1.0, 0.75, m) +
-      edgeCol * edge * 0.5 +
-      coreCol * core;
+      streaks * mix(1.15, 0.9, m) +
+      edgeCol * edge * 0.65 +
+      coreCol * core +
+      ringCol * ring * 0.55;
     float alpha = clamp(
-      m + max(max(streaks.r, streaks.g), streaks.b) + edge * 0.5 + core,
+      m + max(max(streaks.r, streaks.g), streaks.b) + edge * 0.5 + core + ring * 0.5,
       0.0,
       1.0
     );
@@ -142,7 +152,7 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
-type Mode = "idle" | "closing" | "covered" | "opening";
+type Mode = "idle" | "closing" | "covered" | "opening" | "revealing";
 
 const MAX_PIXEL_RATIO = 1.25;
 
@@ -254,32 +264,51 @@ export function createShaderWarpOverlay(
     let flash = 0;
     if (mode === "closing") {
       warp = t * t;
-      cover = smoothstep(0.2, 0.92, t);
-      flash = Math.exp(-(((t - 0.93) / 0.06) ** 2));
+      // 途中までで覆い切り、残りを中心へ光が集まる最高潮に使う
+      cover = smoothstep(0.1, 0.76, t);
+      if (t < 0.72) {
+        flash = 0.12 * t;
+      } else {
+        const k = (t - 0.72) / 0.28;
+        flash = 0.2 + 0.8 * Math.sin((Math.min(k, 1) * Math.PI) / 2);
+      }
       if (t >= 1) {
         mode = "covered";
         coveredAt = now;
       }
     } else if (mode === "covered") {
-      // 覆ったまま巡航（経路切り替えを隠す）
-      warp = 0.85;
+      // 覆ったまま巡航（経路切り替えを隠す）。最高潮の残光を少し長めに残す
+      warp = 0.95;
       cover = 1;
-      // closing 終端（t=1）のコアの明るさから滑らかに減衰させる
-      flash = 0.26 * Math.exp(-(now - coveredAt) / 160);
+      flash = 0.55 * Math.exp(-(now - coveredAt) / 280);
     } else if (mode === "opening") {
-      warp = 0.85 * (1 - t) * (1 - t);
-      cover = 1 - smoothstep(0.08, 0.8, t);
-      flash = 0.35 * (1 - smoothstep(0, 0.3, t));
+      warp = 0.95 * (1 - t) * (1 - t);
+      cover = 1 - smoothstep(0.06, 0.82, t);
+      flash = 0.5 * (1 - smoothstep(0, 0.28, t));
+    } else if (mode === "revealing") {
+      // 戻る/進む：いきなり最高潮で覆い、それから開く
+      const hold = 0.24;
+      if (t < hold) {
+        const k = t / hold;
+        warp = 1;
+        cover = 1;
+        flash = 0.35 + 0.65 * Math.sin(k * Math.PI);
+      } else {
+        const u = (t - hold) / (1 - hold);
+        warp = 0.95 * (1 - u) * (1 - u);
+        cover = 1 - smoothstep(0.04, 0.82, u);
+        flash = 0.6 * (1 - smoothstep(0, 0.22, u));
+      }
     }
 
     uniforms.uTime.value = now / 1000;
-    uniforms.uTravel.value += dt * (0.06 + warp * 2.4);
+    uniforms.uTravel.value += dt * (0.08 + warp * 3.2);
     uniforms.uWarp.value = warp;
     uniforms.uCover.value = cover;
     uniforms.uFlash.value = flash;
     renderer.render(scene, camera);
 
-    if (mode === "opening" && t >= 1) {
+    if ((mode === "opening" || mode === "revealing") && t >= 1) {
       goIdle();
       return;
     }
@@ -324,6 +353,9 @@ export function createShaderWarpOverlay(
     },
     playOpen(durationMs) {
       start("opening", durationMs);
+    },
+    playReveal(durationMs) {
+      start("revealing", durationMs);
     },
     hide() {
       goIdle();

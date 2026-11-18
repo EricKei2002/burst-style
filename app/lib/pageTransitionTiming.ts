@@ -4,22 +4,22 @@ import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "./hangarTransitionTiming";
 export type PageTransitionOverlay = "hangar" | "shader";
 
 /** ワープで閉じる（加速して覆う）長さ（ms） */
-export const SHADER_WARP_CLOSE_MS = 700;
+export const SHADER_WARP_CLOSE_MS = 1400;
 
 /** 覆い終わってから router.push するまでの待機（ワープ + 小さな余白） */
-export const SHADER_NAVIGATE_AFTER_CLOSE_MS = SHADER_WARP_CLOSE_MS + 40;
+export const SHADER_NAVIGATE_AFTER_CLOSE_MS = SHADER_WARP_CLOSE_MS + 180;
 
 /** 遷移先で開き始める前に覆ったまま待つ時間 */
-export const SHADER_OPEN_PAUSE_MS = 180;
+export const SHADER_OPEN_PAUSE_MS = 280;
 
 /** ワープから抜けて新しいページを見せる長さ（ms） */
-export const SHADER_WARP_OPEN_MS = 700;
+export const SHADER_WARP_OPEN_MS = 1200;
 
 /** opening フェーズから idle に戻るまで */
-export const SHADER_OPEN_TO_IDLE_MS = SHADER_WARP_OPEN_MS + 40;
+export const SHADER_OPEN_TO_IDLE_MS = SHADER_WARP_OPEN_MS + 60;
 
-/** 戻る/進む（popstate など）で経路が変わったときの短い開き演出 */
-export const SHADER_WARP_REVEAL_MS = 480;
+/** 戻る/進む（popstate など）で、覆った状態から開く演出の長さ */
+export const SHADER_WARP_REVEAL_MS = 1400;
 
 /** シェーダーが使えて動きが許可されているときだけワープを選ぶ */
 export function pickPageTransitionOverlay(opts: {

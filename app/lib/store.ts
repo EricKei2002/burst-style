@@ -28,12 +28,43 @@ export const useTransitionStore = create<TransitionState>((set) => ({
   setOverlay: (overlay) => set({ overlay }),
 }));
 
+/** クリック時点で未準備なら、この時間まで読み込み完了を待つ */
+export const SHADER_READY_WAIT_MS = 1000;
+
+/**
+ * shaderReady になるまで待つ。timeout 後は現在値を返す。
+ */
+export function waitForShaderReady(
+  timeoutMs = SHADER_READY_WAIT_MS,
+): Promise<boolean> {
+  if (useTransitionStore.getState().shaderReady) {
+    return Promise.resolve(true);
+  }
+  return new Promise((resolve) => {
+    const timeout = window.setTimeout(() => {
+      unsubscribe();
+      resolve(useTransitionStore.getState().shaderReady);
+    }, timeoutMs);
+    const unsubscribe = useTransitionStore.subscribe((state) => {
+      if (state.shaderReady) {
+        window.clearTimeout(timeout);
+        unsubscribe();
+        resolve(true);
+      }
+    });
+  });
+}
+
 /**
  * ページ離脱の演出を開始し、router.push までの待機（ms）を返す。
- * シェーダーが使えなければ従来どおりハンガー扉。
+ * シェーダーがまだなら短い時間だけ待ち、使えなければ従来どおりハンガー扉。
  */
-export function beginLeaveTransition(): number {
-  const { shaderReady, setOverlay, setPhase } = useTransitionStore.getState();
+export async function beginLeaveTransition(): Promise<number> {
+  let { shaderReady } = useTransitionStore.getState();
+  if (!shaderReady && !prefersReducedMotion()) {
+    shaderReady = await waitForShaderReady(SHADER_READY_WAIT_MS);
+  }
+  const { setOverlay, setPhase } = useTransitionStore.getState();
   const overlay = pickPageTransitionOverlay({
     shaderReady,
     reducedMotion: prefersReducedMotion(),
