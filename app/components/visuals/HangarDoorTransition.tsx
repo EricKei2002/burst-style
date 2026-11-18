@@ -2,6 +2,11 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+import {
+  HANGAR_OPEN_PAUSE_MS,
+  HANGAR_OPEN_TO_IDLE_MS,
+  hangarDoorTransitionStyle,
+} from "../../lib/hangarTransitionTiming";
 import { useTransitionStore } from "../../lib/store";
 
 export default function HangarDoorTransition() {
@@ -21,8 +26,8 @@ export default function HangarDoorTransition() {
 
           setTimeout(() => {
             setPhase("idle");
-          }, 800);
-        }, 300); // 開く前に黒い画面で300ms一時停止
+          }, HANGAR_OPEN_TO_IDLE_MS);
+        }, HANGAR_OPEN_PAUSE_MS);
 
         prevPathname.current = pathname;
         return () => clearTimeout(timer);
@@ -31,7 +36,6 @@ export default function HangarDoorTransition() {
     }
   }, [pathname, phase, setPhase]);
 
-  // 視覚状態の計算
   const isClosed = phase === "closing" || phase === "closed";
 
   const leftDoorClass = isClosed ? "translate-x-0" : "-translate-x-full";
@@ -42,8 +46,9 @@ export default function HangarDoorTransition() {
     <div className="pointer-events-none fixed inset-0 z-100 flex overflow-hidden">
       {/* 左のドア */}
       <div
-        className={`h-full w-1/2 bg-zinc-900 border-r-4 border-cyan-900 transition-transform duration-700 ease-in-out ${leftDoorClass}`}
+        className={`h-full w-1/2 bg-zinc-900 border-r-4 border-cyan-900 transition-transform ease-in-out ${leftDoorClass}`}
         style={{
+          ...hangarDoorTransitionStyle,
           backgroundImage: `repeating-linear-gradient(
               45deg,
               transparent,
@@ -59,8 +64,9 @@ export default function HangarDoorTransition() {
 
       {/* 右のドア */}
       <div
-        className={`h-full w-1/2 bg-zinc-900 border-l-4 border-fuchsia-900 transition-transform duration-700 ease-in-out ${rightDoorClass}`}
+        className={`h-full w-1/2 bg-zinc-900 border-l-4 border-fuchsia-900 transition-transform ease-in-out ${rightDoorClass}`}
         style={{
+          ...hangarDoorTransitionStyle,
           backgroundImage: `repeating-linear-gradient(
               -45deg,
               transparent,

@@ -10,7 +10,6 @@ const DEFAULT_INNER_GRADIENT =
   "linear-gradient(145deg, #18181b 0%, #27272a 100%)";
 
 interface ProfileCardProps {
-  avatarUrl?: string;
   name?: string;
   title?: string;
   className?: string;
@@ -32,7 +31,6 @@ const adjust = (
 ) => round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
 
 export default function ProfileCard({
-  avatarUrl,
   name = "Eric Kei",
   title = "Creative Developer",
   className = "",
@@ -225,15 +223,6 @@ export default function ProfileCard({
 
             <div className={styles.content}>
               <div className={styles.avatarContent}>
-                {avatarUrl && (
-                  <Image
-                    className={styles.avatar}
-                    src={avatarUrl}
-                    alt={name}
-                    width={80}
-                    height={80}
-                  />
-                )}
                 <div className={styles.userInfo}>
                   <div>STATUS: ONLINE</div>
                   <div>ID: 0216</div>

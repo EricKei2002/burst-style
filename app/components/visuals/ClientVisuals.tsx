@@ -3,12 +3,9 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import SpaceshipInterior from "./SpaceshipInterior";
 
-// クライアントコンポーネント内でssr:falseのdynamic importを使う
 const StarBackground = dynamic(() => import("./StarBackground"), {
-  ssr: false,
-});
-const SpaceshipInterior = dynamic(() => import("./SpaceshipInterior"), {
   ssr: false,
 });
 const MouseTrail = dynamic(() => import("./MouseTrail"), { ssr: false });
@@ -28,7 +25,6 @@ export default function ClientVisuals() {
   });
 
   useEffect(() => {
-    // Projectsページは動画背景を常に即座に表示するためここでは処理しない
     const isMobile = window.innerWidth < 768;
     const canHover = window.matchMedia(
       "(hover: hover) and (pointer: fine)",
@@ -38,7 +34,6 @@ export default function ClientVisuals() {
     const cpuCores = navigator.hardwareConcurrency ?? 8;
     const isLowSpec = deviceMemory <= 4 || cpuCores <= 4;
     const allowDesktopStars = !isMobile && !isLowSpec;
-    // モバイルはRAM 2GB超・CPUコア2超の端末で有効化（条件を緩和）
     const allowMobileStars = isMobile && deviceMemory > 2 && cpuCores > 2;
     const allowStars = allowDesktopStars || allowMobileStars;
 
@@ -78,7 +73,6 @@ export default function ClientVisuals() {
     window.addEventListener("scroll", activate, { once: true, passive: true });
     window.addEventListener("keydown", activate, { once: true });
 
-    // Fallback for bots/Lighthouse: 8000ms wait so tracing ends before heavy evaluation
     const timer = setTimeout(() => {
       if ("requestIdleCallback" in window) {
         window.requestIdleCallback(activate);
@@ -91,12 +85,6 @@ export default function ClientVisuals() {
     return cleanup;
   }, [isProjectPage]);
 
-  // Projectsページは動画背景を即座に表示
-  if (isProjectPage) {
-    return <SpaceshipInterior />;
-  }
-
-  // Projectsページは動画背景を即座に表示（状態管理不要）
   if (isProjectPage) {
     return <SpaceshipInterior />;
   }

@@ -11,8 +11,7 @@ export interface Project {
   challenges: { title: string; description: string }[];
   improvements: { title: string; description: string }[];
   documentation: {
-    architectureMermaid: string;
-    architectureHtmlUrl?: string;
+    architectureHtmlUrl: string;
   };
 }
 
@@ -73,59 +72,6 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureHtmlUrl: "/projects/saa-drill-architecture.html",
-      architectureMermaid: `graph TD
-    Browser["ブラウザ / PWA<br/>Next.js App Router UI"]
-    SW["Service Worker<br/>オフライン / Push受信"]
-
-    SupaAuth["Supabase Auth<br/>Google OAuth (PKCE)"]
-    Postgres[("Supabase Postgres<br/>progress / push_subscriptions")]
-    PushService["ブラウザPushサービス<br/>Web Push (VAPID)"]
-
-    GenAPI["/api/generate-questions<br/>Vercel Function"]
-    PushAPI["/api/push/subscribe<br/>Vercel Function"]
-    GenCore["問題生成ロジック<br/>gemini-generate.ts（共通）"]
-
-    subgraph Packs ["学習パック（src/packs）"]
-        Registry["パックレジストリ<br/>registry.ts"]
-        PackAws["AWS SAAパック<br/>問題・用語・配点比率"]
-        PackWp["WordPressパック<br/>問題・用語・配点比率"]
-        PackSec["セキュリティパック<br/>問題・用語・配点比率"]
-    end
-
-    subgraph Cron ["Vercel Cron（CRON_SECRET認証）"]
-        CronPool["cron: prepare-ai-pools<br/>毎日 05:00 JST"]
-        CronReminder["cron: daily-reminder<br/>毎日 21:00 JST"]
-    end
-
-    Gemini["Google Gemini API<br/>@google/genai"]
-    RSS["AWS What's New RSS<br/>5分キャッシュ（AWSパック）"]
-    SecRSS["脆弱性情報RSS<br/>JVN・IPA・JPCERT/CC ほか（セキュリティパック）"]
-
-    Browser -->|① Googleログイン PKCE, anon key| SupaAuth
-    Browser -->|② 進捗の取得/保存 anon key, RPC| Postgres
-    Browser -->|③ 選択中パックでAI問題生成（自分のGeminiキー）| GenAPI
-    Browser -->|④ Push購読 登録/解除 JWT| PushAPI
-
-    GenAPI --> GenCore
-    GenCore -->|パックID指定| Registry
-    Registry --> PackAws
-    Registry --> PackWp
-    Registry --> PackSec
-    PushAPI -->|JWT検証 Supabase Admin| SupaAuth
-    PushAPI -->|購読情報を保存 service role| Postgres
-
-    CronPool -->|⑤ 対象ユーザー抽出→結果保存 service role| Postgres
-    CronPool --> GenCore
-    CronReminder -->|⑥ 未完了ユーザー抽出 service role| Postgres
-    CronReminder -->|VAPID署名付きWeb Push送信| PushService
-
-    GenCore -->|Gemini API 呼び出し| Gemini
-    PackAws -.->|新着情報を取得| RSS
-    PackSec -.->|脆弱性情報を取得| SecRSS
-
-    PushService -->|Push配信| SW
-    SW -->|通知表示 → /todayへ遷移| Browser
-`,
     },
   },
   {
@@ -171,75 +117,6 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureHtmlUrl: "/projects/sonta-kun-architecture.html",
-      architectureMermaid: `graph TD
-    subgraph Client ["クライアントサイド "]
-        Browser[ユーザーブラウザ]
-    end
-
-    subgraph Hosting ["Vercel ホスティング"]
-        NextJS["Next.js アプリ (App Router)"]
-        
-        subgraph ServerActions ["サーバーアクション / API"]
-            AuthService["認証サービス"]
-            SontakuEngine["忖度エンジン (空き状況ロジック)"]
-            GeminiClient["Gemini クライアント (制約抽出)"]
-            CalendarService["Google カレンダーサービス"]
-            ZoomService["Zoom サービス"]
-            EmailService["メールサービス (Resend)"]
-        end
-    end
-
-    subgraph Database ["データベース (Supabase)"]
-        SupabaseAuth["Supabase 認証"]
-        Postgres["PostgreSQL データベース"]
-        
-        Tables[("テーブル:
-        - interviews
-        - interview_tokens
-        - availabilities")]
-    end
-
-    subgraph External ["外部サービス"]
-        GoogleGemini["Google Gemini API"]
-        GoogleCal["Google Calendar API"]
-        GoogleMeet["Google Meet API"]
-        ZoomAPI["Zoom API"]
-        ResendAPI["Resend API"]
-    end
-
-    %% フロー
-    Browser -->|HTTPS| NextJS
-    NextJS -->|Server Actions| ServerActions
-    
-    AuthService --> SupabaseAuth
-    
-    SontakuEngine -->|空き状況取得| CalendarService
-    SontakuEngine -->|制約抽出| GeminiClient
-    GeminiClient -->|プロンプト: 自然言語| GoogleGemini
-    GoogleGemini -->|JSON: 制約データ| GeminiClient
-    
-    CalendarService -->|イベント読み書き| GoogleCal
-    GoogleCal -.->|会議リンク生成| GoogleMeet
-    
-    ZoomService -->|ミーティング作成| ZoomAPI
-    EmailService -->|通知送信| ResendAPI
-    
-    ServerActions -->|データ読み書き| Postgres
-    Postgres --- Tables
-
-    %% スタイル定義 (クラス)
-    classDef primary fill:#2563eb,stroke:#1d4ed8,color:#fff;
-    classDef secondary fill:#4b5563,stroke:#374151,color:#fff;
-    classDef external fill:#10b981,stroke:#059669,color:#fff;
-    classDef db fill:#f59e0b,stroke:#d97706,color:#fff;
-
-    class NextJS,SontakuEngine primary;
-    class GeminiClient,CalendarService,ZoomService,EmailService secondary;
-    class GoogleGemini,GoogleCal,GoogleMeet,ZoomAPI,ResendAPI external;
-    class Postgres,SupabaseAuth,Tables db;
-
-
-`,
     },
   },
   {
@@ -286,12 +163,6 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureHtmlUrl: "/projects/cutting-works-architecture.html",
-      architectureMermaid: `graph TD
-    User[ユーザー / クライアント] -->|ギャラリー閲覧| NextJS[Next.js App Router]
-    NextJS -->|コンテンツ取得| MicroCMS[MicroCMS API]
-    NextJS -->|静的アセット配信| Vercel[Vercel CDN]
-    Admin[管理者 / クライアント] -->|コンテンツ更新| MicroCMS
-`,
     },
   },
   {
@@ -343,23 +214,6 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureHtmlUrl: "/projects/discord-role-bot-architecture.html",
-      architectureMermaid: `sequenceDiagram
-    participant User as ユーザー
-    participant API as Discord API
-    participant Bot as Bot
-
-    User->>API: 認証クリック
-    API->>Bot: Button受信
-    Bot->>API: モーダル表示
-    User->>API: 送信
-    API->>Bot: ModalSubmit
-    alt 成功
-        Bot->>API: Memberロール付与
-        Bot->>User: 成功
-    else 失敗
-        Bot->>User: エラー
-    end
-`,
     },
   },
   {
@@ -413,17 +267,6 @@ export const projectsData: Project[] = [
     ],
     documentation: {
       architectureHtmlUrl: "/projects/burst-style-architecture.html",
-      architectureMermaid: `graph TD
-    User[ユーザー] --> Next[Next.js App]
-    Next --> Client[Client Components]
-    Client --> Store[Zustand]
-    Client --> Three[Three.js]
-    Client --> Video[動画背景]
-    User --> Contact[Contact API]
-    Contact --> Turnstile[Turnstile]
-    Contact --> Formspree[Formspree]
-    Contact --> Resend[Resend]
-`,
     },
   },
 ];

@@ -8,14 +8,11 @@ import { TextureLoader } from "three";
 export default function Earth() {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  // ローカルテクスチャを使用
   const texture = useLoader(TextureLoader, "/earth.jpg");
 
   useFrame((state) => {
     if (meshRef.current) {
-      // 軌道ロジック: 太陽/月と同期しているが、異なる位置
-      const t = state.clock.elapsedTime * 0.2 + Math.PI * 1.5; // 270度の位相 (太陽=0, 月=180)
-      // コンテンツ中央への侵入を減らすため、揺れ幅を抑えて奥行きを増やす
+      const t = state.clock.elapsedTime * 0.2 + Math.PI * 1.5; // 位相: 太陽=0, 月=180, 地球=270
       const radius = 18;
 
       meshRef.current.position.x = Math.sin(t) * radius;
@@ -35,11 +32,10 @@ export default function Earth() {
         color="#ffffff"
         roughness={0.5}
         metalness={0.6}
-        emissive="#eeeeff" // 陸地の色（緑）を輝かせるためのニュートラルホワイト
+        emissive="#eeeeff"
         emissiveIntensity={1.2}
       />
       <pointLight intensity={0.8} distance={40} color="#ccddff" decay={2} />
-      {/* 地球は光を反射しますが、通常それ自体は強い光源ではありません */}
     </mesh>
   );
 }

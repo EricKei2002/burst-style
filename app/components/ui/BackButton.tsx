@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "../../lib/hangarTransitionTiming";
+import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { useTransitionStore } from "../../lib/store";
 import MagneticButton from "./MagneticButton";
 export default function BackButton() {
@@ -10,13 +12,14 @@ export default function BackButton() {
 
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
+    preloadSpaceshipAisleVideo();
     setPhase("closing");
     setIsWarping(true); // ワープ開始
 
     setTimeout(() => {
       setPhase("closed");
       router.push("/#projects");
-    }, 900);
+    }, HANGAR_NAVIGATE_AFTER_CLOSE_MS);
   };
 
   return (

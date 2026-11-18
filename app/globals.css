@@ -54,27 +54,6 @@ body {
   box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.9);
 }
 
-/* 3D ユーティリティ */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-}
-
-.translate-z-10 {
-  transform: translateZ(20px);
-}
-
-.translate-z-20 {
-  transform: translateZ(40px);
-}
-
 @media (max-width: 767px) {
   /* GSAPのopacity:0アニメーションをバイパスしてLCP改善 */
   .title-char,

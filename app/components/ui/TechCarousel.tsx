@@ -58,13 +58,6 @@ const carouselStyles = `
     mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
     -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .tech-carousel-inner {
-      animation: scroll-left 40s linear infinite !important;
-      animation-duration: 40s !important;
-      animation-iteration-count: infinite !important;
-    }
-  }
 `;
 
 export default function TechCarousel() {
@@ -72,7 +65,6 @@ export default function TechCarousel() {
 
   return (
     <>
-      {/* スクロールアニメーションCSSをコンポーネントローカルに配置しレンダーブロッキングを削減 */}
       <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
       <div className="w-full overflow-hidden py-16 tech-carousel tech-carousel-wrap">
         <div className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner">

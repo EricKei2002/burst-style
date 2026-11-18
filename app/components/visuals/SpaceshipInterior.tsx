@@ -1,45 +1,56 @@
 "use client";
 
-import { useRef, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { SPACESHIP_AISLE_VIDEO_SRC } from "../../lib/spaceshipVideo";
+import { takeSpaceshipWarmupVideo } from "../../lib/spaceshipVideoPreload";
 
 export default function SpaceshipInterior() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 1.0;
+    const container = containerRef.current;
+    const warm = takeSpaceshipWarmupVideo();
+    if (!container || !warm) {
+      if (videoRef.current) {
+        videoRef.current.playbackRate = 1.0;
+      }
+      return;
     }
+
+    const fallback = container.querySelector("video[data-spaceship-fallback]");
+    fallback?.remove();
+
+    warm.className = "absolute inset-0 h-full w-full object-cover opacity-100";
+    warm.style.cssText = "";
+    warm.autoplay = true;
+    warm.loop = true;
+    warm.muted = true;
+    warm.playsInline = true;
+    warm.playbackRate = 1.0;
+    container.prepend(warm);
+    void warm.play().catch(() => {});
   }, []);
 
-  if (!isProjectPage) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden">
-      {/* 
-        ビデオ背景
-        ファイル名内の特殊文字を安全に処理するためにencodeURIを使用 
-      */}
+    <div
+      ref={containerRef}
+      className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden"
+    >
       <video
         ref={videoRef}
+        data-spaceship-fallback
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
         className="absolute inset-0 h-full w-full object-cover opacity-100"
       >
-        <source
-          src={`/videos/${encodeURIComponent("Spaceship aisle.mp4")}`}
-          type="video/mp4"
-        />
+        <source src={SPACESHIP_AISLE_VIDEO_SRC} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
-      {/* 映画のようなフィールと、圧縮アーティファクトを隠すためのオーバーレイ */}
       <div className="absolute inset-0 bg-radial-gradient from-transparent to-black opacity-40 pointer-events-none" />
       <div className="absolute inset-0 bg-black/30 pointer-events-none" />
     </div>
