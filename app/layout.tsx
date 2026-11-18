@@ -3,6 +3,8 @@ import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
+// three は ShaderPageTransition 内で動的 import（初期 JS に含めない）
+import ShaderPageTransition from "./components/visuals/ShaderPageTransition";
 import SpaceshipVideoWarmup from "./components/visuals/SpaceshipVideoWarmup";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
@@ -97,6 +99,7 @@ export default function RootLayout({
         <LocalSky />
         <SpaceshipVideoWarmup />
         <HangarDoorTransition />
+        <ShaderPageTransition />
         <SmoothScroll>
           <LocaleProvider>
             <main className="min-h-screen w-full">{children}</main>
