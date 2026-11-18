@@ -31,59 +31,6 @@ type SkyState = {
   time: string;
 };
 
-const ICON_PROPS = {
-  width: 14,
-  height: 14,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-  "aria-hidden": true,
-} as const;
-
-/** 計器表示の横に置く、天気の手動切り替え */
-const WEATHER_TOGGLES: {
-  kind: SkyWeather;
-  en: string;
-  ja: string;
-  icon: React.ReactNode;
-}[] = [
-  {
-    kind: "clear",
-    en: "Clear",
-    ja: "晴れ",
-    icon: (
-      <svg {...ICON_PROPS}>
-        <circle cx="12" cy="12" r="4" />
-        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-      </svg>
-    ),
-  },
-  {
-    kind: "rain",
-    en: "Rain",
-    ja: "雨",
-    icon: (
-      <svg {...ICON_PROPS}>
-        <path d="M7 15a4 4 0 1 1 1-7.9A5 5 0 0 1 18 9a3 3 0 0 1 0 6H7z" />
-        <path d="M9 18l-1 3M13 18l-1 3M17 18l-1 3" />
-      </svg>
-    ),
-  },
-  {
-    kind: "snow",
-    en: "Snow",
-    ja: "雪",
-    icon: (
-      <svg {...ICON_PROPS}>
-        <path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9" />
-      </svg>
-    ),
-  },
-];
-
 /** 太陽高度から補間した空の色（下端のグラデーション）をベールの CSS 変数にする */
 function veilStyle(look: SkyLook): CSSProperties {
   const palette = paletteForLook(look);
@@ -117,9 +64,7 @@ export default function LocalSky() {
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
   /** 丸めた位置（API から）。取れるまでは時計ベース */
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
-  /** 計器表示の横のトグルで選んだ天気（null は自動＝?weather= か実際の天気） */
-  const [manualWeather, setManualWeather] = useState<SkyWeather | null>(null);
-  const weather = manualWeather ?? sky?.weather ?? null;
+  const weather = sky?.weather ?? null;
 
   // 低スペック端末・データセーバーでは軽い表示、タブが見えていないときは止める、説明文の言語
   useEffect(() => {
@@ -280,32 +225,6 @@ export default function LocalSky() {
         </>
       )}
       <div className="fixed bottom-24 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5">
-        {!isProjectPage && (
-          // 天気の手動切り替え（押し直すと自動に戻る）
-          <div
-            role="group"
-            aria-label={env.ja ? "天気を切り替える" : "Switch weather"}
-            className="flex flex-col gap-1"
-          >
-            {WEATHER_TOGGLES.map(({ kind, en, ja, icon }) => (
-              <button
-                key={kind}
-                type="button"
-                aria-pressed={weather === kind}
-                aria-label={env.ja ? ja : en}
-                title={env.ja ? ja : en}
-                onClick={() =>
-                  setManualWeather((current) =>
-                    current === kind ? null : kind,
-                  )
-                }
-                className="flex h-6 w-6 items-center justify-center rounded border border-green-300/25 bg-zinc-950/80 text-green-200/80 transition-colors hover:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/70 aria-pressed:border-green-300/60 aria-pressed:bg-green-500/25 aria-pressed:text-green-50"
-              >
-                {icon}
-              </button>
-            ))}
-          </div>
-        )}
         {/* 計器表示。ホバー・フォーカス（キーボード）・タップで短い説明を出す */}
         <div className="group relative">
           <button
