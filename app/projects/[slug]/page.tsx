@@ -79,7 +79,10 @@ export default async function ProjectPage({
                   alt={project.title}
                   fill
                   className="object-cover"
-                  priority
+                  // LCP 画像: 先読みし、取得の優先度を上げる（Next 16 では priority の代わりに preload）
+                  preload
+                  fetchPriority="high"
+                  sizes="(min-width: 944px) 896px, calc(100vw - 48px)"
                 />
               </div>
 
