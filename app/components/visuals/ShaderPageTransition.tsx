@@ -64,11 +64,11 @@ function openMsFor(journey: WarpJourney): number {
   return journey === "fly-between" ? SHADER_FLY_OPEN_MS : SHADER_WARP_OPEN_MS;
 }
 
-/** 初回描画のあと、この時間以内の空き時間でシェーダーを読み込む（8秒は待たない） */
+/** 初回描画のあと、この時間以内の空き時間で宇宙船演出を読み込む（8秒は待たない） */
 const IDLE_LOAD_TIMEOUT_MS = 1500;
 
 /**
- * 全画面シェーダー遷移の薄いラッパー。three 本体は動的 import でのみ読み込み、
+ * 全画面の宇宙船遷移の薄いラッパー。three 本体は動的 import でのみ読み込み、
  * 使えない（読み込み前・WebGL 不可・コンテキスト喪失・動きを減らす設定）ときは
  * shaderReady=false のままにしてハンガー扉に任せる。
  */
@@ -80,7 +80,7 @@ export default function ShaderPageTransition() {
   const phase = useTransitionStore((s) => s.phase);
   const overlayKind = useTransitionStore((s) => s.overlay);
 
-  // 遅延読み込みと初期化・破棄
+  // 遅延読み込みと初期化・破棄（宇宙船シーン）
   useEffect(() => {
     const { setShaderReady } = useTransitionStore.getState();
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -195,7 +195,7 @@ export default function ShaderPageTransition() {
   const warpPlanetId = useTransitionStore((s) => s.warpPlanetId);
   const warpFromPlanetId = useTransitionStore((s) => s.warpFromPlanetId);
 
-  // ストアの phase に合わせてワープを再生する
+  // ストアの phase に合わせて宇宙船の飛行を再生する
   useEffect(() => {
     const overlay = overlayRef.current;
     if (!overlay || overlayKind !== "shader") {

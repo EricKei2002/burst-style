@@ -3,7 +3,7 @@ import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
-// three は ShaderPageTransition 内で動的 import（初期 JS に含めない）
+// three / 宇宙船演出は ShaderPageTransition 内で動的 import（初期 JS に含めない）
 import ShaderPageTransition from "./components/visuals/ShaderPageTransition";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
