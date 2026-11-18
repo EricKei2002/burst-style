@@ -1,18 +1,48 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import SpaceshipInterior from "./SpaceshipInterior";
+import {
+  HOME_SECTION_EVENT,
+  isHomeSection,
+  type HomeSection,
+} from "../../lib/homeSections";
+import { isHomePath, planetForView } from "../../lib/planets";
 
 const StarBackground = dynamic(() => import("./StarBackground"), {
   ssr: false,
 });
 const MouseTrail = dynamic(() => import("./MouseTrail"), { ssr: false });
+const PlanetInterior = dynamic(() => import("./PlanetInterior"), {
+  ssr: false,
+});
+
+function readHomeSection(): HomeSection {
+  if (typeof document === "undefined") return "home";
+  const value = document.documentElement.dataset.homeSection ?? null;
+  return isHomeSection(value) ? value : "home";
+}
 
 export default function ClientVisuals() {
   const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
+  const [homeSection, setHomeSection] = useState<HomeSection>(readHomeSection);
+  const cameFromPlanet = useRef(false);
+
+  useLayoutEffect(() => {
+    if (!isHomePath(pathname)) {
+      return;
+    }
+    const sync = () => setHomeSection(readHomeSection());
+    sync();
+    window.addEventListener(HOME_SECTION_EVENT, sync);
+    return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
+  }, [pathname]);
+
+  const planet = planetForView(
+    pathname,
+    isHomePath(pathname) ? homeSection : null,
+  );
 
   const [config, setConfig] = useState<{
     ready: boolean;
@@ -37,16 +67,30 @@ export default function ClientVisuals() {
     const allowMobileStars = isMobile && deviceMemory > 2 && cpuCores > 2;
     const allowStars = allowDesktopStars || allowMobileStars;
 
-    let activated = false;
-    const activate = () => {
-      if (activated) return;
-      activated = true;
-
+    const applyReady = () => {
       setConfig({
         ready: true,
         showStars: allowStars,
         showPointerFx: canHover,
       });
+    };
+
+    if (planet) {
+      cameFromPlanet.current = true;
+      return;
+    }
+
+    // 惑星から宇宙へ戻ったときは、初回の 8 秒待ちをせず星空を出す
+    if (cameFromPlanet.current) {
+      applyReady();
+      return;
+    }
+
+    let activated = false;
+    const activate = () => {
+      if (activated) return;
+      activated = true;
+      applyReady();
     };
 
     const cleanup = () => {
@@ -83,10 +127,10 @@ export default function ClientVisuals() {
     }, 8000);
 
     return cleanup;
-  }, [isProjectPage]);
+  }, [planet]);
 
-  if (isProjectPage) {
-    return <SpaceshipInterior />;
+  if (planet) {
+    return <PlanetInterior theme={planet} />;
   }
 
   if (!config.ready) return null;

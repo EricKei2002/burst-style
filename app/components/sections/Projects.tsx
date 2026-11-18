@@ -9,7 +9,6 @@ import { projectsData } from "../../lib/data";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import { getLocalizedProject } from "../../lib/projectEn";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
-import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { sectionPageLabel } from "../../lib/homeSections";
 import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
 
@@ -20,10 +19,13 @@ export default function Projects() {
   const { setPhase } = useTransitionStore();
 
   const handleNavigation = (url: string) => {
-    preloadSpaceshipAisleVideo();
     preloadShaderTransition();
-    // 未準備なら短く待ってからワープ。使えなければハンガー扉。
-    void beginLeaveTransition().then((navigateDelayMs) => {
+    // 詳細も Projects の惑星の中。突入ではなく、同じ大気の中を進む。
+    void beginLeaveTransition({
+      journey: "fly-between",
+      planetId: "projects",
+      fromPlanetId: "projects",
+    }).then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
         router.push(url);
@@ -68,7 +70,6 @@ export default function Projects() {
                   href={`/projects/${project.slug}`}
                   prefetch={false}
                   onPointerEnter={() => {
-                    preloadSpaceshipAisleVideo();
                     preloadShaderTransition();
                     router.prefetch(`/projects/${project.slug}`);
                   }}
