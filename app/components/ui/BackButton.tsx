@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "../../lib/hangarTransitionTiming";
+import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
-import { useTransitionStore } from "../../lib/store";
+import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
 import MagneticButton from "./MagneticButton";
 export default function BackButton() {
   const router = useRouter();
@@ -13,12 +13,14 @@ export default function BackButton() {
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
     preloadSpaceshipAisleVideo();
-    setPhase("closing");
+    preloadShaderTransition();
+    // シェーダーが使えればワープ、なければハンガー扉（待機時間も合わせる）
+    const navigateDelayMs = beginLeaveTransition();
 
     setTimeout(() => {
       setPhase("closed");
       router.push("/#projects");
-    }, HANGAR_NAVIGATE_AFTER_CLOSE_MS);
+    }, navigateDelayMs);
   };
 
   return (
@@ -27,6 +29,8 @@ export default function BackButton() {
         <Link
           href="/#projects"
           onClick={handleBack}
+          onPointerEnter={preloadShaderTransition}
+          onFocus={preloadShaderTransition}
           className="group relative flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/10 hover:border-white/20 transition-[border-color] duration-200 ease-out"
         >
           <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/5 group-hover:bg-fuchsia-500/20 transition-colors">

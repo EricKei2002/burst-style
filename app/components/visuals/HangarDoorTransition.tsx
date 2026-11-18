@@ -7,10 +7,14 @@ import {
   HANGAR_OPEN_TO_IDLE_MS,
   hangarDoorTransitionStyle,
 } from "../../lib/hangarTransitionTiming";
+import {
+  SHADER_OPEN_PAUSE_MS,
+  SHADER_OPEN_TO_IDLE_MS,
+} from "../../lib/pageTransitionTiming";
 import { useTransitionStore } from "../../lib/store";
 
 export default function HangarDoorTransition() {
-  const { phase, setPhase } = useTransitionStore();
+  const { phase, setPhase, overlay } = useTransitionStore();
   const pathname = usePathname();
 
   // パス名変更時にドアを開く処理
@@ -20,14 +24,22 @@ export default function HangarDoorTransition() {
     // パス名が変更された場合のみ開く処理をトリガー
     if (prevPathname.current !== pathname) {
       if (phase === "closed" || phase === "closing") {
+        // シェーダー遷移中はワープ側の長さに合わせる（依存に入れると
+        // コンテキスト喪失での切り替え時にタイマーが消えるため getState で読む）
+        const useShader = useTransitionStore.getState().overlay === "shader";
+        const pauseMs = useShader ? SHADER_OPEN_PAUSE_MS : HANGAR_OPEN_PAUSE_MS;
+        const openToIdleMs = useShader
+          ? SHADER_OPEN_TO_IDLE_MS
+          : HANGAR_OPEN_TO_IDLE_MS;
+
         // レンダリングを隠すために一瞬閉じたままにし、その後開く
         const timer = setTimeout(() => {
           setPhase("opening");
 
           setTimeout(() => {
             setPhase("idle");
-          }, HANGAR_OPEN_TO_IDLE_MS);
-        }, HANGAR_OPEN_PAUSE_MS);
+          }, openToIdleMs);
+        }, pauseMs);
 
         prevPathname.current = pathname;
         return () => clearTimeout(timer);
@@ -36,7 +48,9 @@ export default function HangarDoorTransition() {
     }
   }, [pathname, phase, setPhase]);
 
-  const isClosed = phase === "closing" || phase === "closed";
+  // シェーダーが遷移を描いている間は扉を出さない
+  const isClosed =
+    overlay !== "shader" && (phase === "closing" || phase === "closed");
 
   const leftDoorClass = isClosed ? "translate-x-0" : "-translate-x-full";
 

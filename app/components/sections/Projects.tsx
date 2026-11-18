@@ -8,10 +8,10 @@ import TiltCard from "../ui/TiltCard";
 import { projectsData } from "../../lib/data";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import { getLocalizedProject } from "../../lib/projectEn";
-import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "../../lib/hangarTransitionTiming";
+import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { sectionPageLabel } from "../../lib/homeSections";
-import { useTransitionStore } from "../../lib/store";
+import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
 
 export default function Projects() {
   const { locale } = useLocale();
@@ -21,12 +21,14 @@ export default function Projects() {
 
   const handleNavigation = (url: string) => {
     preloadSpaceshipAisleVideo();
-    setPhase("closing");
+    preloadShaderTransition();
+    // シェーダーが使えればワープ、なければハンガー扉（待機時間も合わせる）
+    const navigateDelayMs = beginLeaveTransition();
 
     setTimeout(() => {
       setPhase("closed");
       router.push(url);
-    }, HANGAR_NAVIGATE_AFTER_CLOSE_MS);
+    }, navigateDelayMs);
   };
 
   return (
@@ -67,6 +69,11 @@ export default function Projects() {
                   prefetch={false}
                   onPointerEnter={() => {
                     preloadSpaceshipAisleVideo();
+                    preloadShaderTransition();
+                    router.prefetch(`/projects/${project.slug}`);
+                  }}
+                  onFocus={() => {
+                    preloadShaderTransition();
                     router.prefetch(`/projects/${project.slug}`);
                   }}
                   onClick={(e) => {
