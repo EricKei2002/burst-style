@@ -14,14 +14,17 @@ import {
   HOME_SECTIONS,
   HOME_SECTION_EVENT,
   HOME_SECTION_LABELS,
+  adjacentSection,
   hashForSection,
+  sectionFromDigit,
   sectionFromHash,
   sectionFromLocation,
+  swipeDirection,
   type HomeSection,
 } from "../../lib/homeSections";
 
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
-const LEAVE_MS = 180;
+const LEAVE_MS = 90;
 
 type Props = Record<HomeSection, ReactNode>;
 
@@ -31,18 +34,53 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+/** 文字入力中・ボタンやリンク以外の操作部品の上では、キーやスワイプで切り替えない */
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  return Boolean(
+    target.closest(
+      'input, textarea, select, [role="slider"], [role="listbox"], [role="menu"], [role="tablist"]',
+    ),
+  );
+}
+
+/** 横にスクロールできる要素（カルーセルなど）の上で始まったスワイプは、その要素に任せる */
+function startsInHorizontalScroller(target: EventTarget | null): boolean {
+  let el = target instanceof Element ? target : null;
+  while (el && el !== document.body) {
+    if (el instanceof HTMLElement) {
+      if (el.dataset.noSwipe !== undefined) return true;
+      const overflowX = getComputedStyle(el).overflowX;
+      if (
+        (overflowX === "auto" || overflowX === "scroll") &&
+        el.scrollWidth > el.clientWidth + 1
+      ) {
+        return true;
+      }
+    }
+    el = el.parentElement;
+  }
+  return false;
+}
+
 /**
- * トップページの Home / Projects / About / Contact を、メニューで 1 つずつ切り替えて表示する。
+ * トップページの Home / Projects / About / Contact を、メニュー・左右キー・数字キー・
+ * 横スワイプで 1 つずつ切り替えて表示する（JS が動くときだけ。JS 無しでは縦に並ぶ）。
  * 表示の出し分けは CSS（<html data-home-section> と .home-panel）で行い、
  * 初回は layout の inline script がハッシュから決めるので直リンクでもちらつかない。
  */
 export default function HomeSections(props: Props) {
   const { locale } = useLocale();
   const [active, setActive] = useState<HomeSection>("home");
+  const [enhanced, setEnhanced] = useState(false);
   const [leaving, setLeaving] = useState<HomeSection | null>(null);
   const [animated, setAnimated] = useState(false);
   const [message, setMessage] = useState("");
-  const activeRef = useRef<HomeSection>("home");
+  /** 行き先（切り替え中も含めて最新） */
+  const targetRef = useRef<HomeSection>("home");
+  /** 実際に表示しているセクション */
+  const displayedRef = useRef<HomeSection>("home");
   const panelRefs = useRef<Partial<Record<HomeSection, HTMLDivElement | null>>>(
     {},
   );
@@ -64,16 +102,20 @@ export default function HomeSections(props: Props) {
 
   const show = useCallback(
     (next: HomeSection, { focus, animate, announce }: ShowOptions) => {
-      const prev = activeRef.current;
-      if (next === prev) {
+      if (next === targetRef.current) {
         if (focus) focusHeading(next);
         return;
       }
-      scrollPositions.current[prev] = window.scrollY;
-      activeRef.current = next;
+      targetRef.current = next;
       window.clearTimeout(leaveTimer.current);
 
+      // 連打しても、最後に選んだセクションへ 1 回だけ切り替える
       const swap = () => {
+        const displayed = displayedRef.current;
+        if (displayed !== next) {
+          scrollPositions.current[displayed] = window.scrollY;
+        }
+        displayedRef.current = next;
         document.documentElement.dataset.homeSection = next;
         setLeaving(null);
         setActive(next);
@@ -81,8 +123,8 @@ export default function HomeSections(props: Props) {
           const label = HOME_SECTION_LABELS[next];
           setMessage(
             localeRef.current === "ja"
-              ? `${label} を表示しました`
-              : `Showing ${label}`,
+              ? `${label} を表示しました（${HOME_SECTIONS.indexOf(next) + 1} / ${HOME_SECTIONS.length}）`
+              : `Showing ${label} (${HOME_SECTIONS.indexOf(next) + 1} of ${HOME_SECTIONS.length})`,
           );
         }
         requestAnimationFrame(() => {
@@ -98,14 +140,28 @@ export default function HomeSections(props: Props) {
       };
 
       if (!animate || prefersReducedMotion()) {
+        setLeaving(null);
         swap();
         return;
       }
       setAnimated(true);
-      setLeaving(prev);
+      setLeaving(displayedRef.current);
       leaveTimer.current = window.setTimeout(swap, LEAVE_MS);
     },
     [focusHeading],
+  );
+
+  /** URL を書き換えてから切り替える（メニュー・キー・スワイプ共通） */
+  const navigate = useCallback(
+    (section: HomeSection, focus: boolean) => {
+      const nextUrl = `${window.location.pathname}${window.location.search}${hashForSection(section)}`;
+      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      if (nextUrl !== currentUrl) {
+        window.history.pushState(window.history.state, "", nextUrl);
+      }
+      show(section, { focus, animate: true, announce: true });
+    },
+    [show],
   );
 
   // 直リンク・/projects/[slug] からの戻りでは、描画前に URL の状態へ合わせる
@@ -114,9 +170,11 @@ export default function HomeSections(props: Props) {
       sectionFromLocation(window.location.hash, window.location.search) ??
       "home";
     document.documentElement.dataset.homeSection = initial;
-    activeRef.current = initial;
+    targetRef.current = initial;
+    displayedRef.current = initial;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- 初回だけ URL から復元する
     setActive(initial);
+    setEnhanced(true);
     if (initial !== "home") {
       requestAnimationFrame(() => {
         // #about-lab-todo のようなセクション内のアンカーなら、その位置まで送る
@@ -181,20 +239,84 @@ export default function HomeSections(props: Props) {
       const section = sectionFromHash(url.hash);
       if (!section) return;
       event.preventDefault();
-      const nextUrl = `${url.pathname}${window.location.search}${hashForSection(section)}`;
-      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-      if (nextUrl !== currentUrl) {
-        window.history.pushState(window.history.state, "", nextUrl);
-      }
-      show(section, { focus: true, animate: true, announce: true });
+      navigate(section, true);
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, [show]);
+  }, [navigate]);
+
+  // 左右キー・数字キー 1〜4（入力中・修飾キー付き・ほかの部品が使ったキーは無視）
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.repeat ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.shiftKey ||
+        isTypingTarget(event.target)
+      ) {
+        return;
+      }
+      let next: HomeSection | null = null;
+      if (event.key === "ArrowLeft")
+        next = adjacentSection(targetRef.current, -1);
+      else if (event.key === "ArrowRight")
+        next = adjacentSection(targetRef.current, 1);
+      else next = sectionFromDigit(event.key);
+      if (!next) return;
+      event.preventDefault();
+      navigate(next, true);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [navigate]);
+
+  // スマホの左右スワイプ（縦スクロールやカルーセルの横スクロールとは取り違えない）
+  useEffect(() => {
+    let start: { x: number; y: number; t: number } | null = null;
+    const onTouchStart = (event: TouchEvent) => {
+      if (
+        event.touches.length !== 1 ||
+        isTypingTarget(event.target) ||
+        startsInHorizontalScroller(event.target)
+      ) {
+        start = null;
+        return;
+      }
+      const touch = event.touches[0];
+      start = { x: touch.clientX, y: touch.clientY, t: event.timeStamp };
+    };
+    const onTouchEnd = (event: TouchEvent) => {
+      if (!start) return;
+      const touch = event.changedTouches[0];
+      const dir = swipeDirection(
+        touch.clientX - start.x,
+        touch.clientY - start.y,
+        event.timeStamp - start.t,
+      );
+      start = null;
+      if (dir === null) return;
+      const next = adjacentSection(targetRef.current, dir);
+      if (next !== targetRef.current) navigate(next, false);
+    };
+    const onTouchCancel = () => {
+      start = null;
+    };
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchCancel);
+    };
+  }, [navigate]);
 
   return (
     <div className={`home-sections${animated ? " is-animated" : ""}`}>
-      <Header active={active} />
+      <Header active={active} enhanced={enhanced} />
       <p className="sr-only" role="status" aria-live="polite">
         {message}
       </p>

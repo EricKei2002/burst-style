@@ -37,6 +37,33 @@ export default function LocalSky() {
   const pathname = usePathname();
   const isProjectPage = pathname.startsWith("/projects/");
   const [sky, setSky] = useState<SkyState | null>(null);
+  const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
+
+  // 低スペック端末・データセーバーでは軽い表示、タブが見えていないときは止める、説明文の言語
+  useEffect(() => {
+    const nav = navigator as Navigator & {
+      connection?: { saveData?: boolean };
+    };
+    const lite =
+      (nav.hardwareConcurrency ?? 8) <= 4 || nav.connection?.saveData === true;
+    const read = () =>
+      setEnv({
+        lite,
+        hidden: document.hidden,
+        ja: document.documentElement.lang.startsWith("ja"),
+      });
+    read();
+    document.addEventListener("visibilitychange", read);
+    const langObserver = new MutationObserver(read);
+    langObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["lang"],
+    });
+    return () => {
+      document.removeEventListener("visibilitychange", read);
+      langObserver.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -120,13 +147,20 @@ export default function LocalSky() {
         <>
           <div className="local-sky-veil" aria-hidden="true" />
           {sky.weather && sky.weather !== "clear" && (
-            <div className="local-sky-haze" aria-hidden="true" />
+            <div
+              className="local-sky-haze"
+              data-lite={env.lite ? "" : undefined}
+              data-paused={env.hidden ? "" : undefined}
+              aria-hidden="true"
+            />
           )}
           {(sky.weather === "rain" || sky.weather === "snow") && (
             // 雨は斜めの細い線、雪はゆっくり落ちる粒。動きを減らす設定では CSS で非表示
             <div
               className="local-sky-precip"
               data-kind={sky.weather}
+              data-lite={env.lite ? "" : undefined}
+              data-paused={env.hidden ? "" : undefined}
               aria-hidden="true"
             >
               <span />
@@ -135,9 +169,28 @@ export default function LocalSky() {
           )}
         </>
       )}
-      <p className="local-sky-readout pointer-events-none fixed bottom-24 left-1 z-20 select-none font-mono text-[10px] uppercase leading-none tracking-[0.25em] text-green-200/55 sm:left-1.5">
-        {readout}
-      </p>
+      {/* 計器表示。ホバー・フォーカス（キーボード）・タップで短い説明を出す */}
+      <div className="group fixed bottom-24 left-0 z-20 sm:left-0.5">
+        <button
+          type="button"
+          aria-describedby="local-sky-info"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") event.currentTarget.blur();
+          }}
+          className="local-sky-readout cursor-help select-none rounded px-1 py-2 font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-green-200/80 transition-colors hover:text-green-100 focus-visible:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/60"
+        >
+          {readout}
+        </button>
+        <p
+          id="local-sky-info"
+          role="tooltip"
+          className="pointer-events-none absolute bottom-0 left-full ml-1 w-max max-w-[15rem] rounded-md border border-green-300/30 bg-zinc-950/95 px-2.5 py-1.5 font-mono text-[11px] leading-snug text-green-100 opacity-0 shadow-lg transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100"
+        >
+          {env.ja
+            ? "あなたの地域の時刻と天気に合わせて、空の色を変えています"
+            : "The sky follows your local time and weather"}
+        </p>
+      </div>
     </>
   );
 }

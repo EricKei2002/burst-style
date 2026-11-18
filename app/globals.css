@@ -78,7 +78,7 @@
 }
 :root[data-sky="morning"] {
   --sky-star-opacity: 0.85;
-  --sky-low: rgba(255, 168, 205, 0.34);
+  --sky-low: rgba(255, 168, 205, 0.28);
   --sky-mid: rgba(150, 196, 255, 0.2);
   --sky-wash: rgba(150, 196, 255, 0.05);
 }
@@ -90,8 +90,8 @@
 }
 :root[data-sky="evening"] {
   --sky-star-opacity: 0.9;
-  --sky-low: rgba(255, 128, 40, 0.5);
-  --sky-mid: rgba(150, 60, 190, 0.3);
+  --sky-low: rgba(255, 128, 40, 0.34);
+  --sky-mid: rgba(150, 60, 190, 0.22);
   --sky-wash: rgba(90, 40, 140, 0.06);
 }
 :root[data-weather="cloudy"] {
@@ -238,6 +238,33 @@
   animation-duration: 14s;
 }
 
+/* 小さい画面では粒を減らす（奥のレイヤーを出さず、粒の間隔を広げる） */
+@media (max-width: 767px) {
+  .local-sky-precip > span + span {
+    display: none;
+  }
+  .local-sky-precip[data-kind="rain"] > span {
+    --tile: 150px;
+    --tile-w: 64px;
+  }
+  .local-sky-precip[data-kind="snow"] > span {
+    --tile: 170px;
+    --tile-w: 140px;
+  }
+}
+/* 低スペック端末・データセーバー: 1 レイヤーだけ、もやは止める */
+.local-sky-precip[data-lite] > span + span {
+  display: none;
+}
+.local-sky-haze[data-lite] {
+  animation: none;
+}
+/* タブが見えていないときは止める */
+.local-sky-precip[data-paused] > span,
+.local-sky-haze[data-paused] {
+  animation-play-state: paused;
+}
+
 @keyframes local-sky-fall {
   from {
     transform: translate3d(0, 0, 0);
@@ -266,30 +293,30 @@
   writing-mode: vertical-rl;
   rotate: 180deg;
 }
-
-/* ---- トップのセクション切り替え（Home / Projects / About / Contact）---- */
-.home-panel {
+/* ---- トップのセクション切り替え（Home / Projects / About / Contact）----
+   <html data-home-section> は JS が動くときだけ付く（layout の inline script）。
+   属性が無い＝JS 無しでは全セクションを縦に並べて表示する */
+:root[data-home-section] .home-panel {
   display: none;
 }
-:root:not([data-home-section]) .home-panel[data-section="home"],
 :root[data-home-section="home"] .home-panel[data-section="home"],
 :root[data-home-section="projects"] .home-panel[data-section="projects"],
 :root[data-home-section="about"] .home-panel[data-section="about"],
 :root[data-home-section="contact"] .home-panel[data-section="contact"] {
   display: block;
 }
-/* 初回表示（LCP）にはアニメーションを掛けず、メニューで切り替えたあとだけフェードさせる */
+/* 初回表示（LCP）にはアニメーションを掛けず、切り替えたあとだけ短くフェードさせる */
 .home-sections.is-animated .home-panel {
-  animation: home-panel-in 0.35s ease-out backwards;
+  animation: home-panel-in 0.2s ease-out backwards;
 }
 .home-panel.is-leaving {
   opacity: 0;
-  transition: opacity 0.18s ease-in;
+  transition: opacity 0.09s ease-in;
 }
 @keyframes home-panel-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 12px, 0);
+    transform: translate3d(0, 8px, 0);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -299,5 +326,14 @@
   .home-panel.is-leaving {
     opacity: 1;
     transition: none;
+  }
+}
+/* JS 無しで縦に並べたとき、固定ヘッダーの下に見出しが隠れないようにする */
+:root:not([data-home-section]) .home-panel > section {
+  scroll-margin-top: 4.5rem;
+}
+@media (min-width: 640px) {
+  :root:not([data-home-section]) .home-panel > section {
+    scroll-margin-top: 9.5rem;
   }
 }

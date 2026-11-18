@@ -917,7 +917,7 @@ export default function AboutSection() {
                   />
                 </div>
 
-                <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/50">
+                <div className="group rounded-xl border border-zinc-800 bg-zinc-950/85 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/90">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3
                       className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-fuchsia-400"}`}
