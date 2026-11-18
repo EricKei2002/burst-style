@@ -97,7 +97,7 @@ export default function Top() {
                   <button
                     type="button"
                     onClick={showDescription}
-                    className={`trigger-btn rounded border px-2 py-0.5 transition-colors inline-block font-mono text-xs ${
+                    className={`trigger-btn rounded border px-2 py-0.5 transition-[color,background-color,border-color,scale] duration-150 ease-out motion-safe:active:scale-[0.97] inline-block font-mono text-xs ${
                       descriptionVisible
                         ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none"
                         : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"

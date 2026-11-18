@@ -27,7 +27,7 @@ export default function BackButton() {
         <Link
           href="/#projects"
           onClick={handleBack}
-          className="group relative flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300"
+          className="group relative flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/10 hover:border-white/20 transition-[border-color] duration-200 ease-out"
         >
           <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/5 group-hover:bg-fuchsia-500/20 transition-colors">
             <svg
@@ -39,7 +39,7 @@ export default function BackButton() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-zinc-400 group-hover:text-fuchsia-400 transition-colors group-hover:-translate-x-0.5 transform duration-300"
+              className="text-zinc-400 group-hover:text-fuchsia-400 transition-[color,translate] duration-200 ease-out group-hover:-translate-x-0.5"
             >
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
@@ -50,7 +50,7 @@ export default function BackButton() {
           </span>
 
           {/* Hover Glow */}
-          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-fuchsia-500/10 blur-md transition-opacity duration-500 -z-10" />
+          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-fuchsia-500/10 blur-md transition-opacity duration-200 ease-out -z-10" />
         </Link>
       </MagneticButton>
     </div>

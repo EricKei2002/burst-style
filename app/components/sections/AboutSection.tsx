@@ -33,10 +33,10 @@ function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
   return (
     <a
       href="#contact"
-      className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black ${
+      className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-[color,background-color,border-color,scale] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black motion-safe:active:scale-[0.97] ${
         isProfessional
-          ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus:ring-blue-500"
-          : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus:ring-fuchsia-500"
+          ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus-visible:ring-blue-500"
+          : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus-visible:ring-fuchsia-500"
       }`}
     >
       {copy.about.contactCta}
@@ -779,18 +779,18 @@ export default function AboutSection() {
         const q = gsap.utils.selector(sectionRef.current);
         gsap.fromTo(
           q(".about-header"),
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+          { y: 12, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" },
         );
         gsap.fromTo(
           q(".about-card"),
-          { y: 50, opacity: 0 },
+          { y: 16, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1.2,
+            duration: 0.5,
             ease: "power3.out",
-            stagger: 0.2,
+            stagger: 0.06,
             clearProps: "transform",
           },
         );
@@ -848,10 +848,10 @@ export default function AboutSection() {
                 aria-pressed={!isProfessional}
                 aria-label={copy.about.switchGeekAria}
                 onClick={() => setIsProfessional(false)}
-                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-colors duration-200 ${
                   !isProfessional
                     ? "bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30"
-                    : "text-zinc-400 hover:text-zinc-300"
+                    : "border border-transparent text-zinc-400 hover:text-zinc-300"
                 }`}
               >
                 {copy.about.geekModeLabel}
@@ -861,10 +861,10 @@ export default function AboutSection() {
                 aria-pressed={isProfessional}
                 aria-label={copy.about.switchProAria}
                 onClick={() => setIsProfessional(true)}
-                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-mono transition-colors duration-200 ${
                   isProfessional
                     ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                    : "text-zinc-400 hover:text-zinc-300"
+                    : "border border-transparent text-zinc-400 hover:text-zinc-300"
                 }`}
               >
                 {copy.about.proModeLabel}
@@ -920,7 +920,10 @@ export default function AboutSection() {
                     {/* アニメーションコンテンツ切り替え */}
                     <div className="relative min-h-[60px]">
                       {isProfessional && item.professionalDescription ? (
-                        <div className="transition duration-300 starting:translate-y-2 starting:opacity-0">
+                        <div
+                          key="pro"
+                          className="transition duration-200 ease-out starting:translate-y-1 starting:opacity-0"
+                        >
                           {locale === "en" ? (
                             <ProEnglishView
                               block={ABOUT_TIMELINE_PRO_EN[index]!}
@@ -930,7 +933,10 @@ export default function AboutSection() {
                           )}
                         </div>
                       ) : (
-                        <div className="transition duration-300 starting:translate-y-2 starting:opacity-0">
+                        <div
+                          key="geek"
+                          className="transition duration-200 ease-out starting:translate-y-1 starting:opacity-0"
+                        >
                           {locale === "en" ? (
                             <GeekEnglishView
                               block={ABOUT_TIMELINE_GEEK_EN[index]!}
