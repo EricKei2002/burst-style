@@ -3,6 +3,14 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
+import {
+  getShootingStarDelayFactor,
+  isPrecipitating,
+} from "../../lib/localSky";
+
+const reducedMotion =
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // 初期遅延をコンポーネント外で生成（lintルール準拠）
 let nextDelay = 0;
@@ -22,6 +30,8 @@ const ShootingStar = () => {
     if (!meshRef.current) return;
 
     if (!activeRef.current) {
+      // 動きを減らす設定のとき・雨や雪のときは流れ星を出さない（雨が星の落下に見えないように）
+      if (reducedMotion || isPrecipitating()) return;
       delayRef.current -= delta;
       if (delayRef.current <= 0) {
         activeRef.current = true;
@@ -42,12 +52,15 @@ const ShootingStar = () => {
         const target = startPos.current.clone().add(velocity.current);
         meshRef.current.lookAt(target);
 
-        delayRef.current = Math.random() * 10 + 2;
+        // 現地の時間帯と天気で出現頻度を少しだけ変える（夜は多め、昼や雨は少なめ）
+        delayRef.current =
+          (Math.random() * 10 + 2) * getShootingStarDelayFactor();
       }
     } else {
       meshRef.current.position.addScaledVector(velocity.current, delta);
 
-      if (meshRef.current.position.y < -100) {
+      // 途中で雨や雪になったら、飛んでいる流れ星もすぐ消す
+      if (meshRef.current.position.y < -100 || isPrecipitating()) {
         activeRef.current = false;
         meshRef.current.visible = false;
         meshRef.current.position.set(0, -1000, 0);

@@ -73,7 +73,7 @@ export default function Projects() {
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* ヘッダー */}
-        <div className="mb-16 max-w-2xl rounded-2xl border border-white/10 bg-black/65 p-6 backdrop-blur-sm">
+        <div className="mb-16 max-w-2xl rounded-2xl border border-white/10 bg-black/85 p-6 backdrop-blur-sm">
           <div className="mb-4 flex items-center gap-2 text-fuchsia-100">
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-sm font-semibold tracking-wider uppercase">
@@ -125,7 +125,7 @@ export default function Projects() {
                       e.preventDefault();
                       handleNavigation(`/projects/${project.slug}`);
                     }}
-                    className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/30 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/50 focus-visible:outline-none ${
+                    className={`project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/85 text-left transition-all duration-700 ease-out hover:border-zinc-600 hover:bg-zinc-900/90 focus-visible:outline-none ${
                       isVisible
                         ? "translate-y-0 opacity-100 scale-100"
                         : "translate-y-8 opacity-0 scale-[0.98]"

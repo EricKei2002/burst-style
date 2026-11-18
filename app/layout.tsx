@@ -6,6 +6,8 @@ import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
 import SpaceshipVideoWarmup from "./components/visuals/SpaceshipVideoWarmup";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
+import LocalSky from "./components/visuals/LocalSky";
+import { homeSectionInitScript } from "./lib/homeSections";
 import { LocaleProvider } from "./lib/locale";
 import { LOCALE_STORAGE_KEY } from "./lib/localeConstants";
 
@@ -83,6 +85,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
+        {/* トップの直リンク（#projects など）で、最初から該当セクションだけを表示する */}
+        <script dangerouslySetInnerHTML={{ __html: homeSectionInitScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
@@ -90,6 +94,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
+        <LocalSky />
         <SpaceshipVideoWarmup />
         <HangarDoorTransition />
         <SmoothScroll>

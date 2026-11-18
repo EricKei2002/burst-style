@@ -54,7 +54,7 @@ export default function NowSectionView({
   return (
     <section id="now" className="relative w-full py-24 sm:py-32">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mb-12 max-w-2xl rounded-2xl border border-white/10 bg-black/65 p-6 backdrop-blur-sm">
+        <div className="mb-12 max-w-2xl rounded-2xl border border-white/10 bg-black/85 p-6 backdrop-blur-sm">
           <div className="mb-4 flex items-center gap-2 text-fuchsia-100">
             <span className="h-px w-8 bg-current"></span>
             <span className="font-mono text-sm font-semibold tracking-wider uppercase">
@@ -75,7 +75,7 @@ export default function NowSectionView({
             return (
               <li
                 key={item.id}
-                className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 backdrop-blur-sm transition-colors hover:border-zinc-600 hover:bg-zinc-900/50"
+                className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/85 p-6 backdrop-blur-sm transition-colors hover:border-zinc-600 hover:bg-zinc-900/90"
               >
                 <div className="flex items-center justify-between gap-3">
                   {item.href ? (

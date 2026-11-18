@@ -22,6 +22,7 @@ import {
   ProEnglishView,
 } from "../../lib/aboutTimelineEn";
 import { useLocale, useSiteCopy } from "../../lib/locale";
+import { HOME_SECTION_EVENT, type HomeSection } from "../../lib/homeSections";
 
 function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
   const copy = useSiteCopy();
@@ -724,10 +725,13 @@ export default function AboutSection() {
 
   useEffect(() => {
     let ctx: { revert: () => void } | null = null;
+    let cancelled = false;
+    let onSectionChange: ((event: Event) => void) | null = null;
 
     const initAnimations = async () => {
       const { gsap } = await import("gsap");
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      if (cancelled) return;
       gsap.registerPlugin(ScrollTrigger);
 
       const reducedMotion = window.matchMedia(
@@ -742,7 +746,7 @@ export default function AboutSection() {
       }
 
       ctx = gsap.context(() => {
-        // 背景パララックス
+        // 背景パララックス（About の中をスクロールしている間だけ動く）
         gsap.to(".bg-grid", {
           yPercent: 30,
           ease: "none",
@@ -754,38 +758,6 @@ export default function AboutSection() {
           },
         });
 
-        // ヘッダー表示（Projects / Contactと同じ見せ方）
-        gsap.fromTo(
-          ".about-header",
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 80%",
-            },
-          },
-        );
-
-        // コンテンツの表示
-        gsap.fromTo(
-          ".about-card",
-          { y: 50, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 1.2,
-            ease: "power3.out",
-            stagger: 0.2,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 85%",
-            },
-          },
-        );
         // プロフィールの成長トランジション
         const mm = gsap.matchMedia();
 
@@ -808,10 +780,52 @@ export default function AboutSection() {
             .to({}, { duration: 0.15 });
         });
       }, sectionRef);
+
+      // トップはメニューでセクションを切り替える形なので、見出しとカードの登場は
+      // スクロール位置ではなく「About に切り替わったとき」に再生する
+      const playEntrance = () => {
+        if (!sectionRef.current) return;
+        const q = gsap.utils.selector(sectionRef.current);
+        gsap.fromTo(
+          q(".about-header"),
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+        );
+        gsap.fromTo(
+          q(".about-card"),
+          { y: 50, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1.2,
+            ease: "power3.out",
+            stagger: 0.2,
+            clearProps: "transform",
+          },
+        );
+      };
+
+      onSectionChange = (event: Event) => {
+        const { section } = (event as CustomEvent<{ section: HomeSection }>)
+          .detail;
+        if (section !== "about") return;
+        // 非表示の間は位置を測れないため、表示されたあとに測り直す
+        ScrollTrigger.refresh();
+        playEntrance();
+      };
+      window.addEventListener(HOME_SECTION_EVENT, onSectionChange);
+      if (document.documentElement.dataset.homeSection === "about") {
+        ScrollTrigger.refresh();
+        playEntrance();
+      }
     };
 
     initAnimations();
     return () => {
+      cancelled = true;
+      if (onSectionChange) {
+        window.removeEventListener(HOME_SECTION_EVENT, onSectionChange);
+      }
       ctx?.revert();
     };
   }, []);
@@ -903,7 +917,7 @@ export default function AboutSection() {
                   />
                 </div>
 
-                <div className="group rounded-xl border border-zinc-800 bg-zinc-900/30 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/50">
+                <div className="group rounded-xl border border-zinc-800 bg-zinc-950/85 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/90">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3
                       className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-fuchsia-400"}`}
