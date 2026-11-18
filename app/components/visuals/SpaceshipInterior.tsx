@@ -35,6 +35,8 @@ export default function SpaceshipInterior() {
   return (
     <div
       ref={containerRef}
+      // 装飾の背景動画なので支援技術から隠す（引き継いだウォームアップ動画も含む）
+      aria-hidden="true"
       className="fixed inset-0 -z-50 h-full w-full bg-[#000000] overflow-hidden"
     >
       <video

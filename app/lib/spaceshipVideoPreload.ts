@@ -1,7 +1,6 @@
 import { SPACESHIP_AISLE_VIDEO_SRC } from "./spaceshipVideo";
 
 const WARMUP_VIDEO_ID = "spaceship-aisle-warmup";
-const PRELOAD_LINK_ATTR = "data-spaceship-aisle-preload";
 
 let preloadStarted = false;
 
@@ -12,16 +11,8 @@ export function preloadSpaceshipAisleVideo(): void {
   }
   preloadStarted = true;
 
-  if (!document.querySelector(`link[${PRELOAD_LINK_ATTR}]`)) {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "video";
-    link.href = SPACESHIP_AISLE_VIDEO_SRC;
-    link.type = "video/mp4";
-    link.setAttribute(PRELOAD_LINK_ATTR, "true");
-    document.head.appendChild(link);
-  }
-
+  // <link rel="preload" as="video"> は主要ブラウザで未実装のため使わず、
+  // 隠し video 要素（preload="auto"）で取得とデコードを先行させる
   let video = document.getElementById(
     WARMUP_VIDEO_ID,
   ) as HTMLVideoElement | null;

@@ -124,10 +124,15 @@ export default function Projects() {
                       <div className="absolute inset-0 z-10 bg-zinc-950/20 transition-colors group-hover:bg-transparent" />
                       <Image
                         src={project.image}
-                        alt={project.title}
+                        // 見出し（h3）と同じ文言を二重に読ませない
+                        alt=""
                         fill
                         className="object-cover transition duration-700 ease-out group-hover:scale-105"
-                        sizes="(min-width: 768px) 50vw, 100vw"
+                        sizes={
+                          isDanglingLast
+                            ? "(min-width: 1280px) 1216px, 100vw"
+                            : "(min-width: 1280px) 584px, (min-width: 768px) 50vw, 100vw"
+                        }
                       />
                     </div>
 
