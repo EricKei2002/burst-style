@@ -7,10 +7,7 @@ interface TiltCardProps {
   className?: string;
 }
 
-export default function TiltCard({
-  children,
-  className = "",
-}: TiltCardProps) {
+export default function TiltCard({ children, className = "" }: TiltCardProps) {
   return (
     <div
       style={{ transform: "translateZ(0)" }}
