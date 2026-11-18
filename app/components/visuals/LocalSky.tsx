@@ -28,7 +28,9 @@ function formatTime(date: Date): string {
 
 /**
  * 見ている人の現地時間（ブラウザの時刻）と天気（/api/local-sky）を、
- * 星空背景の色味と画面左端の小さな計器表示に控えめに反映する。
+ * 星空背景の色味（朝・昼・夕方は画面下端のグラデーション）、雨・雪・もや、
+ * 画面左端の小さな計器表示に反映する。どれも本文の後ろ（z-index が負）に置き、
+ * クリックは通し、読み上げからは隠す。マウント後に描くので LCP には関わらない。
  * 確認用: ?sky=morning|day|evening|night&weather=clear|cloudy|rain|snow|none
  */
 export default function LocalSky() {
@@ -114,7 +116,25 @@ export default function LocalSky() {
 
   return (
     <>
-      {!isProjectPage && <div className="local-sky-veil" aria-hidden="true" />}
+      {!isProjectPage && (
+        <>
+          <div className="local-sky-veil" aria-hidden="true" />
+          {sky.weather && sky.weather !== "clear" && (
+            <div className="local-sky-haze" aria-hidden="true" />
+          )}
+          {(sky.weather === "rain" || sky.weather === "snow") && (
+            // 雨は斜めの細い線、雪はゆっくり落ちる粒。動きを減らす設定では CSS で非表示
+            <div
+              className="local-sky-precip"
+              data-kind={sky.weather}
+              aria-hidden="true"
+            >
+              <span />
+              <span />
+            </div>
+          )}
+        </>
+      )}
       <p className="local-sky-readout pointer-events-none fixed bottom-24 left-1 z-20 select-none font-mono text-[10px] uppercase leading-none tracking-[0.25em] text-green-200/55 sm:left-1.5">
         {readout}
       </p>

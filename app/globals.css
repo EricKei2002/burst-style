@@ -66,47 +66,200 @@
   }
 }
 
-/* ---- Local sky（現地時間と天気を星空へ控えめに反映）---- */
+/* ---- Local sky（現地時間と天気を星空へ反映）---- */
 :root {
   --sky-star-opacity: 1;
+  --sky-weather-dim: 1;
   --sky-haze: 0;
-  --sky-tint: transparent;
+  /* 画面下端の色（下から low → mid → 上は透明） */
+  --sky-low: transparent;
+  --sky-mid: transparent;
+  --sky-wash: transparent;
 }
 :root[data-sky="morning"] {
-  --sky-star-opacity: 0.9;
-  --sky-tint: rgba(255, 168, 120, 0.07);
+  --sky-star-opacity: 0.85;
+  --sky-low: rgba(255, 168, 205, 0.34);
+  --sky-mid: rgba(150, 196, 255, 0.2);
+  --sky-wash: rgba(150, 196, 255, 0.05);
 }
 :root[data-sky="day"] {
-  --sky-star-opacity: 0.82;
-  --sky-tint: rgba(96, 140, 220, 0.08);
+  --sky-star-opacity: 0.75;
+  --sky-low: rgba(110, 170, 245, 0.3);
+  --sky-mid: rgba(80, 135, 225, 0.16);
+  --sky-wash: rgba(70, 120, 210, 0.1);
 }
 :root[data-sky="evening"] {
-  --sky-star-opacity: 0.94;
-  --sky-tint: rgba(208, 92, 150, 0.08);
+  --sky-star-opacity: 0.9;
+  --sky-low: rgba(255, 128, 40, 0.5);
+  --sky-mid: rgba(150, 60, 190, 0.3);
+  --sky-wash: rgba(90, 40, 140, 0.06);
 }
 :root[data-weather="cloudy"] {
-  --sky-haze: 0.22;
+  --sky-weather-dim: 0.55;
+  --sky-haze: 1;
 }
-:root[data-weather="rain"],
+:root[data-weather="rain"] {
+  --sky-weather-dim: 0.3;
+  --sky-haze: 0.7;
+}
 :root[data-weather="snow"] {
-  --sky-haze: 0.32;
+  --sky-weather-dim: 0.6;
+  --sky-haze: 0.6;
 }
 
 .star-bg {
-  opacity: calc(var(--sky-star-opacity) * (1 - var(--sky-haze)));
-  transition: opacity 4s ease;
+  opacity: calc(var(--sky-star-opacity) * var(--sky-weather-dim));
+  transition: opacity 3s ease;
 }
 
-/* 星空と本文の間に敷く色味と霞（クリックは通す） */
+/* 星空と本文の間に敷く色味（クリックは通す）。本文のカードは不透明なので文字の読みやすさは変わらない */
 .local-sky-veil {
   position: fixed;
   inset: 0;
   z-index: -40;
   pointer-events: none;
   background:
-    radial-gradient(120% 70% at 50% 110%, var(--sky-tint), transparent 70%),
-    rgba(150, 160, 180, calc(var(--sky-haze) * 0.12));
-  transition: background 4s ease;
+    linear-gradient(
+      to top,
+      var(--sky-low) 0%,
+      var(--sky-mid) 22%,
+      transparent 58%
+    ),
+    var(--sky-wash);
+  transition: opacity 3s ease;
+}
+
+/* 曇り・雨・雪のもや。ゆっくり横に流れる */
+.local-sky-haze {
+  position: fixed;
+  inset: -10% -30%;
+  z-index: -39;
+  pointer-events: none;
+  opacity: calc(var(--sky-haze) * 0.9);
+  background:
+    radial-gradient(
+      40% 28% at 22% 30%,
+      rgba(170, 180, 200, 0.16),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 30% at 70% 55%,
+      rgba(160, 170, 195, 0.14),
+      transparent 70%
+    ),
+    radial-gradient(
+      55% 35% at 40% 85%,
+      rgba(150, 160, 185, 0.16),
+      transparent 70%
+    ),
+    rgba(130, 140, 160, 0.06);
+  animation: local-sky-drift 60s ease-in-out infinite alternate;
+  transition: opacity 3s ease;
+}
+
+@keyframes local-sky-drift {
+  from {
+    transform: translate3d(-4%, 0, 0);
+  }
+  to {
+    transform: translate3d(4%, -2%, 0);
+  }
+}
+
+/* 雨と雪。グラデーションだけで描き、transform だけを動かす（画像を使わないので LCP の候補にならない） */
+.local-sky-precip {
+  position: fixed;
+  inset: 0;
+  z-index: -38;
+  overflow: hidden;
+  pointer-events: none;
+  animation: local-sky-fade-in 1.5s ease both;
+}
+.local-sky-precip > span {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  top: calc(-1 * var(--tile));
+  height: calc(100% + 2 * var(--tile));
+  background-size: var(--tile-w) var(--tile);
+  will-change: transform;
+}
+.local-sky-precip[data-kind="rain"] {
+  transform: rotate(14deg);
+  inset: -20%;
+}
+.local-sky-precip[data-kind="rain"] > span {
+  --tile: 120px;
+  --tile-w: 46px;
+  background-image:
+    radial-gradient(
+      0.7px 13px at 20% 25%,
+      rgba(190, 210, 255, 0.55),
+      transparent
+    ),
+    radial-gradient(
+      0.6px 10px at 70% 75%,
+      rgba(190, 210, 255, 0.4),
+      transparent
+    );
+  animation: local-sky-fall 0.55s linear infinite;
+}
+.local-sky-precip[data-kind="rain"] > span + span {
+  --tile: 90px;
+  --tile-w: 31px;
+  opacity: 0.6;
+  animation-duration: 0.8s;
+}
+.local-sky-precip[data-kind="snow"] > span {
+  --tile: 140px;
+  --tile-w: 110px;
+  background-image:
+    radial-gradient(
+      circle 1.8px at 18% 22%,
+      rgba(255, 255, 255, 0.85) 60%,
+      transparent
+    ),
+    radial-gradient(
+      circle 1.3px at 64% 58%,
+      rgba(255, 255, 255, 0.7) 60%,
+      transparent
+    ),
+    radial-gradient(
+      circle 1.5px at 85% 90%,
+      rgba(255, 255, 255, 0.6) 60%,
+      transparent
+    );
+  animation: local-sky-fall 9s linear infinite;
+}
+.local-sky-precip[data-kind="snow"] > span + span {
+  --tile: 100px;
+  --tile-w: 80px;
+  opacity: 0.55;
+  animation-duration: 14s;
+}
+
+@keyframes local-sky-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, var(--tile), 0);
+  }
+}
+@keyframes local-sky-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 動きを減らす設定では雨と雪を出さず、もやも止める（色と星の明るさだけ変える） */
+@media (prefers-reduced-motion: reduce) {
+  .local-sky-precip {
+    display: none;
+  }
+  .local-sky-haze {
+    animation: none;
+  }
 }
 
 .local-sky-readout {
