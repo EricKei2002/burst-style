@@ -17,12 +17,13 @@ import { useTransitionStore } from "../../lib/store";
 type ShaderWarpHandle = {
   playClose(durationMs: number): void;
   playOpen(durationMs: number): void;
+  playReveal(durationMs: number): void;
   hide(): void;
   dispose(): void;
 };
 
-/** マウント後、この時間 + アイドル待ちでシェーダーを読み込む */
-const IDLE_LOAD_DELAY_MS = 8000;
+/** 初回描画のあと、この時間以内の空き時間でシェーダーを読み込む（8秒は待たない） */
+const IDLE_LOAD_TIMEOUT_MS = 1500;
 
 /**
  * 全画面シェーダー遷移の薄いラッパー。three 本体は動的 import でのみ読み込み、
@@ -93,13 +94,34 @@ export default function ShaderPageTransition() {
         });
     };
 
-    const idleTimer = window.setTimeout(() => {
-      if ("requestIdleCallback" in window) {
-        idleHandle = window.requestIdleCallback(init, { timeout: 2000 });
-      } else {
-        init();
-      }
-    }, IDLE_LOAD_DELAY_MS);
+    let idleTimer: number | null = null;
+    if (typeof window.requestIdleCallback === "function") {
+      idleHandle = window.requestIdleCallback(init, {
+        timeout: IDLE_LOAD_TIMEOUT_MS,
+      });
+    } else {
+      idleTimer = window.setTimeout(init, 0);
+    }
+
+    // ポインタやキーの最初の操作でも先読みする（初回クリックに間に合わせる）
+    const onFirstInput = () => init();
+    window.addEventListener("pointermove", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("pointerdown", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("keydown", onFirstInput, { once: true });
+    window.addEventListener("scroll", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("touchstart", onFirstInput, {
+      once: true,
+      passive: true,
+    });
 
     const unsubscribeIntent = onShaderTransitionIntent(init);
 
@@ -112,11 +134,16 @@ export default function ShaderPageTransition() {
 
     return () => {
       cancelled = true;
-      window.clearTimeout(idleTimer);
+      if (idleTimer !== null) window.clearTimeout(idleTimer);
       if (idleHandle !== null && "cancelIdleCallback" in window) {
         window.cancelIdleCallback(idleHandle);
       }
       unsubscribeIntent();
+      window.removeEventListener("pointermove", onFirstInput);
+      window.removeEventListener("pointerdown", onFirstInput);
+      window.removeEventListener("keydown", onFirstInput);
+      window.removeEventListener("scroll", onFirstInput);
+      window.removeEventListener("touchstart", onFirstInput);
       motionQuery.removeEventListener("change", handleMotionChange);
       teardown();
     };
@@ -135,21 +162,28 @@ export default function ShaderPageTransition() {
     }
   }, [phase, overlayKind]);
 
-  // 戻る/進むなど想定外の経路変更：履歴は遅らせず、開く演出だけ短く見せる
+  // 戻る/進む：履歴は遅らせず、覆った最高潮から開く演出を見せる
   useEffect(() => {
     if (prevPathname.current === pathname) {
       return;
     }
     prevPathname.current = pathname;
     const overlay = overlayRef.current;
+    const currentPhase = useTransitionStore.getState().phase;
+    // closing/closed はこちらから始めた離脱。履歴戻りの割り込みは
+    // idle だけでなく opening 中でも最高潮から開く演出を出す。
     if (
       !overlay ||
-      useTransitionStore.getState().phase !== "idle" ||
+      currentPhase === "closing" ||
+      currentPhase === "closed" ||
       prefersReducedMotion()
     ) {
       return;
     }
-    overlay.playOpen(SHADER_WARP_REVEAL_MS);
+    overlay.playReveal(SHADER_WARP_REVEAL_MS);
+    if (currentPhase !== "idle") {
+      useTransitionStore.getState().setPhase("idle");
+    }
   }, [pathname]);
 
   return (
