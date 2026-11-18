@@ -33,6 +33,7 @@ import {
   scheduleSectionWarpOpen,
   startSectionWarp,
   useTransitionStore,
+  waitForShaderReady,
 } from "../../lib/store";
 
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
@@ -40,7 +41,13 @@ const LEAVE_MS = 90;
 
 type Props = Record<HomeSection, ReactNode>;
 
-type ShowOptions = { focus: boolean; animate: boolean; announce: boolean };
+type ShowOptions = {
+  focus: boolean;
+  animate: boolean;
+  announce: boolean;
+  /** セクション内のアンカー（#projects-index など）。切り替え後にそこへ送ってフォーカスする */
+  anchor?: string | null;
+};
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -104,6 +111,8 @@ export default function HomeSections(props: Props) {
   const warpInFlight = useRef(false);
   const warpSwapped = useRef(false);
   const localeRef = useRef(locale);
+  /** 宇宙船の準備待ち中に次の操作が来たら、古い要求は捨てる */
+  const navToken = useRef(0);
 
   useEffect(() => {
     localeRef.current = locale;
@@ -124,8 +133,23 @@ export default function HomeSections(props: Props) {
   }, []);
 
   const show = useCallback(
-    (next: HomeSection, { focus, animate, announce }: ShowOptions) => {
+    (
+      next: HomeSection,
+      { focus, animate, announce, anchor = null }: ShowOptions,
+    ) => {
+      const focusAnchor = () => {
+        const el = anchor ? document.getElementById(anchor) : null;
+        if (!el) return false;
+        if (!el.hasAttribute("tabindex")) el.tabIndex = -1;
+        el.scrollIntoView({ block: "start" });
+        el.focus({ preventScroll: true });
+        return true;
+      };
       if (next === targetRef.current) {
+        if (anchor && displayedRef.current === next) {
+          requestAnimationFrame(() => focusAnchor());
+          return;
+        }
         if (focus) focusHeading(next);
         return;
       }
@@ -153,11 +177,13 @@ export default function HomeSections(props: Props) {
           );
         }
         requestAnimationFrame(() => {
-          window.scrollTo({
-            top: scrollPositions.current[dest] ?? 0,
-            behavior: "instant",
-          });
-          if (focus) focusHeading(dest);
+          if (!(dest === next && focusAnchor())) {
+            window.scrollTo({
+              top: scrollPositions.current[dest] ?? 0,
+              behavior: "instant",
+            });
+            if (focus) focusHeading(dest);
+          }
           window.dispatchEvent(
             new CustomEvent(HOME_SECTION_EVENT, { detail: { section: dest } }),
           );
@@ -230,15 +256,33 @@ export default function HomeSections(props: Props) {
     [clearWarpTimers, focusHeading],
   );
 
-  /** URL を書き換えてから切り替える（メニュー・キー・スワイプ共通） */
+  /**
+   * URL を書き換えてから切り替える（ヘッダー・下部タブ・キー・スワイプ共通）。
+   * 宇宙船の準備がまだなら、ページ遷移と同じく最大 1 秒待ってから宇宙船か短いフェードかを決める。
+   */
   const navigate = useCallback(
-    (section: HomeSection, focus: boolean) => {
-      const nextUrl = `${window.location.pathname}${window.location.search}${hashForSection(section)}`;
-      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-      if (nextUrl !== currentUrl) {
-        window.history.pushState(window.history.state, "", nextUrl);
+    (section: HomeSection, focus: boolean, anchor: string | null = null) => {
+      const token = ++navToken.current;
+      const go = () => {
+        if (token !== navToken.current) return;
+        const hash = anchor ? `#${anchor}` : hashForSection(section);
+        const nextUrl = `${window.location.pathname}${window.location.search}${hash}`;
+        const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        if (nextUrl !== currentUrl) {
+          window.history.pushState(window.history.state, "", nextUrl);
+        }
+        show(section, { focus, animate: true, announce: true, anchor });
+      };
+      const needsWait =
+        section !== targetRef.current &&
+        !prefersReducedMotion() &&
+        !useTransitionStore.getState().shaderReady;
+      if (!needsWait) {
+        go();
+        return;
       }
-      show(section, { focus, animate: true, announce: true });
+      preloadShaderTransition(true);
+      void waitForShaderReady().then(go);
     },
     [show],
   );
@@ -323,7 +367,9 @@ export default function HomeSections(props: Props) {
       const section = sectionFromHash(url.hash);
       if (!section) return;
       event.preventDefault();
-      navigate(section, true);
+      const id = decodeURIComponent(url.hash.slice(1));
+      const inner = id && id !== section && id !== "top" ? id : null;
+      navigate(section, true, inner);
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);

@@ -11,6 +11,7 @@ import {
   UnsignedByteType,
   type Side,
 } from "three";
+import { drain } from "./frameSlicer";
 import { fbm, mulberry32, smooth } from "./proceduralNoise";
 
 /**
@@ -32,6 +33,13 @@ function finishTexture(tex: DataTexture, mipmaps: boolean): DataTexture {
  * 各セルの縁は必ず 0 に落ちるので板の輪郭が出ない。
  */
 export function createCloudAtlas(size: number): DataTexture {
+  return drain(cloudAtlasSteps(size));
+}
+
+/** createCloudAtlas の分割版（行ごとに yield する。FrameSlicer.run に渡す） */
+export function* cloudAtlasSteps(
+  size: number,
+): Generator<void, DataTexture, unknown> {
   const data = new Uint8Array(size * size * 4);
   const cell = size / 2;
   const octaves = size >= 256 ? 5 : 4;
@@ -49,6 +57,7 @@ export function createCloudAtlas(size: number): DataTexture {
     const ox = (v % 2) * cell;
     const oy = Math.floor(v / 2) * cell;
     for (let py = 0; py < cell; py++) {
+      yield;
       // DataTexture の行 0 は uv.y = 0（下）。ny は上が正
       const ny = (py + 0.5) / cell - 0.5;
       for (let px = 0; px < cell; px++) {

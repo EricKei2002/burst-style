@@ -104,8 +104,8 @@ export default function ContactSection({
       className="relative w-full py-24 sm:py-32 overflow-clip"
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mb-16 max-w-2xl">
-          <p className="mb-4 font-mono text-sm text-fuchsia-200">
+        <div className="instrument-panel mb-16 max-w-2xl p-6">
+          <p className="instrument-label mb-4 text-sm">
             <span aria-hidden="true">[{sectionPageLabel("contact")}] </span>
             ~/contact
           </p>
@@ -120,7 +120,7 @@ export default function ContactSection({
         </div>
 
         <div className="relative mx-auto max-w-3xl">
-          <div className="relative w-full rounded-2xl border border-zinc-800 bg-zinc-950/85 p-8 sm:p-12 overflow-hidden backdrop-blur-sm">
+          <div className="relative w-full rounded-2xl border border-zinc-800 bg-[rgb(7_7_11/0.95)] p-8 sm:p-12 overflow-hidden">
             {!isSent ? (
               <form
                 ref={formRef}

@@ -249,7 +249,7 @@ export default function LocalSky() {
             onKeyDown={(event) => {
               if (event.key === "Escape") event.currentTarget.blur();
             }}
-            className="local-sky-readout cursor-help select-none rounded px-1 py-2 font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-green-200/80 transition-colors hover:text-green-100 focus-visible:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/60"
+            className="local-sky-readout cursor-help select-none rounded bg-[rgb(7_7_11/0.85)] px-1 py-2 font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-green-200 transition-colors hover:text-green-100 focus-visible:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/60"
           >
             {readout}
           </button>

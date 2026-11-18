@@ -8,6 +8,7 @@ import ShaderPageTransition from "./components/visuals/ShaderPageTransition";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
 import LocalSky from "./components/visuals/LocalSky";
+import SkipToWork from "./components/ui/SkipToWork";
 import { homeSectionInitScript } from "./lib/homeSections";
 import { LocaleProvider } from "./lib/locale";
 import { LOCALE_STORAGE_KEY } from "./lib/localeConstants";
@@ -100,6 +101,7 @@ export default function RootLayout({
         <ShaderPageTransition />
         <SmoothScroll>
           <LocaleProvider>
+            <SkipToWork />
             <main className="min-h-screen w-full">{children}</main>
           </LocaleProvider>
         </SmoothScroll>

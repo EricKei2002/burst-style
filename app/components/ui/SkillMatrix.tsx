@@ -21,7 +21,7 @@ export default function SkillMatrix({
   const accentText = isProfessional ? "text-blue-400" : "text-fuchsia-400";
 
   return (
-    <div className="about-card mt-24">
+    <div className="about-card instrument-panel mt-24 p-6 sm:p-8">
       <h3 className="mb-2 text-2xl font-bold tracking-tight text-white">
         {copy.about.skillsHeading}
       </h3>
@@ -31,7 +31,7 @@ export default function SkillMatrix({
         {skillGroups.map((group) => (
           <div
             key={group.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6"
+            className="rounded-md border border-zinc-800 bg-zinc-950 p-5"
           >
             <div className="mb-1 flex items-center justify-between gap-4">
               <h4

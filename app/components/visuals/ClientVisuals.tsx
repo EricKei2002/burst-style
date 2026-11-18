@@ -26,7 +26,9 @@ function readHomeSection(): HomeSection {
 
 export default function ClientVisuals() {
   const pathname = usePathname();
-  const [homeSection, setHomeSection] = useState<HomeSection>(readHomeSection);
+  // サーバー描画と同じ "home" から始め、描画前（useLayoutEffect）に URL の状態へ合わせる。
+  // 初回から <html data-home-section> を読むと、#projects などの直リンクで水和が食い違う
+  const [homeSection, setHomeSection] = useState<HomeSection>("home");
   const cameFromPlanet = useRef(false);
 
   useLayoutEffect(() => {

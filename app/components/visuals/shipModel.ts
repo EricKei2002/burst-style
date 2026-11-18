@@ -32,6 +32,7 @@ import {
   type Texture,
 } from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { drain } from "./frameSlicer";
 import { mulberry32, valueNoise } from "./proceduralNoise";
 
 /**
@@ -114,11 +115,13 @@ function finish(tex: DataTexture, srgb = false): DataTexture {
  * 継ぎ目は溝（高さ低）、一部の継ぎ目に沿ってリベットを打つ。
  * ORM: R = AO、G = 粗さ、B = 金属度
  */
-function createHullTextures(size: number): {
-  albedo: DataTexture;
-  normal: DataTexture;
-  orm: DataTexture;
-} {
+function* hullTextureSteps(
+  size: number,
+): Generator<
+  void,
+  { albedo: DataTexture; normal: DataTexture; orm: DataTexture },
+  unknown
+> {
   const rnd = mulberry32(4242);
   const height = new Float32Array(size * size).fill(1);
   const tone = new Float32Array(size * size);
@@ -172,6 +175,7 @@ function createHullTextures(size: number): {
     const x0 = Math.floor(p.u0 * size);
     const x1 = Math.ceil(p.u1 * size);
     for (let y = y0; y < y1; y++) {
+      if ((y & 7) === 0) yield;
       const vv = (y + 0.5) / size;
       for (let x = x0; x < x1; x++) {
         const uu = (x + 0.5) / size;
@@ -204,6 +208,7 @@ function createHullTextures(size: number): {
   const orm = new Uint8Array(size * size * 4);
   const strength = size / 96;
   for (let y = 0; y < size; y++) {
+    if ((y & 7) === 0) yield;
     for (let x = 0; x < size; x++) {
       const i = y * size + x;
       const xl = (x - 1 + size) % size;
@@ -287,11 +292,13 @@ function v2(list: number[][]): Vector2[] {
  * 放熱板のテクスチャ。外向きに走る冷却管（縞）と、管に沿って残る熱のにじみ。
  * 戻り値の glow は emissiveMap（白 = 熱い管）。
  */
-function createRadiatorTextures(size: number): {
-  albedo: DataTexture;
-  normal: DataTexture;
-  glow: DataTexture;
-} {
+function* radiatorTextureSteps(
+  size: number,
+): Generator<
+  void,
+  { albedo: DataTexture; normal: DataTexture; glow: DataTexture },
+  unknown
+> {
   const albedo = new Uint8Array(size * size * 4);
   const normal = new Uint8Array(size * size * 4);
   const glow = new Uint8Array(size * size * 4);
@@ -302,6 +309,7 @@ function createRadiatorTextures(size: number): {
     return Math.max(0, Math.cos((k - 0.5) * Math.PI * 1.6));
   };
   for (let y = 0; y < size; y++) {
+    if ((y & 7) === 0) yield;
     const v = (y + 0.5) / size;
     const h = height(v);
     const dh = (height(v + 1 / size) - height(v - 1 / size)) * (size / 40);
@@ -385,6 +393,19 @@ export function createShipModel(
   softDot: Texture,
   disposables: Disposable[],
 ): ShipModel {
+  return drain(shipModelSteps(quality, rim, softDot, disposables));
+}
+
+/**
+ * createShipModel の分割版。テクスチャは数行ごと、組み立ては部位ごとに yield する
+ * （FrameSlicer.run に渡すと 1 タスク数 ms に収まる）。
+ */
+export function* shipModelSteps(
+  quality: ShipQuality,
+  rim: { value: Color },
+  softDot: Texture,
+  disposables: Disposable[],
+): Generator<void, ShipModel, unknown> {
   const d = DETAIL[quality];
   const low = quality === "low";
   const group = new Group();
@@ -393,8 +414,9 @@ export function createShipModel(
     return x;
   };
 
+  yield;
   // ---- テクスチャ ----
-  const tex = createHullTextures(d.tex);
+  const tex = yield* hullTextureSteps(d.tex);
   track(tex.albedo);
   track(tex.normal);
   track(tex.orm);
@@ -411,11 +433,12 @@ export function createShipModel(
   };
   const ringTex = cloneSet(14, 1);
   const frameTex = cloneSet(2, 2);
-  const rad = createRadiatorTextures(low ? 64 : 128);
+  const rad = yield* radiatorTextureSteps(low ? 64 : 128);
   track(rad.albedo);
   track(rad.normal);
   track(rad.glow);
 
+  yield;
   // ---- 材質（PBR） ----
   const pbr = (
     set: { albedo: Texture; normal: Texture; orm: Texture },
@@ -579,6 +602,7 @@ export function createShipModel(
     return s;
   };
 
+  yield;
   // ---- 窓：小さな角丸の板をインスタンスで並べる ----
   const windowGeo = track(new RoundedBoxGeometry(1, 1, 1, 1, 0.2));
   const windowSlots: {
@@ -593,6 +617,7 @@ export function createShipModel(
     size: Vector3,
   ) => windowSlots.push({ pos, rot, size });
 
+  yield;
   // ---- 指令モジュール：丸いドーム型の機首（尖らせない） ----
   const cmdR = 0.19;
   const cmdFront = -0.82;
@@ -677,6 +702,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- 背骨（主構造） ----
   add(
     new CylinderGeometry(0.068, 0.068, 0.92, Math.max(16, d.radial / 2)),
@@ -697,6 +723,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- 居住リング：回転する居住区。外周と後面に灯る窓の列 ----
   const ringZ = -0.25;
   const ringR = 0.44;
@@ -797,6 +824,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- 推進剤タンク群と断熱材で包んだ機器部 ----
   const tankZ = 0.13;
   add(
@@ -831,6 +859,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- 放熱板：長い板を外へ張り出す（翼ではなく、冷却管の縞と熱のにじみ） ----
   {
     const segs = low ? 2 : 3;
@@ -882,6 +911,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- エンジン部：推力構造（回転体）＋大きなノズルの束 ----
   const aftZ = 0.58;
   add(
@@ -965,6 +995,7 @@ export function createShipModel(
     );
   }
 
+  yield;
   // ---- アンテナ ----
   // 高利得パラボラ：背骨の上のマスト。前上方を向く
   {
@@ -1116,6 +1147,7 @@ export function createShipModel(
     }
   }
 
+  yield;
   // ---- 窓をまとめて置く ----
   {
     const win = new InstancedMesh(windowGeo, windowMat, windowSlots.length);
