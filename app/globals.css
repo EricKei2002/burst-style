@@ -65,3 +65,51 @@
     transform: none !important;
   }
 }
+
+/* ---- Local sky（現地時間と天気を星空へ控えめに反映）---- */
+:root {
+  --sky-star-opacity: 1;
+  --sky-haze: 0;
+  --sky-tint: transparent;
+}
+:root[data-sky="morning"] {
+  --sky-star-opacity: 0.9;
+  --sky-tint: rgba(255, 168, 120, 0.07);
+}
+:root[data-sky="day"] {
+  --sky-star-opacity: 0.82;
+  --sky-tint: rgba(96, 140, 220, 0.08);
+}
+:root[data-sky="evening"] {
+  --sky-star-opacity: 0.94;
+  --sky-tint: rgba(208, 92, 150, 0.08);
+}
+:root[data-weather="cloudy"] {
+  --sky-haze: 0.22;
+}
+:root[data-weather="rain"],
+:root[data-weather="snow"] {
+  --sky-haze: 0.32;
+}
+
+.star-bg {
+  opacity: calc(var(--sky-star-opacity) * (1 - var(--sky-haze)));
+  transition: opacity 4s ease;
+}
+
+/* 星空と本文の間に敷く色味と霞（クリックは通す） */
+.local-sky-veil {
+  position: fixed;
+  inset: 0;
+  z-index: -40;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 70% at 50% 110%, var(--sky-tint), transparent 70%),
+    rgba(150, 160, 180, calc(var(--sky-haze) * 0.12));
+  transition: background 4s ease;
+}
+
+.local-sky-readout {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}

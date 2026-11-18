@@ -108,7 +108,7 @@ export default function StarBackground() {
   return (
     <div
       ref={observerRef}
-      className="fixed inset-0 -z-50 h-full w-full bg-[#050505]"
+      className="star-bg fixed inset-0 -z-50 h-full w-full bg-[#050505]"
       aria-hidden="true"
     >
       {isReady && (
