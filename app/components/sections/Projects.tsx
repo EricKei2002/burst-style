@@ -123,9 +123,69 @@ export default function Projects() {
               <li data-stage="docked">{ja ? "駐機" : "docked"}</li>
               <li data-stage="inspect">{ja ? "点検" : "inspect"}</li>
             </ol>
-            <p className="instrument-tag absolute right-3 bottom-2 max-sm:hidden">
-              {ja ? "看板を選ぶと作品が開く" : "select a sign to open"}
-            </p>
+            {/* 看板ごとの点検の札（キーボードと読み上げの入口）。押すと看板のクリックと同じく
+                HANGAR_EXHIBIT_EVENT を流し、上の handleNavigation（宇宙船の fly-between）で開く。
+                フォーカス中は駐機窓に data-inspect を付け、段階ラベルを「点検」にする */}
+            <ul
+              aria-label={ja ? "格納庫の看板" : "Hangar signs"}
+              className="hangar-signs"
+              onFocus={(e) => {
+                const bay =
+                  e.currentTarget.closest<HTMLElement>("[data-hangar-bay]");
+                if (bay) bay.dataset.inspect = "";
+              }}
+              onBlur={(e) => {
+                const bay =
+                  e.currentTarget.closest<HTMLElement>("[data-hangar-bay]");
+                const next = e.relatedTarget as Node | null;
+                if (bay && !(next && bay.contains(next))) {
+                  delete bay.dataset.inspect;
+                }
+              }}
+            >
+              {projectsData.map((raw, index) => {
+                const project = getLocalizedProject(raw, locale);
+                return (
+                  <li key={project.slug}>
+                    <button
+                      type="button"
+                      data-hangar-sign={project.slug}
+                      aria-label={
+                        ja
+                          ? `${project.title}の看板を点検して開く`
+                          : `Inspect and open ${project.title}`
+                      }
+                      onPointerEnter={() => {
+                        preloadShaderTransition();
+                        router.prefetch(`/projects/${project.slug}`);
+                      }}
+                      onFocus={() => {
+                        preloadShaderTransition();
+                        router.prefetch(`/projects/${project.slug}`);
+                      }}
+                      onClick={(e) => {
+                        // 3D の看板のクリック判定（document の click）には渡さない
+                        e.preventDefault();
+                        window.dispatchEvent(
+                          new CustomEvent<HangarExhibitDetail>(
+                            HANGAR_EXHIBIT_EVENT,
+                            { detail: { slug: project.slug } },
+                          ),
+                        );
+                      }}
+                      className="hangar-sign"
+                    >
+                      <span aria-hidden="true" className="hangar-sign__no">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span aria-hidden="true" className="hangar-sign__name">
+                        {project.title}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
 
@@ -236,7 +296,7 @@ export default function Projects() {
         <section
           id="projects-index"
           aria-labelledby="projects-index-title"
-          className="instrument-panel mt-16 scroll-mt-28 px-5 pt-5 pb-2 sm:mt-24 sm:px-8 sm:pt-7"
+          className="instrument-panel mt-16 px-5 pt-5 pb-2 sm:mt-24 sm:px-8 sm:pt-7"
         >
           <div className="grid gap-x-8 gap-y-2 border-b border-white/10 pb-5 md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:items-end">
             <p className="instrument-label md:pb-1">ls -l</p>

@@ -38,8 +38,31 @@ export default function Header({
   const linkClass =
     "relative inline-flex h-full w-full items-center justify-center rounded-[3px] px-1.5 text-green-100 transition-[color,scale] duration-150 ease-out hover:text-white focus-visible:text-white motion-safe:active:scale-[0.97] aria-[current=page]:font-semibold aria-[current=page]:text-white sm:h-auto sm:min-h-8 sm:w-auto";
 
+  const headerRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const tickRef = useRef<HTMLLIElement>(null);
+
+  // 実際のヘッダーの高さを --header-h に入れる。アンカー（#projects-index や一覧の行）の
+  // scroll-margin-top がこれを使い、跳んだ先がヘッダーの下に隠れないようにする。
+  // JS 無しのときは globals.css の固定値に戻る
+  useLayoutEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const root = document.documentElement;
+    const write = () => {
+      root.style.setProperty(
+        "--header-h",
+        `${Math.ceil(header.getBoundingClientRect().height)}px`,
+      );
+    };
+    write();
+    const ro = new ResizeObserver(write);
+    ro.observe(header);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--header-h");
+    };
+  }, []);
 
   // 目盛りを現在地のリンクの下へ動かす（transform だけを動かす。幅は scaleX で合わせる）
   useLayoutEffect(() => {
@@ -78,8 +101,10 @@ export default function Header({
   }, [active, enhanced, locale]);
 
   return (
-    <header className="sticky inset-x-0 top-0 z-30 sm:mt-5">
-      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:py-5 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
+    // 上端から下端まで不透明のバー（.site-header）。外側に余白（margin）を作らず、
+    // 2 枚のパネルの間や上の余白から本文が透けないようにする
+    <header ref={headerRef} className="site-header sticky inset-x-0 top-0 z-30">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:pt-8 sm:pb-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
         <div
           aria-hidden="true"
           className="hidden min-h-[68px] w-full items-center rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm tracking-wide text-green-100 sm:inline-flex sm:text-base lg:max-w-[340px]"
@@ -109,9 +134,9 @@ export default function Header({
               // 現在地（読み上げは切り替え時の通知とメニューの aria-current で伝えるので隠す）
               <p
                 aria-hidden="true"
-                className="flex min-w-0 items-baseline gap-1.5 truncate text-[11px] text-fuchsia-100 sm:ml-auto sm:text-xs"
+                className="flex min-w-0 items-baseline gap-1.5 truncate text-[11px] text-green-100 sm:ml-auto sm:text-xs"
               >
-                <span className="tabular-nums text-fuchsia-200/90">
+                <span className="tabular-nums text-green-200/80">
                   {sectionPageLabel(active)}
                 </span>
                 <span className="font-semibold sm:hidden">

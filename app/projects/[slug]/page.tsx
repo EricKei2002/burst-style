@@ -99,7 +99,7 @@ export default async function ProjectPage({
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-xs font-mono text-fuchsia-200"
+                      className="text-xs font-mono text-[rgb(var(--planet-accent))]"
                     >
                       #{tag}
                     </span>
@@ -115,7 +115,7 @@ export default async function ProjectPage({
                 <h2 className="text-xl font-bold text-zinc-100 mb-4 flex items-center gap-2">
                   <span
                     aria-hidden="true"
-                    className="font-mono text-fuchsia-300"
+                    className="font-mono text-[rgb(var(--planet-accent))]"
                   >
                     &gt;
                   </span>
@@ -132,7 +132,7 @@ export default async function ProjectPage({
                 <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
                   <span
                     aria-hidden="true"
-                    className="font-mono text-fuchsia-300"
+                    className="font-mono text-[rgb(var(--planet-accent))]"
                   >
                     &gt;
                   </span>
@@ -144,7 +144,7 @@ export default async function ProjectPage({
                       key={idx}
                       className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6"
                     >
-                      <h3 className="text-fuchsia-400 font-medium mb-2 text-sm font-mono tracking-wider">
+                      <h3 className="text-[rgb(var(--planet-accent))] font-medium mb-2 text-sm font-mono tracking-wider">
                         [PROBLEM_{idx + 1}] {item.title}
                       </h3>
                       <p className="text-zinc-400 text-sm leading-relaxed">
@@ -159,7 +159,7 @@ export default async function ProjectPage({
                 <h2 className="text-xl font-bold text-zinc-100 mb-6 flex items-center gap-2">
                   <span
                     aria-hidden="true"
-                    className="font-mono text-fuchsia-300"
+                    className="font-mono text-[rgb(var(--planet-accent))]"
                   >
                     &gt;
                   </span>
@@ -197,7 +197,7 @@ export default async function ProjectPage({
                       href={project.siteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-fuchsia-600/10 text-fuchsia-400 border border-fuchsia-500/20 hover:bg-fuchsia-600/20 transition-all font-mono text-xs"
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-lg bg-[rgb(var(--planet-accent)/0.1)] text-[rgb(var(--planet-accent))] border border-[rgb(var(--planet-accent)/0.2)] hover:bg-[rgb(var(--planet-accent)/0.15)] transition-all font-mono text-xs"
                     >
                       <span>Visit Site</span>
                       <svg

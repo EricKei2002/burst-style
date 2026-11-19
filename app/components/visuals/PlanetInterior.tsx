@@ -262,19 +262,27 @@ export default function PlanetInterior({ theme }: Props) {
       }
       // 駐機窓の上では、看板に乗ったときだけ指のカーソルにする
       const bay = (e.target as Element | null)?.closest?.("[data-hangar-bay]");
+      // 下の点検の札にキーボードのフォーカスがある間は、点検の表示をポインターで消さない
+      const focusHolds = (el: HTMLElement) =>
+        el.contains(document.activeElement) &&
+        Boolean(document.activeElement?.matches?.(":focus-visible"));
       if (inspectBay && inspectBay !== bay) {
-        delete inspectBay.dataset.inspect;
+        if (!focusHolds(inspectBay)) delete inspectBay.dataset.inspect;
         inspectBay = null;
       }
       if (bay instanceof HTMLElement) {
-        const over = Boolean(s.pickExhibit(e.clientX, e.clientY));
+        // 札の上ではボタン自身のカーソルに任せる
+        const onSign = Boolean(
+          (e.target as Element | null)?.closest?.("[data-hangar-sign]"),
+        );
+        const over = !onSign && Boolean(s.pickExhibit(e.clientX, e.clientY));
         bay.style.cursor = over ? "pointer" : "";
-        // 看板に乗っている間は段階ラベルを「点検」にする
-        if (over) {
+        // 看板（または札）に乗っている間は段階ラベルを「点検」にする
+        if (over || onSign) {
           bay.dataset.inspect = "";
           inspectBay = bay;
         } else {
-          delete bay.dataset.inspect;
+          if (!focusHolds(bay)) delete bay.dataset.inspect;
           inspectBay = null;
         }
       }
@@ -286,6 +294,8 @@ export default function PlanetInterior({ theme }: Props) {
       if (e.defaultPrevented || e.button !== 0) return;
       const target = e.target as Element | null;
       if (!target?.closest?.("[data-hangar-bay]")) return;
+      // 点検の札は自分で HANGAR_EXHIBIT_EVENT を流す（二重に開かない）
+      if (target.closest("[data-hangar-sign]")) return;
       const slug = sceneRef.current?.pickExhibit(e.clientX, e.clientY);
       if (!slug) return;
       e.preventDefault();

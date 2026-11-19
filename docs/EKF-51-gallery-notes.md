@@ -76,6 +76,16 @@ Web フォントは追加していない。
 - 既存のコントラスト上書き（`.text-zinc-400` など）はそのまま。新しく作った薄い文字（駐機段階の消灯中の段）は `rgb(161 161 170)` で、ほぼ不透明の下地に対して AA を満たす
 - JS なしでは `.nav-tick` を出さない（`aria-current` も付かない）。駐機窓は従来どおり畳まれる
 
+## レビュー後の修正
+
+- `TiltCard.tsx` は Projects から外れて誰も import していなかったので削除した
+- 駐機窓の下辺に、看板ごとの点検の札（`<button data-hangar-sign>`、`.hangar-signs`）を並べた。Tab で届き、Enter / Space で看板のクリックと同じ `HANGAR_EXHIBIT_EVENT` を流す（Projects の `handleNavigation` → 宇宙船の fly-between）。フォーカス中は駐機窓に `data-inspect` が付いて段階が「点検」になる（3D の準備前でも点く）。狭い幅でも題名を省略表示する。`aria-label` は「〇〇の看板を点検して開く」/ “Inspect and open 〇〇”
+- 固定ヘッダーの `sm:mt-5` をやめ、上端からヘッダー下端までを不透明の `rgb(7 7 11)` のバー（`.site-header`）にした。2 枚のパネルの隙間や上の余白から作品一覧の文字が透けない。上の余白はヘッダーの内側の padding に移したので、「作品一覧へスキップ」はそのままヘッダーの上辺に乗る
+- Header がヘッダーの実寸を `--header-h` に入れ、`#projects-index`・各 `.projects-index__row`・JS 無しのセクションに `scroll-margin-top: calc(var(--header-h) + 0.75rem)` を付けた（JS 無しは幅ごとの固定値）。`html` の `scroll-padding-top` は `scroll-margin-top` と足し算になり二重にずれるため使っていない
+- ヘッダーの現在地のページ番号を fuchsia から計器の緑に揃えた
+- 詳細の「Back to Projects」のぼかした fuchsia の光をやめ、縁と矢印が惑星のアクセント色になるだけにした。`:focus-visible` のリングを足した
+- About / Contact / 404 / 詳細ページに残っていた fuchsia の塗りと光るドロップシャドウを、惑星のアクセント色（縁と文字色）に揃えた。Contact 送信後の丸い光るアイコンはやめ、角のある計器の印にした
+
 ## 確認
 
 - `prettier --check`（変更したファイル）、`eslint app`、`tsc --noEmit`、`next build`、`tsx --test`（7 件すべて成功）
@@ -84,5 +94,4 @@ Web フォントは追加していない。
 ## 残課題
 
 - ヒーローの「概要」は PC では `/Enter` まで透明のまま場所を取る（元の挙動を残した）
-- 駐機段階はポインターの時だけ「点検」になる。看板はもともとキーボードで選べないため、キーボードでは「駐機」のまま
 - WebGL のコンテキストを失ったときは段階が「接近」に戻る（3D の代わりの CSS の空になるため）

@@ -14,7 +14,7 @@ export default function NotFound() {
   return (
     <section className="relative flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-xl rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.94)] p-8 font-mono sm:p-10">
-        <p className="mb-6 flex items-center gap-2 text-xs tracking-wider text-fuchsia-400 uppercase">
+        <p className="mb-6 flex items-center gap-2 text-xs tracking-wider text-[rgb(var(--planet-accent))] uppercase">
           <span className="h-px w-8 bg-current" />
           Error 404
         </p>
@@ -44,7 +44,7 @@ export default function NotFound() {
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
             href="/"
-            className="flex items-center justify-center rounded-lg border border-fuchsia-500/30 bg-fuchsia-600/10 px-5 py-3 text-xs tracking-wider text-fuchsia-300 uppercase transition-colors hover:bg-fuchsia-600/20"
+            className="flex items-center justify-center rounded-lg border border-[rgb(var(--planet-accent)/0.3)] bg-[rgb(var(--planet-accent)/0.1)] px-5 py-3 text-xs tracking-wider text-[rgb(var(--planet-accent))] uppercase transition-colors hover:bg-[rgb(var(--planet-accent)/0.15)]"
           >
             <NotFoundText en="< Return to base" ja="< トップへ戻る" />
           </Link>

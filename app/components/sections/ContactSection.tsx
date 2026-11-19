@@ -132,7 +132,7 @@ export default function ContactSection({
                   <div className="space-y-2">
                     <label
                       htmlFor="name"
-                      className="text-xs font-mono text-fuchsia-300 ml-1"
+                      className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                     >
                       {copy.contact.formName}
                     </label>
@@ -149,7 +149,7 @@ export default function ContactSection({
                       className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.name
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                          : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                          : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                       }`}
                       placeholder={copy.contact.placeholderName}
                     />
@@ -165,7 +165,7 @@ export default function ContactSection({
                   <div className="space-y-2">
                     <label
                       htmlFor="email"
-                      className="text-xs font-mono text-fuchsia-300 ml-1"
+                      className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                     >
                       {copy.contact.formEmail}
                     </label>
@@ -182,7 +182,7 @@ export default function ContactSection({
                       className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.email
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                          : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                          : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                       }`}
                       placeholder={copy.contact.placeholderEmail}
                     />
@@ -200,7 +200,7 @@ export default function ContactSection({
                 <div className="space-y-2">
                   <label
                     htmlFor="message"
-                    className="text-xs font-mono text-fuchsia-300 ml-1"
+                    className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                   >
                     {copy.contact.formMessage}
                   </label>
@@ -216,7 +216,7 @@ export default function ContactSection({
                     className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 resize-none font-sans ${
                       fieldErrors.message
                         ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                        : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                        : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                     }`}
                     placeholder={copy.contact.placeholderMessage}
                   />
@@ -319,7 +319,7 @@ export default function ContactSection({
               </form>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center transition-opacity duration-500 starting:opacity-0">
-                <div className="w-16 h-16 bg-fuchsia-500/30 text-fuchsia-200 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[6px] border border-[rgb(var(--planet-accent)/0.45)] bg-[rgb(7_7_11/0.95)] text-[rgb(var(--planet-accent))]">
                   <svg
                     width="32"
                     height="32"
@@ -350,7 +350,7 @@ export default function ContactSection({
                 <button
                   type="button"
                   onClick={() => setIsSent(false)}
-                  className="mt-8 text-sm text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4 font-mono uppercase tracking-wider"
+                  className="mt-8 text-sm text-[rgb(var(--planet-accent))] hover:text-[rgb(var(--planet-accent))] underline underline-offset-4 font-mono uppercase tracking-wider"
                 >
                   {copy.contact.sendAnother}
                 </button>
