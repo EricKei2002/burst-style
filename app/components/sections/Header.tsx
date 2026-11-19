@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { Fragment, useLayoutEffect, useRef } from "react";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import {
   HOME_SECTIONS,
@@ -34,9 +34,10 @@ export default function Header({
   const copy = useSiteCopy();
   const index = HOME_SECTIONS.indexOf(active);
 
-  // 現在地は塗りではなく、下の目盛り（.nav-tick）が滑って示す。文字は白く太くするだけ
+  // 現在地は塗りではなく、下の目盛り（.nav-tick）が滑って示す。文字は白く太くするだけ。
+  // スマホの下部タブは 5 区画（360px で約 65px 幅）なので、文字を 10px・字間なし・余白少なめにして折り返さない
   const linkClass =
-    "relative inline-flex h-full w-full items-center justify-center rounded-[3px] px-1.5 text-green-100 transition-[color,scale] duration-150 ease-out hover:text-white focus-visible:text-white motion-safe:active:scale-[0.97] aria-[current=page]:font-semibold aria-[current=page]:text-white sm:h-auto sm:min-h-8 sm:w-auto";
+    "relative inline-flex h-full w-full items-center justify-center whitespace-nowrap rounded-[3px] px-0.5 text-[10px] tracking-normal text-green-100 sm:px-1.5 sm:text-sm sm:tracking-wide transition-[color,scale] duration-150 ease-out hover:text-white focus-visible:text-white motion-safe:active:scale-[0.97] aria-[current=page]:font-semibold aria-[current=page]:text-white sm:h-auto sm:min-h-8 sm:w-auto";
 
   const headerRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -180,26 +181,39 @@ export default function Header({
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
             <ul
               ref={listRef}
-              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11/0.97)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-5 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11/0.97)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
             >
               {enhanced && (
                 // 現在地の目盛り。スマホは下部タブの上辺、PC はリンクの下を滑る
                 <li ref={tickRef} aria-hidden="true" className="nav-tick" />
               )}
               {HOME_SECTIONS.map((section, i) => (
-                <li key={section} className="h-full sm:h-auto">
-                  <a
-                    href={SECTION_HREF[section]}
-                    aria-current={
-                      // JS 無し（縦に並ぶ表示）では現在地が決まらないので付けない
-                      enhanced && active === section ? "page" : undefined
-                    }
-                    aria-keyshortcuts={enhanced ? String(i + 1) : undefined}
-                    className={linkClass}
-                  >
-                    /{HOME_SECTION_LABELS[section]}
-                  </a>
-                </li>
+                <Fragment key={section}>
+                  <li className="h-full sm:h-auto">
+                    <a
+                      href={SECTION_HREF[section]}
+                      aria-current={
+                        // JS 無し（縦に並ぶ表示）では現在地が決まらないので付けない
+                        enhanced && active === section ? "page" : undefined
+                      }
+                      aria-keyshortcuts={enhanced ? String(i + 1) : undefined}
+                      className={linkClass}
+                    >
+                      /{HOME_SECTION_LABELS[section]}
+                    </a>
+                  </li>
+                  {section === "projects" && (
+                    // 作品一覧への常設リンク（タッチでもいつでも届く「作品一覧へスキップ」）。
+                    // SkipToWork と同じく素の <a>：HomeSections のハッシュ処理と JS 無しのアンカーを通す。
+                    // 現在地の目盛りはセクションの /Projects に残すので aria-current は付けない
+                    <li className="h-full sm:h-auto">
+                      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                      <a href="/#projects-index" className={linkClass}>
+                        {copy.header.indexLink}
+                      </a>
+                    </li>
+                  )}
+                </Fragment>
               ))}
             </ul>
             {enhanced && (

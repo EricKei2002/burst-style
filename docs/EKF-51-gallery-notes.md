@@ -100,7 +100,7 @@ Web フォントは追加していない。
 
 - **ホーム上部の宇宙**: Header がスクロール量を見て `<html data-header-solid>` を付け外しする（`scrollY > 4`）。`:root[data-home-section="home"]:not([data-header-solid]) .site-header` のときだけバーを透明にし、2 枚のパネルの周りと上端から星空を見せる。パネル自体は従来どおりほぼ不透明。少しでもスクロールしたとき・Projects / About / Contact では不透明のバーに戻るので、作品一覧の文字は透けない。切り替えは `background-color` / `border-color` の 180ms、reduced-motion では即時。JS 無しは `data-home-section` が付かないので常に不透明。詳細ページと 404 にはこのヘッダーが無い
 - **スクロール余白を 1 か所に**: `html { scroll-padding-top: calc(var(--header-h, var(--header-h-fallback)) + 0.75rem) }` だけにし、要素側の `scroll-margin-top`（`#projects-index`・`.projects-index__row`・JS 無しのセクション）と About の `scroll-mt-32` を外した。`#projects` `#about` `#contact` `#projects-index` `#about-lab-*`、スキップリンク、`scrollIntoView` が同じ余白（ヘッダー + 12px）になる
-- **アンカーのずれ**: 360px で `/#about-lab-todo` に直接来ると、跳んだあとに上の内容の高さが変わって行き先がヘッダーの裏（-69px）へずれていた。跳んだ直後の 2 秒間だけ、ユーザーが操作（wheel / touch / key / pointer）するまで `ResizeObserver` で行き先を保つ
+- **アンカーのずれ**: 360px で `/#about-lab-todo` に直接来ると、跳んだあとに上の内容の高さが変わって行き先がヘッダーの裏（-69px）へずれていた。跳んだ直後の 2 秒間だけ、ユーザーが操作（wheel / touch / key / pointer）するまで `ResizeObserver` で行き先を保つ（3 回目のレビューで「最後の高さ変化から 2 秒・最長 8 秒」に変更。下記）
 - **タブレット**: ヘッダーの 2 枚を `md`（768px）から横並びにした（`lg` からだったため 640〜1023px で約 209px あった → 129px）。1024〜1279px では `←→ / 1–4` のヒントが 3 行目に折り返して 149px になっていたので、ヒントは `xl` 以上だけに出す。JS 無しのフォールバック高さも 640〜767px = 12.5rem、768px 以上 = 8.125rem に合わせた
 - **キーボード**: 左下の計器ボタン（ローカル時刻）がスキップリンクより先に Tab で届いていたので、`<LocalSky />` を body の末尾へ移した（空のレイヤーは z-index が負なので見た目は変わらない）。全体の `:focus-visible` リングを固定の fuchsia から `--planet-accent` に変え、惑星ごとの色にした
 - **360px のはみ出し**: Now の一覧（`grid` の暗黙トラック）が長い語の幅に引っ張られて 11px はみ出していたので、`grid-cols-1` と `min-w-0` を付けた
@@ -112,12 +112,19 @@ Web フォントは追加していない。
 
 ### 残課題
 
-- スマホ（640px 未満）では「作品一覧へスキップ」が右下に常に出ていて、本文の上に重なる（前回からの仕様）
+- ~~スマホ（640px 未満）では「作品一覧へスキップ」が右下に常に出ていて、本文の上に重なる~~ → 3 回目のレビューで解消（下記）
 - スクロール位置を復元して読み込むときの透明ちらつきは、layout のインラインスクリプト（`headerSolidInitScript`）で描画前に `data-header-solid` を付けるようにした
 
 - 360px で左下の時刻・方位計器が下部タブ（/Home）に重なっていたので、`md` 未満は `bottom-32` に上げた
 - ヒーローや導入文の em ダッシュが狭い幅でハイフン折りに見える箇所を、カンマやコロン、ピリオドに直した（Home brief / Projects intro / About intro / Contact lead）
-- スマホで常時表示のスキップリンクが下部タブの直上に本文へ重なっていたので、トップと作品詳細の下余白をタブ＋リンクの分まで広げた
+- スマホで常時表示のスキップリンクが下部タブの直上に本文へ重なっていたので、トップと作品詳細の下余白をタブ＋リンクの分まで広げた（3 回目のレビューで、スキップをフォーカス時だけ出す形にしたため元に戻した）
 - 作品詳細や 404 には下部タブが無いのに、スキップリンクがタブ分だけ浮いて本文に被っていた。タブがあるトップ以外は、PC と同じく画面上端に吊るす
 - `homeSectionInitScript` が作品詳細や 404 でも `data-home-section=home` を付けていた。トップ以外では外すようにした（下部タブが無いページのスキップ位置がこれで正しく上端になる）
 - Contact の導入文は、スマホで br が hidden だったため「hello.」と次行がつながっていた。常に改行するようにした
+
+## 3 回目のレビュー後の修正
+
+- **スマホのスキップリンク**: トップ（`:root[data-home-section]` かつ 639px 以下）では、常時表示のスキップがタブ直上に浮いてスクロール中の本文（作品索引・Contact のラベル）に重なっていた。DOM 先頭の `.skip-to-work` は最初の Tab のまま、`:not(:focus)` の間は clip / clip-path の定番の隠し方で見た目だけ消し（`display:none` / `visibility:hidden` は使わない）、フォーカスされたらタブの直上に出す。640px 以上とトップ以外（作品詳細・404）は従来どおり上端に吊るして常に見える
+- **常設の /Index**: タッチでも「作品一覧へスキップ」がいつでも使えるよう、下部タブ（と sm 以上のヘッダーメニュー）に `/#projects-index` への素の `<a>` を足した（ラベルは `siteCopy.header.indexLink`、英語 `/Index`・日本語 `/一覧`）。並びは Home / Projects / Index / About / Contact、タブは `grid-cols-5`。`aria-current` は付けず、現在地の目盛りはセクションの /Projects に残す（`.nav-tick` のロジックは変更なし）。5 区画で折れないよう、タブ内のリンクはモバイルだけ 10px・字間なし・`whitespace-nowrap`・左右余白 2px にした（sm 以上は従来の text-sm / tracking-wide）。数字キー 1〜4 はセクションだけで、Index には割り当てない
+- **下余白を戻した**: スキップが常時は出なくなったので、トップは `pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0`、作品詳細はタブが無いので `pb-16`
+- **アンカー保持**: `scrollToAnchor` は、`ResizeObserver` が送り直すたびに 2 秒の静止タイマーを振り直し、最後の高さ変化から 2 秒静かになったら止める。開始から 8 秒で必ず切る。ユーザー操作（wheel / touchstart / keydown / pointerdown）で即停止は維持。新しいアンカーへ送るときは前の保持を止める。余白は従来どおり html の `scroll-padding-top`

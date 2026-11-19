@@ -515,8 +515,10 @@ html {
   display: none;
 }
 
-/* ---- 作品一覧へのスキップ（常に見える）----
-   PC はヘッダー上の余白、スマホは下部タブの上に小さく置く */
+/* ---- 作品一覧へのスキップ ----
+   640px 以上とトップ以外（作品詳細・404）は画面上端に吊るして常に見せる。
+   スマホのトップはフォーカスされるまで視覚的に隠し（本文に重ねない）、
+   フォーカス時だけ下部タブの直上に出す。タッチでは下部タブの /Index が常設の入口 */
 .skip-to-work {
   position: fixed;
   z-index: 100;
@@ -545,6 +547,17 @@ html {
     padding: 7px 9px;
     border-top: 1px solid rgb(var(--planet-accent) / 0.55);
     border-radius: 4px;
+  }
+  /* 定番の visually-hidden。display / visibility は使わず、Tab で届くまま見た目だけ消す */
+  :root[data-home-section] .skip-to-work:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
   }
 }
 @media (min-width: 640px) {

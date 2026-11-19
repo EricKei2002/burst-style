@@ -13,6 +13,8 @@ export function buildSiteCopy(locale: Locale) {
       }),
       langEn: pick(locale, { en: "EN", ja: "EN" }),
       langJa: pick(locale, { en: "JA", ja: "JA" }),
+      /** 下部タブ・ヘッダーメニューに常設する作品一覧（#projects-index）へのリンク */
+      indexLink: pick(locale, { en: "/Index", ja: "/一覧" }),
     },
     hero: {
       establishing: "> ESTABLISHING CONNECTION...",

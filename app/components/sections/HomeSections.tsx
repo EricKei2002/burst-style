@@ -39,21 +39,42 @@ import {
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
 const LEAVE_MS = 90;
 
+/** アンカー保持：最後の高さ変化からこの時間だけ静かなら止める（ms） */
+const ANCHOR_QUIET_MS = 2000;
+/** アンカー保持の上限（開始から、ms） */
+const ANCHOR_MAX_MS = 8000;
+/** 実行中のアンカー保持を止める関数。新しいアンカーへ送るときに前のものを切る */
+let stopAnchorHold: (() => void) | null = null;
+
 /**
  * アンカーへ送ったあと、上の内容（画像・遅れて描く部品）の高さが変わると行き先がヘッダーの裏へずれる。
- * 跳んだ直後の短い間だけ、ユーザーが自分で操作するまで行き先を保つ。
+ * 高さが変わるたびに行き先へ送り直し、最後の変化から 2 秒静かになったら止める（開始から最長 8 秒）。
+ * ユーザーが自分で操作（wheel / touchstart / keydown / pointerdown）したら即座に止める。
  * 余白は html の scroll-padding-top（globals.css）に任せる
  */
 function scrollToAnchor(el: HTMLElement) {
+  stopAnchorHold?.();
   el.scrollIntoView({ block: "start" });
   const userEvents = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
-  const ro = new ResizeObserver(() => el.scrollIntoView({ block: "start" }));
-  const stop = () => {
-    ro.disconnect();
-    window.clearTimeout(timer);
-    for (const type of userEvents) window.removeEventListener(type, stop);
+  let quietTimer = 0;
+  const armQuiet = () => {
+    window.clearTimeout(quietTimer);
+    quietTimer = window.setTimeout(stop, ANCHOR_QUIET_MS);
   };
-  const timer = window.setTimeout(stop, 2000);
+  const ro = new ResizeObserver(() => {
+    el.scrollIntoView({ block: "start" });
+    armQuiet();
+  });
+  const maxTimer = window.setTimeout(stop, ANCHOR_MAX_MS);
+  function stop() {
+    ro.disconnect();
+    window.clearTimeout(quietTimer);
+    window.clearTimeout(maxTimer);
+    for (const type of userEvents) window.removeEventListener(type, stop);
+    if (stopAnchorHold === stop) stopAnchorHold = null;
+  }
+  stopAnchorHold = stop;
+  armQuiet();
   for (const type of userEvents) {
     window.addEventListener(type, stop, { passive: true });
   }
