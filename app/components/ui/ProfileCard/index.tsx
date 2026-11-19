@@ -159,6 +159,8 @@ export default function ProfileCard({
   return (
     <div
       ref={wrapRef}
+      // スマホで左端の時刻（LocalSky）と重なる間は時刻の方を隠す
+      data-sky-avoid=""
       className={`${styles.wrapper} ${className}`}
       style={
         {

@@ -356,6 +356,16 @@
   writing-mode: vertical-rl;
   rotate: 180deg;
 }
+/* パネルが左端の時刻に重なっている間は時刻を隠す（LocalSky が data-covered を付ける） */
+.local-sky-dock {
+  transition:
+    opacity 150ms ease-out,
+    visibility 150ms;
+}
+.local-sky-dock[data-covered] {
+  opacity: 0;
+  visibility: hidden;
+}
 /* ---- トップのセクション切り替え（Home / Projects / About / Contact）----
    <html data-home-section> は JS が動くときだけ付く（layout の inline script）。
    属性が無い＝JS 無しでは全セクションを縦に並べて表示する */

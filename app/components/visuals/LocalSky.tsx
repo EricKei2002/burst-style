@@ -29,6 +29,9 @@ import {
 // 雨粒の Canvas は雨のときだけ要る。最初の JS から外し、雨になってから読み込む
 const RainCanvas = dynamic(() => import("./RainCanvas"), { ssr: false });
 
+/** 左端の時刻を重ねて描かない要素（計器パネルと About のプロフィールカード） */
+const SKY_AVOID = ".instrument-panel, [data-sky-avoid]";
+
 type SkyState = {
   phase: SkyPhase;
   look: SkyLook;
@@ -177,6 +180,54 @@ export default function LocalSky() {
     };
   }, []);
 
+  // 狭い画面では左端の時刻がパネル（作品一覧など）の左縁に乗る。重なっている間だけ時刻を隠す。
+  // IntersectionObserver の判定範囲（rootMargin）を時刻の矩形まで縮め、パネルがそこへ入ったかだけを見る
+  // （スクロールごとの計算はしない）。PC の左余白ではどれとも重ならないので出たまま
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [covered, setCovered] = useState(false);
+  const hasSky = sky !== null;
+  useEffect(() => {
+    const dock = dockRef.current;
+    if (!dock) return;
+    let io: IntersectionObserver | null = null;
+    const hits = new Set<Element>();
+    const watch = () => {
+      io?.disconnect();
+      hits.clear();
+      const targets = document.querySelectorAll(SKY_AVOID);
+      const r = dock.getBoundingClientRect();
+      const { clientWidth: vw, clientHeight: vh } = document.documentElement;
+      if (!targets.length || !r.width || !r.height) {
+        setCovered(false);
+        return;
+      }
+      const inset = (n: number) => `${-Math.max(0, Math.floor(n))}px`;
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) hits.add(e.target);
+            else hits.delete(e.target);
+          }
+          setCovered(hits.size > 0);
+        },
+        {
+          rootMargin: `${inset(r.top)} ${inset(vw - r.right)} ${inset(vh - r.bottom)} ${inset(r.left)}`,
+        },
+      );
+      targets.forEach((el) => io?.observe(el));
+    };
+    watch();
+    // 時刻の文字数（都市名・天気の有無）と画面サイズが変わったら範囲を取り直す
+    const ro = new ResizeObserver(watch);
+    ro.observe(dock);
+    window.addEventListener("resize", watch);
+    return () => {
+      io?.disconnect();
+      ro.disconnect();
+      window.removeEventListener("resize", watch);
+    };
+  }, [hasSky, pathname, homeSection]);
+
   // 星空背景（StarBackground / ShootingStars / globals.css）が読む値を <html> に置く
   useEffect(() => {
     if (!sky) return;
@@ -240,7 +291,11 @@ export default function LocalSky() {
           )}
         </>
       )}
-      <div className="fixed bottom-32 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5 md:bottom-24">
+      <div
+        ref={dockRef}
+        data-covered={covered ? "" : undefined}
+        className="local-sky-dock fixed bottom-32 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5 md:bottom-24"
+      >
         {/* 計器表示。ホバー・フォーカス（キーボード）・タップで短い説明を出す */}
         <div className="group relative">
           <button
