@@ -464,8 +464,9 @@ html {
 }
 
 /* ---- 計器（世界の上に乗る UI）----
-   半透明のガラスではなく、ほぼ不透明の黒い計器盤。縁は細い線、左に惑星色の目盛り。
-   惑星ごとの色は <html data-home-section> と詳細ページの [data-planet] で切り替える */
+   半透明のガラスではなく、ほぼ不透明の黒い計器盤。縁は細い線、左にセクション色の目盛り。
+   色は <html data-home-section> で切り替える（既定は Home / Projects / 作品詳細 / 404 の
+   フクシア）。どれも宇宙の暗い背景と計器盤の黒（rgb 7 7 11）の上で WCAG AA 以上 */
 :root {
   --planet-accent: 240 171 252;
   --planet-accent-2: 103 232 249;
@@ -504,44 +505,6 @@ html {
   color: rgb(244 244 245);
   background: rgb(7 7 11 / 0.9);
   border: 1px solid rgb(var(--planet-accent) / 0.45);
-}
-/* 駐機窓：中身は 3D。四隅の照準だけを描く */
-.hangar-bay__corner {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-color: rgb(var(--planet-accent-2) / 0.8);
-  border-style: solid;
-  border-width: 0;
-  pointer-events: none;
-}
-.hangar-bay__corner--tl {
-  top: 0;
-  left: 0;
-  border-top-width: 1.5px;
-  border-left-width: 1.5px;
-}
-.hangar-bay__corner--tr {
-  top: 0;
-  right: 0;
-  border-top-width: 1.5px;
-  border-right-width: 1.5px;
-}
-.hangar-bay__corner--bl {
-  bottom: 0;
-  left: 0;
-  border-bottom-width: 1.5px;
-  border-left-width: 1.5px;
-}
-.hangar-bay__corner--br {
-  bottom: 0;
-  right: 0;
-  border-bottom-width: 1.5px;
-  border-right-width: 1.5px;
-}
-/* JS 無し（縦に並ぶ表示）では 3D が無いので駐機窓は畳む */
-:root:not([data-home-section]) .hangar-bay {
-  display: none;
 }
 
 /* ---- 作品一覧へのスキップ ----
@@ -751,129 +714,6 @@ html {
   }
 }
 
-/* 駐機窓の段階：接近（3D 準備中）→ 駐機（3D 準備完了）→ 点検（看板に乗っている間） */
-.hangar-stage {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  list-style: none;
-}
-.hangar-stage__pad {
-  padding-right: 0.6rem;
-  border-right: 1px solid rgb(255 255 255 / 0.18);
-}
-.hangar-stage [data-stage] {
-  position: relative;
-  color: rgb(161 161 170);
-  transition: color 0.15s ease-out;
-}
-.hangar-stage [data-stage]::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -4px;
-  height: 1px;
-  background: rgb(var(--planet-accent-2));
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform 0.2s var(--ui-ease-out);
-}
-/* 点いている段 */
-.hangar-bay [data-stage="approach"],
-:root[data-planet-scene] .hangar-bay [data-stage="docked"],
-.hangar-bay[data-inspect] [data-stage="inspect"] {
-  color: rgb(250 250 250);
-}
-.hangar-bay [data-stage="approach"]::after,
-:root[data-planet-scene] .hangar-bay [data-stage="docked"]::after,
-.hangar-bay[data-inspect] [data-stage="inspect"]::after {
-  transform: scaleX(1);
-}
-/* 準備ができたら「接近」を消灯し、点検中（看板に乗る／下の札にフォーカス）は前の段を消灯する。
-   キーボードの点検は 3D の準備前でも点く */
-:root[data-planet-scene] .hangar-bay [data-stage="approach"],
-:root .hangar-bay[data-inspect] [data-stage="approach"],
-:root .hangar-bay[data-inspect] [data-stage="docked"] {
-  color: rgb(161 161 170);
-}
-:root[data-planet-scene] .hangar-bay [data-stage="approach"]::after,
-:root .hangar-bay[data-inspect] [data-stage="approach"]::after,
-:root .hangar-bay[data-inspect] [data-stage="docked"]::after {
-  transform: scaleX(0);
-}
-
-/* 駐機窓の下辺に並ぶ点検の札。看板ごとに 1 つ。キーボードと読み上げの入口で、
-   ポインターでは 3D の看板と同じ行き先になる。光らせず、縁と文字色だけで状態を出す */
-.hangar-signs {
-  position: absolute;
-  left: 0.75rem;
-  right: 0.75rem;
-  bottom: 0.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.375rem;
-  list-style: none;
-}
-.hangar-sign {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.4em;
-  min-height: 24px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  padding: 6px 8px;
-  border-radius: 3px;
-  color: rgb(228 228 231);
-  background: rgb(7 7 11 / 0.9);
-  border: 1px solid rgb(255 255 255 / 0.16);
-  cursor: pointer;
-  transition:
-    color 0.15s ease-out,
-    border-color 0.15s ease-out,
-    scale 0.15s ease-out;
-}
-.hangar-sign__no {
-  color: rgb(161 161 170);
-  font-variant-numeric: tabular-nums;
-}
-.hangar-sign:hover,
-.hangar-sign:focus-visible {
-  color: rgb(250 250 250);
-  border-color: rgb(var(--planet-accent) / 0.8);
-}
-.hangar-sign:hover .hangar-sign__no,
-.hangar-sign:focus-visible .hangar-sign__no {
-  color: rgb(var(--planet-accent));
-}
-.hangar-sign:focus-visible {
-  outline: 2px solid rgb(var(--planet-accent));
-  outline-offset: 2px;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .hangar-sign:active {
-    scale: 0.97;
-  }
-}
-/* 狭い幅でも題名を残す。折り返して窓の下辺に収める */
-@media (max-width: 639px) {
-  .hangar-sign {
-    min-height: 32px;
-    max-width: 100%;
-    font-size: 10px;
-    padding: 6px 7px;
-  }
-  .hangar-sign__name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 9.5em;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .home-sections.is-animated .home-panel:not(.is-leaving) .enter-rise {
     animation: none;
@@ -886,9 +726,7 @@ html {
   .project-card__title,
   .projects-index__row::before,
   .projects-index__link,
-  .projects-index__open,
-  .hangar-stage [data-stage]::after,
-  .hangar-sign {
+  .projects-index__open {
     transition: none;
   }
 }

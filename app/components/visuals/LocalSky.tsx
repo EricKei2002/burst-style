@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
-import { isHomePath } from "../../lib/planets";
 import {
   HOME_SECTION_EVENT,
   isHomeSection,
@@ -78,7 +77,8 @@ export default function LocalSky() {
     window.addEventListener(HOME_SECTION_EVENT, sync);
     return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
   }, [pathname]);
-  const showEarthSky = isHomePath(pathname) && homeSection === "home";
+  // 空の色・天気は宇宙の背景（作品詳細以外のすべて）に重ねる。詳細は惑星の地表なので出さない
+  const showEarthSky = !pathname.startsWith("/projects/");
   const [sky, setSky] = useState<SkyState | null>(null);
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
   /** 丸めた位置（API から）。取れるまでは時計ベース */

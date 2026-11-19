@@ -22,10 +22,6 @@ import {
   swipeDirection,
   type HomeSection,
 } from "../../lib/homeSections";
-import {
-  planetForHomeSection,
-  warpJourneyForSections,
-} from "../../lib/planets";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import {
   beginSectionWarpOpen,
@@ -195,7 +191,6 @@ export default function HomeSections(props: Props) {
         if (focus) focusHeading(next);
         return;
       }
-      const from = displayedRef.current;
       targetRef.current = next;
       window.clearTimeout(leaveTimer.current);
 
@@ -237,21 +232,17 @@ export default function HomeSections(props: Props) {
         !prefersReducedMotion() &&
         useTransitionStore.getState().shaderReady;
 
-      const warpOpts = (origin: HomeSection, dest: HomeSection) => {
-        const journey = warpJourneyForSections(origin, dest);
-        const destPlanet = planetForHomeSection(dest);
-        const fromPlanet = planetForHomeSection(origin);
-        return {
-          journey,
-          planetId: destPlanet?.id ?? fromPlanet?.id ?? null,
-          fromPlanetId: fromPlanet?.id ?? null,
-        };
-      };
+      // トップのセクションはどれも宇宙。惑星に出入りしない宇宙船の移動だけにする
+      const warpOpts = () => ({
+        journey: "neutral" as const,
+        planetId: null,
+        fromPlanetId: null,
+      });
 
       if (useShader) {
         preloadShaderTransition();
         if (warpInFlight.current && !warpSwapped.current) {
-          const opts = warpOpts(from, next);
+          const opts = warpOpts();
           useTransitionStore
             .getState()
             .setWarpContext(opts.journey, opts.planetId, opts.fromPlanetId);
@@ -262,7 +253,7 @@ export default function HomeSections(props: Props) {
           endSectionWarp();
           warpInFlight.current = false;
         }
-        const opts = warpOpts(from, next);
+        const opts = warpOpts();
         const delay = startSectionWarp(opts);
         const journey = opts.journey;
         warpInFlight.current = true;

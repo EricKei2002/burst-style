@@ -10,9 +10,7 @@ import {
   SHADER_WARP_REVEAL_MS,
   prefersReducedMotion,
 } from "../../lib/pageTransitionTiming";
-import { sectionFromLocation } from "../../lib/homeSections";
 import {
-  isHomePath,
   planetById,
   planetForView,
   rgbVec,
@@ -295,15 +293,8 @@ export default function ShaderPageTransition() {
     ) {
       return;
     }
-    const toSection = isHomePath(pathname)
-      ? (sectionFromLocation(window.location.hash, window.location.search) ??
-        "home")
-      : null;
-    const fromPlanet = planetForView(
-      prevPath,
-      prevPath.startsWith("/projects/") ? "projects" : "home",
-    );
-    const toPlanet = planetForView(pathname, toSection);
+    const fromPlanet = planetForView(prevPath);
+    const toPlanet = planetForView(pathname);
     let journey: WarpJourney = "neutral";
     if (!fromPlanet && toPlanet) journey = "enter-planet";
     else if (fromPlanet && !toPlanet) journey = "leave-space";
