@@ -114,7 +114,7 @@ export default function ContactSection({
           </h2>
           <p className="text-zinc-200 leading-relaxed">
             {copy.contact.leadLine1}
-            <br className="hidden sm:block" />
+            <br />
             {copy.contact.leadLine2}
           </p>
         </div>
