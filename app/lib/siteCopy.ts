@@ -15,11 +15,9 @@ export function buildSiteCopy(locale: Locale) {
       langJa: pick(locale, { en: "JA", ja: "JA" }),
       /** 下部タブ・ヘッダーメニューに常設する作品一覧（#projects-index）へのリンク */
       indexLink: pick(locale, { en: "/Index", ja: "/一覧" }),
-      /** indexLink の読み上げ名（先頭の / を付けない） */
-      indexLinkName: pick(locale, { en: "Index", ja: "一覧" }),
       /**
        * スマホの下部タブ（5 区画）だけで使う短いラベル。320px でも 12px で収まるように短くする。
-       * 読み上げ名は aria-label で元の語（Projects / Contact など）のままにする
+       * 表示が元の語と同じ（/Home・/Index・/About）なら aria-label は付けず、見えている文字を読ませる
        */
       tabShort: {
         home: "/Home",
@@ -28,6 +26,14 @@ export function buildSiteCopy(locale: Locale) {
         about: "/About",
         contact: "/Mail",
       },
+      /**
+       * 短いラベルが元の語と違うタブの読み上げ名（WCAG 2.5.3 Label in Name）。
+       * スマホで見える語（Work / Mail）で始め、PC で見える語（Projects / Contact）も含める
+       */
+      tabName: {
+        projects: "Work (Projects)",
+        contact: "Mail (Contact)",
+      } as Partial<Record<"home" | "projects" | "about" | "contact", string>>,
     },
     hero: {
       establishing: "> ESTABLISHING CONNECTION...",

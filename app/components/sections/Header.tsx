@@ -36,7 +36,8 @@ export default function Header({
 
   // 現在地は塗りではなく、下の目盛り（.nav-tick）が滑って示す。文字は白く太くするだけ。
   // スマホの下部タブは 5 区画（320px で約 58px 幅）。12px で読めるよう、スマホだけ短いラベル
-  // （copy.header.tabShort: /Work・/Mail など）を出し、PC は元のラベルのまま。読み上げ名は aria-label で元の語にする
+  // （copy.header.tabShort: /Work・/Mail など）を出し、PC は元のラベルのまま。読み上げ名は見えている文字から取り、
+  // 短いラベルが違う語になるタブ（/Work・/Mail）だけ copy.header.tabName（「Work (Projects)」など）を aria-label にする
   const linkClass =
     "relative inline-flex h-full w-full items-center justify-center whitespace-nowrap rounded-[3px] px-0.5 text-xs tracking-normal text-green-100 sm:px-1.5 sm:text-sm sm:tracking-wide transition-[color,scale] duration-150 ease-out hover:text-white focus-visible:text-white motion-safe:active:scale-[0.97] aria-[current=page]:font-semibold aria-[current=page]:text-white sm:h-auto sm:min-h-8 sm:w-auto";
 
@@ -198,7 +199,7 @@ export default function Header({
                         enhanced && active === section ? "page" : undefined
                       }
                       aria-keyshortcuts={enhanced ? String(i + 1) : undefined}
-                      aria-label={HOME_SECTION_LABELS[section]}
+                      aria-label={copy.header.tabName[section]}
                       className={linkClass}
                     >
                       <span className="sm:hidden">
@@ -215,11 +216,7 @@ export default function Header({
                     // 現在地の目盛りはセクションの /Projects に残すので aria-current は付けない
                     <li className="h-full sm:h-auto">
                       {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                      <a
-                        href="/#projects-index"
-                        aria-label={copy.header.indexLinkName}
-                        className={linkClass}
-                      >
+                      <a href="/#projects-index" className={linkClass}>
                         <span className="sm:hidden">
                           {copy.header.tabShort.index}
                         </span>
