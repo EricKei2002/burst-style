@@ -181,50 +181,61 @@ export default function LocalSky() {
   }, []);
 
   // 狭い画面では左端の時刻がパネル（作品一覧など）の左縁に乗る。重なっている間だけ時刻を隠す。
-  // IntersectionObserver の判定範囲（rootMargin）を時刻の矩形まで縮め、パネルがそこへ入ったかだけを見る
-  // （スクロールごとの計算はしない）。PC の左余白ではどれとも重ならないので出たまま
+  // スクロール・リサイズ・ページ内ジャンプのたびに、時刻とパネルの矩形を直接比べる（1 フレームに 1 回まで）。
+  // IntersectionObserver の rootMargin で時刻の矩形まで縮める方式は、本番環境で判定が抜けることがあった。
+  // PC の左余白ではどれとも重ならないので出たまま
   const dockRef = useRef<HTMLDivElement>(null);
   const [covered, setCovered] = useState(false);
   const hasSky = sky !== null;
   useEffect(() => {
     const dock = dockRef.current;
     if (!dock) return;
-    let io: IntersectionObserver | null = null;
-    const hits = new Set<Element>();
-    const watch = () => {
-      io?.disconnect();
-      hits.clear();
-      const targets = document.querySelectorAll(SKY_AVOID);
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      // visibility: hidden でもレイアウトは残るので、隠している間も矩形は取れる
       const r = dock.getBoundingClientRect();
-      const { clientWidth: vw, clientHeight: vh } = document.documentElement;
-      if (!targets.length || !r.width || !r.height) {
+      if (!r.width || !r.height) {
         setCovered(false);
         return;
       }
-      const inset = (n: number) => `${-Math.max(0, Math.floor(n))}px`;
-      io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) hits.add(e.target);
-            else hits.delete(e.target);
-          }
-          setCovered(hits.size > 0);
-        },
-        {
-          rootMargin: `${inset(r.top)} ${inset(vw - r.right)} ${inset(vh - r.bottom)} ${inset(r.left)}`,
-        },
-      );
-      targets.forEach((el) => io?.observe(el));
+      let hit = false;
+      for (const el of document.querySelectorAll(SKY_AVOID)) {
+        const p = el.getBoundingClientRect();
+        if (
+          p.width > 0 &&
+          p.height > 0 &&
+          p.left < r.right &&
+          p.right > r.left &&
+          p.top < r.bottom &&
+          p.bottom > r.top
+        ) {
+          hit = true;
+          break;
+        }
+      }
+      setCovered(hit);
     };
-    watch();
-    // 時刻の文字数（都市名・天気の有無）と画面サイズが変わったら範囲を取り直す
-    const ro = new ResizeObserver(watch);
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(check);
+    };
+    schedule();
+    // 時刻の文字数（都市名・天気の有無）が変わったときも測り直す
+    const ro = new ResizeObserver(schedule);
     ro.observe(dock);
-    window.addEventListener("resize", watch);
+    // 捕捉段階で拾い、ページ全体だけでなく内側のスクロール領域の動きにも反応する
+    document.addEventListener("scroll", schedule, {
+      passive: true,
+      capture: true,
+    });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("hashchange", schedule);
     return () => {
-      io?.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
       ro.disconnect();
-      window.removeEventListener("resize", watch);
+      document.removeEventListener("scroll", schedule, { capture: true });
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("hashchange", schedule);
     };
   }, [hasSky, pathname, homeSection]);
 
