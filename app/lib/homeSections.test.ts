@@ -17,6 +17,7 @@ function testSectionFromHash() {
   assert.equal(sectionFromHash("#projects"), "projects");
   assert.equal(sectionFromHash("#About"), "about");
   assert.equal(sectionFromHash("#about-lab-todo"), "about");
+  assert.equal(sectionFromHash("#projects-index"), "projects");
   assert.equal(sectionFromHash("#contact"), "contact");
   assert.equal(sectionFromHash("#name"), null);
   assert.equal(sectionFromHash("#%E0%A4%A"), null);

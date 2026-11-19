@@ -21,6 +21,15 @@ export const SHADER_OPEN_TO_IDLE_MS = SHADER_WARP_OPEN_MS + 60;
 /** 戻る/進む（popstate など）で、覆った状態から開く演出の長さ */
 export const SHADER_WARP_REVEAL_MS = 1400;
 
+/** 惑星同士を飛び移るときの閉じる長さ（突入より短く） */
+export const SHADER_FLY_CLOSE_MS = 900;
+
+export const SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS = SHADER_FLY_CLOSE_MS + 140;
+
+export const SHADER_FLY_OPEN_MS = 800;
+
+export const SHADER_FLY_OPEN_TO_IDLE_MS = SHADER_FLY_OPEN_MS + 60;
+
 /** シェーダーが使えて動きが許可されているときだけワープを選ぶ */
 export function pickPageTransitionOverlay(opts: {
   shaderReady: boolean;

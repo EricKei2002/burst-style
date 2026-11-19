@@ -68,8 +68,9 @@ export default async function ProjectPage({
     <>
       {/* ページを開いた直後に動画を全画面表示するイントロ演出 */}
       <ProjectIntro />
-      <article className="min-h-screen pt-24 pb-16 px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
+      <article className="min-h-screen px-3 pt-24 pb-16 sm:px-6 lg:px-8">
+        {/* 惑星の空の上でも本文の AA を保つ、ほぼ不透明の計器盤 */}
+        <div className="instrument-panel mx-auto max-w-4xl p-5 sm:p-8">
           <BackButton />
           <header className="mb-12">
             <div className="flex flex-col gap-6">

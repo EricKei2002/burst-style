@@ -6,6 +6,8 @@ import {
   SHADER_OPEN_TO_IDLE_MS,
   SHADER_WARP_CLOSE_MS,
   SHADER_WARP_OPEN_MS,
+  SHADER_FLY_CLOSE_MS,
+  SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS,
   navigateDelayFor,
   pickPageTransitionOverlay,
 } from "./pageTransitionTiming";
@@ -36,6 +38,10 @@ function testDelays() {
   assert.ok(SHADER_WARP_CLOSE_MS >= 1200 && SHADER_WARP_CLOSE_MS <= 1500);
   assert.ok(SHADER_OPEN_PAUSE_MS >= 200 && SHADER_OPEN_PAUSE_MS <= 400);
   assert.ok(SHADER_WARP_OPEN_MS >= 1000 && SHADER_WARP_OPEN_MS <= 1500);
+  assert.ok(
+    SHADER_FLY_CLOSE_MS >= 700 && SHADER_FLY_CLOSE_MS < SHADER_WARP_CLOSE_MS,
+  );
+  assert.ok(SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS >= SHADER_FLY_CLOSE_MS);
 }
 
 testOverlayChoice();

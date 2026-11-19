@@ -103,7 +103,7 @@ const ServerSpecs = () => (
           <span className="inline-flex items-center rounded bg-[#2496ed]/10 px-1.5 py-0.5 text-[#2496ed]">
             Docker
           </span>
-          <span className="inline-flex items-center rounded bg-[#5865F2]/10 px-1.5 py-0.5 text-[#5865F2]">
+          <span className="inline-flex items-center rounded bg-[#5865F2]/10 px-1.5 py-0.5 text-[#9ba3ff]">
             Discord BOT
           </span>
         </div>
@@ -829,7 +829,7 @@ export default function AboutSection() {
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         {/* ヘッダー */}
-        <header className="about-header mb-16 max-w-2xl">
+        <header className="about-header instrument-panel mb-16 max-w-2xl p-6">
           <p
             className={`mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
           >
@@ -904,7 +904,7 @@ export default function AboutSection() {
                   />
                 </div>
 
-                <div className="group rounded-xl border border-zinc-800 bg-zinc-950/85 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/90">
+                <div className="group rounded-xl border border-zinc-800 bg-[rgb(7_7_11/0.95)] p-6 transition hover:border-zinc-700 hover:bg-zinc-900">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3
                       className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-fuchsia-400"}`}

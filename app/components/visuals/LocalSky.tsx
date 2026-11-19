@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
+import { isHomePath } from "../../lib/planets";
+import {
+  HOME_SECTION_EVENT,
+  isHomeSection,
+  type HomeSection,
+} from "../../lib/homeSections";
 import dynamic from "next/dynamic";
 import {
   getSkyPhase,
@@ -59,7 +65,17 @@ function formatTime(date: Date): string {
  */
 export default function LocalSky() {
   const pathname = usePathname();
-  const isProjectPage = pathname.startsWith("/projects/");
+  const [homeSection, setHomeSection] = useState<HomeSection>("home");
+  useEffect(() => {
+    const sync = () => {
+      const value = document.documentElement.dataset.homeSection ?? null;
+      setHomeSection(isHomeSection(value) ? value : "home");
+    };
+    sync();
+    window.addEventListener(HOME_SECTION_EVENT, sync);
+    return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
+  }, [pathname]);
+  const showEarthSky = isHomePath(pathname) && homeSection === "home";
   const [sky, setSky] = useState<SkyState | null>(null);
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
   /** 丸めた位置（API から）。取れるまでは時計ベース */
@@ -186,7 +202,7 @@ export default function LocalSky() {
 
   return (
     <>
-      {!isProjectPage && (
+      {showEarthSky && (
         <>
           <div
             className="local-sky-veil"
@@ -233,7 +249,7 @@ export default function LocalSky() {
             onKeyDown={(event) => {
               if (event.key === "Escape") event.currentTarget.blur();
             }}
-            className="local-sky-readout cursor-help select-none rounded px-1 py-2 font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-green-200/80 transition-colors hover:text-green-100 focus-visible:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/60"
+            className="local-sky-readout cursor-help select-none rounded bg-[rgb(7_7_11/0.85)] px-1 py-2 font-mono text-[11px] uppercase leading-none tracking-[0.2em] text-green-200 transition-colors hover:text-green-100 focus-visible:text-green-50 focus-visible:outline-1 focus-visible:outline-green-300/60"
           >
             {readout}
           </button>

@@ -22,7 +22,7 @@ export function isHomeSection(value: string | null): value is HomeSection {
 
 /**
  * "#projects" → "projects"。空・#top・#now は Home。
- * #about-lab-todo のような About 内のアンカーは About。知らないハッシュは null。
+ * #about-lab-todo のような About 内のアンカーは About、#projects-index は Projects。知らないハッシュは null。
  */
 export function sectionFromHash(hash: string): HomeSection | null {
   let id = hash.replace(/^#/, "");
@@ -35,6 +35,7 @@ export function sectionFromHash(hash: string): HomeSection | null {
   if (id === "" || id === "top" || id === "now") return "home";
   if (isHomeSection(id)) return id;
   if (id.startsWith("about-")) return "about";
+  if (id.startsWith("projects-")) return "projects";
   return null;
 }
 
@@ -95,4 +96,4 @@ export function swipeDirection(
  * （属性が無い＝JS 無しでは全セクションを縦に並べる）。
  * トップの直リンク（#projects など）は初回描画前に決めるので Home が一瞬見えない。layout の <head> で実行する。
  */
-export const homeSectionInitScript = `try{var d=document.documentElement;d.dataset.homeSection="home";if(location.pathname==="/"){var h=location.hash.slice(1);if(!h){h=new URLSearchParams(location.search).get("section")||""}h=decodeURIComponent(h).toLowerCase();if(h.indexOf("about-")===0){h="about"}if(["projects","about","contact"].indexOf(h)>=0){d.dataset.homeSection=h}}}catch(e){}`;
+export const homeSectionInitScript = `try{var d=document.documentElement;d.dataset.homeSection="home";if(location.pathname==="/"){var h=location.hash.slice(1);if(!h){h=new URLSearchParams(location.search).get("section")||""}h=decodeURIComponent(h).toLowerCase();if(h.indexOf("about-")===0){h="about"}if(h.indexOf("projects-")===0){h="projects"}if(["projects","about","contact"].indexOf(h)>=0){d.dataset.homeSection=h}}}catch(e){}`;

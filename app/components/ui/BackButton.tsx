@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
-import { preloadSpaceshipAisleVideo } from "../../lib/spaceshipVideoPreload";
 import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
 import MagneticButton from "./MagneticButton";
 export default function BackButton() {
@@ -12,10 +11,13 @@ export default function BackButton() {
 
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
-    preloadSpaceshipAisleVideo();
     preloadShaderTransition();
-    // 未準備なら短く待ってからワープ。使えなければハンガー扉。
-    void beginLeaveTransition().then((navigateDelayMs) => {
+    // 詳細から Projects セクションへ。同じ惑星の中に留まる。
+    void beginLeaveTransition({
+      journey: "fly-between",
+      planetId: "projects",
+      fromPlanetId: "projects",
+    }).then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
         router.push("/#projects");
@@ -24,14 +26,14 @@ export default function BackButton() {
   };
 
   return (
-    <div className="fixed top-6 left-6 z-50 mix-blend-difference">
+    <div className="fixed top-6 left-6 z-50">
       <MagneticButton>
         <Link
           href="/#projects"
           onClick={handleBack}
-          onPointerEnter={preloadShaderTransition}
-          onFocus={preloadShaderTransition}
-          className="group relative flex items-center gap-3 px-5 py-3 rounded-full bg-zinc-900/40 backdrop-blur-md border border-white/10 hover:border-white/20 transition-[border-color] duration-200 ease-out"
+          onPointerEnter={() => preloadShaderTransition()}
+          onFocus={() => preloadShaderTransition()}
+          className="group relative flex items-center gap-3 px-5 py-3 rounded-md bg-[rgb(7_7_11/0.95)] border border-white/15 shadow-[inset_2px_0_0_rgb(var(--planet-accent)/0.85)] hover:border-white/30 transition-[border-color] duration-200 ease-out"
         >
           <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/5 group-hover:bg-fuchsia-500/20 transition-colors">
             <svg
@@ -49,7 +51,7 @@ export default function BackButton() {
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
           </div>
-          <span className="text-sm font-mono text-zinc-300 group-hover:text-white transition-colors tracking-wide pr-1">
+          <span className="text-sm font-mono text-zinc-100 group-hover:text-white transition-colors tracking-wide pr-1">
             Back to Projects
           </span>
 

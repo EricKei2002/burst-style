@@ -400,3 +400,116 @@
     scroll-margin-top: 9.5rem;
   }
 }
+
+/* ---- 計器（世界の上に乗る UI）----
+   半透明のガラスではなく、ほぼ不透明の黒い計器盤。縁は細い線、左に惑星色の目盛り。
+   惑星ごとの色は <html data-home-section> と詳細ページの [data-planet] で切り替える */
+:root {
+  --planet-accent: 240 171 252;
+  --planet-accent-2: 103 232 249;
+}
+:root[data-home-section="about"] {
+  --planet-accent: 252 211 77;
+  --planet-accent-2: 253 186 116;
+}
+:root[data-home-section="contact"] {
+  --planet-accent: 165 180 252;
+  --planet-accent-2: 196 181 253;
+}
+.instrument-panel {
+  position: relative;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 6px;
+  /* 惑星の空の上でも本文の AA を保つため、ほぼ不透明にする */
+  background: rgb(7 7 11 / 0.95);
+  box-shadow:
+    inset 2px 0 0 rgb(var(--planet-accent) / 0.85),
+    0 1px 0 rgb(255 255 255 / 0.04) inset;
+}
+.instrument-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgb(var(--planet-accent));
+}
+.instrument-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 5px 7px;
+  border-radius: 3px;
+  color: rgb(244 244 245);
+  background: rgb(7 7 11 / 0.9);
+  border: 1px solid rgb(var(--planet-accent) / 0.45);
+}
+/* 駐機窓：中身は 3D。四隅の照準だけを描く */
+.hangar-bay__corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: rgb(var(--planet-accent-2) / 0.8);
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+.hangar-bay__corner--tl {
+  top: 0;
+  left: 0;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.hangar-bay__corner--tr {
+  top: 0;
+  right: 0;
+  border-top-width: 1.5px;
+  border-right-width: 1.5px;
+}
+.hangar-bay__corner--bl {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.hangar-bay__corner--br {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
+}
+/* JS 無し（縦に並ぶ表示）では 3D が無いので駐機窓は畳む */
+:root:not([data-home-section]) .hangar-bay {
+  display: none;
+}
+
+/* ---- 作品一覧へのスキップ（常に見える）----
+   PC はヘッダー上の余白、スマホは下部タブの上に小さく置く */
+.skip-to-work {
+  position: fixed;
+  z-index: 100;
+  right: 0.75rem;
+  bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 7px 9px;
+  border-radius: 4px;
+  color: rgb(250 250 250);
+  background: rgb(7 7 11 / 0.94);
+  border: 1px solid rgb(var(--planet-accent) / 0.55);
+  text-decoration: none;
+}
+.skip-to-work:hover {
+  color: rgb(var(--planet-accent));
+}
+@media (min-width: 640px) {
+  .skip-to-work {
+    top: 0;
+    bottom: auto;
+    right: 1.5rem;
+    padding: 4px 8px;
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+  }
+}
