@@ -520,30 +520,36 @@ html {
 .skip-to-work {
   position: fixed;
   z-index: 100;
+  top: 0;
   right: 0.75rem;
-  bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
   line-height: 1;
-  padding: 7px 9px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  border-radius: 0 0 4px 4px;
   color: rgb(250 250 250);
   background: rgb(7 7 11 / 0.94);
   border: 1px solid rgb(var(--planet-accent) / 0.55);
+  border-top: 0;
   text-decoration: none;
 }
 .skip-to-work:hover {
   color: rgb(var(--planet-accent));
 }
+/* トップ（下部タブあり）だけ、タブの直上に置く。作品詳細や 404 は上に吊るす */
+@media (max-width: 639px) {
+  :root[data-home-section] .skip-to-work {
+    top: auto;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
+    padding: 7px 9px;
+    border-top: 1px solid rgb(var(--planet-accent) / 0.55);
+    border-radius: 4px;
+  }
+}
 @media (min-width: 640px) {
   .skip-to-work {
-    top: 0;
-    bottom: auto;
     right: 1.5rem;
-    padding: 4px 8px;
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
   }
 }
 
