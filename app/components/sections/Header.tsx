@@ -42,8 +42,8 @@ export default function Header({
   const listRef = useRef<HTMLUListElement>(null);
   const tickRef = useRef<HTMLLIElement>(null);
 
-  // 実際のヘッダーの高さを --header-h に入れる。アンカー（#projects-index や一覧の行）の
-  // scroll-margin-top がこれを使い、跳んだ先がヘッダーの下に隠れないようにする。
+  // 実際のヘッダーの高さを --header-h に入れる。html の scroll-padding-top がこれを使い、
+  // アンカー・スキップリンク・フォーカス移動の行き先がヘッダーの下に隠れないようにする。
   // JS 無しのときは globals.css の固定値に戻る
   useLayoutEffect(() => {
     const header = headerRef.current;
@@ -61,6 +61,22 @@ export default function Header({
     return () => {
       ro.disconnect();
       root.style.removeProperty("--header-h");
+    };
+  }, []);
+
+  // 少しでもスクロールしたら <html data-header-solid> を付け、ヘッダーを不透明のバーにする。
+  // 透明になるのは CSS 側で「Home セクション かつ data-header-solid 無し」のときだけ
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const update = () => {
+      if (window.scrollY > 4) root.dataset.headerSolid = "";
+      else delete root.dataset.headerSolid;
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", update);
+      delete root.dataset.headerSolid;
     };
   }, []);
 
@@ -102,12 +118,13 @@ export default function Header({
 
   return (
     // 上端から下端まで不透明のバー（.site-header）。外側に余白（margin）を作らず、
-    // 2 枚のパネルの間や上の余白から本文が透けないようにする
+    // 2 枚のパネルの間や上の余白から本文が透けないようにする。
+    // Home の先頭だけ CSS がバーを透明にし、パネルの周りに星空を見せる
     <header ref={headerRef} className="site-header sticky inset-x-0 top-0 z-30">
-      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:pt-8 sm:pb-4 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:pt-8 sm:pb-4 md:flex-row md:items-stretch md:justify-between md:gap-4 lg:gap-6 lg:px-8">
         <div
           aria-hidden="true"
-          className="hidden min-h-[68px] w-full items-center rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm tracking-wide text-green-100 sm:inline-flex sm:text-base lg:max-w-[340px]"
+          className="hidden min-h-[68px] w-full items-center rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm tracking-wide text-green-100 sm:inline-flex sm:text-base md:w-auto md:shrink-0 lg:w-full lg:max-w-[340px]"
         >
           <span className="font-semibold text-green-100">Burst Style</span>
         </div>
@@ -117,7 +134,7 @@ export default function Header({
             preloadShaderTransition();
             void import("../visuals/PlanetInterior");
           }}
-          className="relative w-full rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-3 py-1 font-mono text-xs tracking-wide text-left text-green-100 sm:min-h-[68px] sm:px-4 sm:py-2.5 sm:text-sm lg:max-w-[760px]"
+          className="relative w-full rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-3 py-1 font-mono text-xs tracking-wide text-left text-green-100 sm:min-h-[68px] sm:px-4 sm:py-2.5 sm:text-sm md:min-w-0 md:flex-1 lg:max-w-[760px]"
         >
           <div className="flex min-h-10 items-center justify-between gap-2 sm:min-h-0 sm:justify-start">
             <div className="flex min-w-0 flex-wrap items-center gap-x-0.5 gap-y-0.5">
@@ -152,7 +169,7 @@ export default function Header({
               <LangButtons locale={locale} setLocale={setLocale} copy={copy} />
             </div>
           </div>
-          <div className="contents sm:mt-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1">
+          <div className="contents sm:mt-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-5 sm:gap-y-1 lg:gap-x-6">
             <div
               className="hidden shrink-0 items-center gap-0.5 rounded-md border border-green-300/35 bg-black/40 p-0.5 sm:flex"
               role="group"
@@ -163,7 +180,7 @@ export default function Header({
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
             <ul
               ref={listRef}
-              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11/0.97)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0"
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11/0.97)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
             >
               {enhanced && (
                 // 現在地の目盛り。スマホは下部タブの上辺、PC はリンクの下を滑る
@@ -188,7 +205,7 @@ export default function Header({
             {enhanced && (
               <p
                 aria-hidden="true"
-                className="ml-auto hidden text-[11px] tracking-wider text-green-200/75 lg:block"
+                className="ml-auto hidden text-[11px] tracking-wider text-green-200/75 xl:block"
                 title={
                   locale === "ja"
                     ? "← → キーか 1〜4 で切り替え"

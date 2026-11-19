@@ -327,7 +327,7 @@ const timeline: TimelineItem[] = [
     ),
     tags: ["C#", "Windows Forms", "Algorithms"],
     extraComponent: (
-      <div id="about-lab-csharp" className="scroll-mt-32 w-full">
+      <div id="about-lab-csharp" className="w-full">
         <CsharpCalculator />
       </div>
     ),
@@ -579,7 +579,7 @@ const timeline: TimelineItem[] = [
     tags: ["Web Development", "TypeScript", "Frontend", "Study"],
     githubUrl: "https://github.com/EricKei2002/Todo-with-Typescript",
     extraComponent: (
-      <div id="about-lab-todo" className="scroll-mt-32 w-full">
+      <div id="about-lab-todo" className="w-full">
         <TodoAppDemo />
       </div>
     ),

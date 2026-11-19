@@ -240,7 +240,7 @@ export default function LocalSky() {
           )}
         </>
       )}
-      <div className="fixed bottom-24 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5">
+      <div className="fixed bottom-32 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5 md:bottom-24">
         {/* 計器表示。ホバー・フォーカス（キーボード）・タップで短い説明を出す */}
         <div className="group relative">
           <button

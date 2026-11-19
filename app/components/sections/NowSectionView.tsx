@@ -65,7 +65,7 @@ export default function NowSectionView({
           <p className="leading-relaxed text-zinc-50">{copy.now.intro}</p>
         </div>
 
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
             const relative = item.date
               ? formatRelative(item.date, renderedAt, locale)
@@ -73,7 +73,7 @@ export default function NowSectionView({
             return (
               <li
                 key={item.id}
-                className="flex flex-col gap-3 rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.95)] p-6 transition-colors duration-150 hover:border-[rgb(var(--planet-accent)/0.6)]"
+                className="flex min-w-0 flex-col gap-3 rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.95)] p-6 transition-colors duration-150 hover:border-[rgb(var(--planet-accent)/0.6)]"
               >
                 <div className="flex items-center justify-between gap-3">
                   {item.href ? (

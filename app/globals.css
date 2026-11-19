@@ -36,7 +36,8 @@
 }
 
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 2px solid #f0abfc;
+  /* 惑星ごとのアクセント（--planet-accent は下の「計器」で定義。未定義でも fuchsia に戻る） */
+  outline: 2px solid rgb(var(--planet-accent, 240 171 252));
   outline-offset: 3px;
   box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.9);
 }
@@ -392,9 +393,12 @@
   }
 }
 /* ---- 固定ヘッダー ----
-   上端から下端まで不透明のバー。ガラスにせず、行の文字が背後・隙間・上の余白から透けないようにする。
-   --header-h は Header が実測して入れる。JS 無しのときは下の固定値（スマホ 1 行 / タブレットは
-   2 枚が縦に積む / PC は横並び）に戻る */
+   基本は上端から下端まで不透明のバー。ガラスにせず、行の文字が背後・隙間・上の余白から透けないようにする。
+   例外は「Home セクションの先頭（スクロールほぼ 0）」だけで、そのときはバーを消して
+   パネルの周りから星空を見せる（パネル自体はほぼ不透明のまま）。Header がスクロールを見て
+   <html data-header-solid> を付け外しする。JS 無しでは data-home-section が無いので常に不透明。
+   --header-h は Header が実測して入れる。JS 無しのときは下の固定値（スマホ 1 行 /
+   640〜767px は 2 枚が縦に積む / 768px 以上は横並び）に戻る */
 :root {
   --header-h-fallback: 4.5rem;
 }
@@ -403,20 +407,31 @@
     --header-h-fallback: 12.5rem;
   }
 }
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   :root {
-    --header-h-fallback: 7.5rem;
+    --header-h-fallback: 8.125rem;
   }
 }
 .site-header {
-  background: rgb(7 7 11);
+  background-color: rgb(7 7 11);
   border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  transition:
+    background-color 0.18s ease-out,
+    border-color 0.18s ease-out;
 }
-/* アンカーで跳んだ先（セクション・文字だけの一覧・その各行）をヘッダーの下に出す */
-:root:not([data-home-section]) .home-panel > section,
-#projects-index,
-.projects-index__row {
-  scroll-margin-top: calc(var(--header-h, var(--header-h-fallback)) + 0.75rem);
+:root[data-home-section="home"]:not([data-header-solid]) .site-header {
+  background-color: transparent;
+  border-color: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
+}
+/* アンカー・スキップリンク・フォーカス移動で跳んだ先をヘッダーの下に出す。
+   余白はここ 1 か所だけ（要素側の scroll-margin-top / scroll-mt-* は付けない。二重になる） */
+html {
+  scroll-padding-top: calc(var(--header-h, var(--header-h-fallback)) + 0.75rem);
 }
 
 /* ---- 計器（世界の上に乗る UI）----

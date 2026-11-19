@@ -39,6 +39,27 @@ import {
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
 const LEAVE_MS = 90;
 
+/**
+ * アンカーへ送ったあと、上の内容（画像・遅れて描く部品）の高さが変わると行き先がヘッダーの裏へずれる。
+ * 跳んだ直後の短い間だけ、ユーザーが自分で操作するまで行き先を保つ。
+ * 余白は html の scroll-padding-top（globals.css）に任せる
+ */
+function scrollToAnchor(el: HTMLElement) {
+  el.scrollIntoView({ block: "start" });
+  const userEvents = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+  const ro = new ResizeObserver(() => el.scrollIntoView({ block: "start" }));
+  const stop = () => {
+    ro.disconnect();
+    window.clearTimeout(timer);
+    for (const type of userEvents) window.removeEventListener(type, stop);
+  };
+  const timer = window.setTimeout(stop, 2000);
+  for (const type of userEvents) {
+    window.addEventListener(type, stop, { passive: true });
+  }
+  ro.observe(document.body);
+}
+
 type Props = Record<HomeSection, ReactNode>;
 
 type ShowOptions = {
@@ -141,7 +162,7 @@ export default function HomeSections(props: Props) {
         const el = anchor ? document.getElementById(anchor) : null;
         if (!el) return false;
         if (!el.hasAttribute("tabindex")) el.tabIndex = -1;
-        el.scrollIntoView({ block: "start" });
+        scrollToAnchor(el);
         el.focus({ preventScroll: true });
         return true;
       };
@@ -306,7 +327,7 @@ export default function HomeSections(props: Props) {
           anchorId && anchorId !== initial
             ? document.getElementById(anchorId)
             : null;
-        if (anchor) anchor.scrollIntoView({ block: "start" });
+        if (anchor) scrollToAnchor(anchor);
         else window.scrollTo({ top: 0, behavior: "instant" });
         window.dispatchEvent(
           new CustomEvent(HOME_SECTION_EVENT, {

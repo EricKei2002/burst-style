@@ -29,7 +29,7 @@ export function buildSiteCopy(locale: Locale) {
         ja: "「Burst Style」— 創造性を爆発させ、未知の体験を形にする。",
       }),
       tagline2: pick(locale, {
-        en: "As a web engineer, I ship value that breaks the usual frame—with passion as the engine.",
+        en: "As a web engineer, I ship value that breaks the usual frame, with passion as the engine.",
         ja: "Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。",
       }),
     },
@@ -39,7 +39,7 @@ export function buildSiteCopy(locale: Locale) {
         ja: "既成概念を打ち砕き、記憶に残る体験を。",
       }),
       introLine2: pick(locale, {
-        en: "Burst Style—where design and engineering meet.",
+        en: "Burst Style, where design and engineering meet.",
         ja: "デザインと技術を融合した『Burst Style』の実践。",
       }),
     },
@@ -130,7 +130,7 @@ export function buildSiteCopy(locale: Locale) {
     },
     about: {
       intro: pick(locale, {
-        en: "Background and milestones in a timeline—how I grew into the work I do now.",
+        en: "Background and milestones in a timeline: how I grew into the work I do now.",
         ja: "技術と経験を積み上げてきた背景を、タイムライン形式で紹介します。",
       }),
       contactCta: pick(locale, { en: "Contact", ja: "お問い合わせ" }),
@@ -163,7 +163,7 @@ export function buildSiteCopy(locale: Locale) {
     },
     contact: {
       leadLine1: pick(locale, {
-        en: "New projects, collaboration, or a casual hello—",
+        en: "New projects, collaboration, or a casual hello.",
         ja: "新しいプロジェクト、コラボレーション、またはカジュアルな挨拶まで。",
       }),
       leadLine2: pick(locale, {

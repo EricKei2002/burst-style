@@ -81,7 +81,7 @@ Web フォントは追加していない。
 - `TiltCard.tsx` は Projects から外れて誰も import していなかったので削除した
 - 駐機窓の下辺に、看板ごとの点検の札（`<button data-hangar-sign>`、`.hangar-signs`）を並べた。Tab で届き、Enter / Space で看板のクリックと同じ `HANGAR_EXHIBIT_EVENT` を流す（Projects の `handleNavigation` → 宇宙船の fly-between）。フォーカス中は駐機窓に `data-inspect` が付いて段階が「点検」になる（3D の準備前でも点く）。狭い幅でも題名を省略表示する。`aria-label` は「〇〇の看板を点検して開く」/ “Inspect and open 〇〇”
 - 固定ヘッダーの `sm:mt-5` をやめ、上端からヘッダー下端までを不透明の `rgb(7 7 11)` のバー（`.site-header`）にした。2 枚のパネルの隙間や上の余白から作品一覧の文字が透けない。上の余白はヘッダーの内側の padding に移したので、「作品一覧へスキップ」はそのままヘッダーの上辺に乗る
-- Header がヘッダーの実寸を `--header-h` に入れ、`#projects-index`・各 `.projects-index__row`・JS 無しのセクションに `scroll-margin-top: calc(var(--header-h) + 0.75rem)` を付けた（JS 無しは幅ごとの固定値）。`html` の `scroll-padding-top` は `scroll-margin-top` と足し算になり二重にずれるため使っていない
+- Header がヘッダーの実寸を `--header-h` に入れ、アンカーの行き先をヘッダーの下に出すようにした（JS 無しは幅ごとの固定値）。※ 2 回目のレビューで `html` の `scroll-padding-top` 1 か所にまとめ直した（下記）
 - ヘッダーの現在地のページ番号を fuchsia から計器の緑に揃えた
 - 詳細の「Back to Projects」のぼかした fuchsia の光をやめ、縁と矢印が惑星のアクセント色になるだけにした。`:focus-visible` のリングを足した
 - About / Contact / 404 / 詳細ページに残っていた fuchsia の塗りと光るドロップシャドウを、惑星のアクセント色（縁と文字色）に揃えた。Contact 送信後の丸い光るアイコンはやめ、角のある計器の印にした
@@ -95,3 +95,25 @@ Web フォントは追加していない。
 
 - ヒーローの「概要」は PC では `/Enter` まで透明のまま場所を取る（元の挙動を残した）
 - WebGL のコンテキストを失ったときは段階が「接近」に戻る（3D の代わりの CSS の空になるため）
+
+## 2 回目のレビュー後の修正
+
+- **ホーム上部の宇宙**: Header がスクロール量を見て `<html data-header-solid>` を付け外しする（`scrollY > 4`）。`:root[data-home-section="home"]:not([data-header-solid]) .site-header` のときだけバーを透明にし、2 枚のパネルの周りと上端から星空を見せる。パネル自体は従来どおりほぼ不透明。少しでもスクロールしたとき・Projects / About / Contact では不透明のバーに戻るので、作品一覧の文字は透けない。切り替えは `background-color` / `border-color` の 180ms、reduced-motion では即時。JS 無しは `data-home-section` が付かないので常に不透明。詳細ページと 404 にはこのヘッダーが無い
+- **スクロール余白を 1 か所に**: `html { scroll-padding-top: calc(var(--header-h, var(--header-h-fallback)) + 0.75rem) }` だけにし、要素側の `scroll-margin-top`（`#projects-index`・`.projects-index__row`・JS 無しのセクション）と About の `scroll-mt-32` を外した。`#projects` `#about` `#contact` `#projects-index` `#about-lab-*`、スキップリンク、`scrollIntoView` が同じ余白（ヘッダー + 12px）になる
+- **アンカーのずれ**: 360px で `/#about-lab-todo` に直接来ると、跳んだあとに上の内容の高さが変わって行き先がヘッダーの裏（-69px）へずれていた。跳んだ直後の 2 秒間だけ、ユーザーが操作（wheel / touch / key / pointer）するまで `ResizeObserver` で行き先を保つ
+- **タブレット**: ヘッダーの 2 枚を `md`（768px）から横並びにした（`lg` からだったため 640〜1023px で約 209px あった → 129px）。1024〜1279px では `←→ / 1–4` のヒントが 3 行目に折り返して 149px になっていたので、ヒントは `xl` 以上だけに出す。JS 無しのフォールバック高さも 640〜767px = 12.5rem、768px 以上 = 8.125rem に合わせた
+- **キーボード**: 左下の計器ボタン（ローカル時刻）がスキップリンクより先に Tab で届いていたので、`<LocalSky />` を body の末尾へ移した（空のレイヤーは z-index が負なので見た目は変わらない）。全体の `:focus-visible` リングを固定の fuchsia から `--planet-accent` に変え、惑星ごとの色にした
+- **360px のはみ出し**: Now の一覧（`grid` の暗黙トラック）が長い語の幅に引っ張られて 11px はみ出していたので、`grid-cols-1` と `min-w-0` を付けた
+
+### 確認
+
+- Playwright で 360 / 390 / 700 / 768 / 1024 / 1280 / 1440 を撮影（`~/burst-gallery-rebuild-shots/`、コミットしない）。各幅でヘッダーの高さ、ホーム先頭で透明・スクロール後と他セクションで `rgb(7 7 11)`、`#projects-index` の上端 = ヘッダー + 12px、横はみ出し無しを数値で確認
+- Tab を送って順番とリングを確認: スキップリンク → 言語 → ナビ → 本文（Projects は 索引リンク → 点検札 5 枚 → カード → 索引）、Contact はフォーム 3 欄 → 送信、詳細は 戻る → 図の拡大 → 外部リンク。どれも `:focus-visible` のリングが出る
+
+### 残課題
+
+- スマホ（640px 未満）では「作品一覧へスキップ」が右下に常に出ていて、本文の上に重なる（前回からの仕様）
+- スクロール位置を復元して読み込むときの透明ちらつきは、layout のインラインスクリプト（`headerSolidInitScript`）で描画前に `data-header-solid` を付けるようにした
+
+- 360px で左下の時刻・方位計器が下部タブ（/Home）に重なっていたので、`md` 未満は `bottom-32` に上げた
+- ヒーローや導入文の em ダッシュが狭い幅でハイフン折りに見える箇所を、カンマやコロン、ピリオドに直した（Home brief / Projects intro / About intro / Contact lead）
