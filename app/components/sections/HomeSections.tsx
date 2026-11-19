@@ -149,7 +149,7 @@ export default function HomeSections(props: Props) {
   const warpInFlight = useRef(false);
   const warpSwapped = useRef(false);
   const localeRef = useRef(locale);
-  /** 宇宙船の準備待ち中に次の操作が来たら、古い要求は捨てる */
+  /** 遷移演出（ワープ）の準備待ち中に次の操作が来たら、古い要求は捨てる */
   const navToken = useRef(0);
 
   useEffect(() => {
@@ -232,7 +232,7 @@ export default function HomeSections(props: Props) {
         !prefersReducedMotion() &&
         useTransitionStore.getState().shaderReady;
 
-      // トップのセクションはどれも宇宙。惑星に出入りしない宇宙船の移動だけにする
+      // トップのセクションはどれも宇宙。惑星に出入りしない移動（neutral）にする
       const warpOpts = () => ({
         journey: "neutral" as const,
         planetId: null,
@@ -291,7 +291,7 @@ export default function HomeSections(props: Props) {
 
   /**
    * URL を書き換えてから切り替える（ヘッダー・下部タブ・キー・スワイプ共通）。
-   * 宇宙船の準備がまだなら、ページ遷移と同じく最大 1 秒待ってから宇宙船か短いフェードかを決める。
+   * ワープの準備がまだなら、ページ遷移と同じく最大 1 秒待ってからワープか短いフェードかを決める。
    */
   const navigate = useCallback(
     (section: HomeSection, focus: boolean, anchor: string | null = null) => {
