@@ -690,8 +690,8 @@ const timeline: TimelineItem[] = [
         </p>
         <p>
           現在は会社に所属しながら、プライベートでは個人開発や AWS SAA（AWS
-          Certified Solutions Architect –
-          Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
+          Certified Solutions
+          Architect&nbsp;–&nbsp;Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
           <a
             href="https://drill.burst.style"
             target="_blank"

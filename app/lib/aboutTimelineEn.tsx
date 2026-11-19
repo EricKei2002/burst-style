@@ -139,7 +139,7 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
     ],
   },
   {
-    lead: "v2020.0 Security Patch: Study-abort error from pandemic—force-routed into digital space.",
+    lead: "v2020.0 Security Patch: Study-abort error from pandemic: force-routed into digital space.",
     bullets: [
       {
         tone: "red",
@@ -238,7 +238,8 @@ export const ABOUT_TIMELINE_GEEK_EN: GeekEnglishBlock[] = [
         text: "Spec: “curiosity” consumes memory, but paying it down across work and side projects.",
       },
     ],
-    footer: "For collabs or a quick ping—same as always, reach me via Contact.",
+    footer:
+      "For collabs or a quick ping, reach me via Contact, same as always.",
   },
 ];
 
@@ -252,19 +253,19 @@ export const ABOUT_TIMELINE_PRO_EN: ProEnglishBlock[] = [
   {
     paragraphs: [
       "My first step into programming was the visual language Scratch.",
-      "I learned how fun it is to instruct a computer logically and watch ideas become real—early training in computational thinking.",
+      "I learned how fun it is to instruct a computer logically and watch ideas become real: early training in computational thinking.",
     ],
   },
   {
     paragraphs: [
       "Encouraged by friends, I moved into C# and serious tooling.",
-      "With Visual Studio and Windows Forms I taught myself variables, control flow, OOP basics, and shipped a working calculator—learning to care about the user’s perspective, not only the code.",
+      "With Visual Studio and Windows Forms I taught myself variables, control flow, OOP basics, and shipped a working calculator, learning to care about the user’s perspective, not only the code.",
     ],
   },
   {
     paragraphs: [
       "Alongside software, I went deep on hardware.",
-      "Building PCs taught me how CPU, GPU, memory, and storage shape the whole system. Overclocking and tuning showed me how to find bottlenecks and iterate—core engineering practice.",
+      "Building PCs taught me how CPU, GPU, memory, and storage shape the whole system. Overclocking and tuning showed me how to find bottlenecks and iterate: core engineering practice.",
     ],
   },
   {
@@ -282,19 +283,19 @@ export const ABOUT_TIMELINE_PRO_EN: ProEnglishBlock[] = [
   {
     paragraphs: [
       "I traveled solo to North America to meet friends I’d only known online.",
-      "Living locally tested real-world English and proved I could plan and execute a big trip alone—turning digital relationships into trusted real-world ones deepened my interest in bridging online and offline.",
+      "Living locally tested real-world English and proved I could plan and execute a big trip alone. Turning digital relationships into trusted real-world ones deepened my interest in bridging online and offline.",
     ],
   },
   {
     paragraphs: [
-      "I worked live-in jobs in resort towns like Hakuba and Niseko—international guests meant English was part of daily work.",
+      "I worked live-in jobs in resort towns like Hakuba and Niseko, where international guests meant English was part of daily work.",
       "Harsh winter conditions built grit; off the clock I kept studying programming. I’m proud of adapting fast and sustaining effort toward a goal.",
     ],
   },
   {
     paragraphs: [
-      "I focused on modern web skills—TypeScript, React, Next.js.",
-      "Beyond tutorials I shipped apps like a Todo product to learn types, component design, SSR, and practical debugging—with AI tools as one accelerator in the loop.",
+      "I focused on modern web skills: TypeScript, React, Next.js.",
+      "Beyond tutorials I shipped apps like a Todo product to learn types, component design, SSR, and practical debugging, with AI tools as one accelerator in the loop.",
     ],
   },
   {
@@ -306,7 +307,7 @@ export const ABOUT_TIMELINE_PRO_EN: ProEnglishBlock[] = [
   {
     paragraphs: [
       "I work as a frontend engineer on a product team.",
-      "Outside work I keep building personal projects and studying for the AWS Solutions Architect – Associate (SAA) certification. To keep the habit going, I built an AWS Study App (Next.js / Supabase), a daily 10-question practice app, and use it myself every day.",
+      "Outside work I keep building personal projects and studying for the AWS Solutions Architect Associate (SAA) certification. To keep the habit going, I built an AWS Study App (Next.js / Supabase), a daily 10-question practice app, and use it myself every day.",
       "I care about shipping with React and TypeScript, contributing with adaptability and English communication, and keep experimenting with infra and AI to widen my lens.",
     ],
   },

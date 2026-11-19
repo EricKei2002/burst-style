@@ -15,6 +15,19 @@ export function buildSiteCopy(locale: Locale) {
       langJa: pick(locale, { en: "JA", ja: "JA" }),
       /** 下部タブ・ヘッダーメニューに常設する作品一覧（#projects-index）へのリンク */
       indexLink: pick(locale, { en: "/Index", ja: "/一覧" }),
+      /** indexLink の読み上げ名（先頭の / を付けない） */
+      indexLinkName: pick(locale, { en: "Index", ja: "一覧" }),
+      /**
+       * スマホの下部タブ（5 区画）だけで使う短いラベル。320px でも 12px で収まるように短くする。
+       * 読み上げ名は aria-label で元の語（Projects / Contact など）のままにする
+       */
+      tabShort: {
+        home: "/Home",
+        projects: "/Work",
+        index: pick(locale, { en: "/Index", ja: "/一覧" }),
+        about: "/About",
+        contact: "/Mail",
+      },
     },
     hero: {
       establishing: "> ESTABLISHING CONNECTION...",
@@ -27,8 +40,8 @@ export function buildSiteCopy(locale: Locale) {
         ja: "詳細を表示する",
       }),
       tagline1: pick(locale, {
-        en: '"Burst Style" — creativity that explodes into unfamiliar, memorable experiences.',
-        ja: "「Burst Style」— 創造性を爆発させ、未知の体験を形にする。",
+        en: '"Burst Style": creativity that explodes into unfamiliar, memorable experiences.',
+        ja: "「Burst Style」\u00a0—\u00a0創造性を爆発させ、未知の体験を形にする。",
       }),
       tagline2: pick(locale, {
         en: "As a web engineer, I ship value that breaks the usual frame, with passion as the engine.",
@@ -117,7 +130,7 @@ export function buildSiteCopy(locale: Locale) {
         "saa-drill": {
           name: "SAA Drill",
           summary: pick(locale, {
-            en: "AWS Solutions Architect – Associate (SAA) practice drill. Next.js 16 on Vercel.",
+            en: "AWS Solutions Architect Associate (SAA) practice drill. Next.js 16 on Vercel.",
             ja: "AWS SAA（Solutions Architect Associate）向けの演習ドリル。Next.js 16 / Vercel。",
           }),
         },
