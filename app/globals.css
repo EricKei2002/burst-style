@@ -403,10 +403,11 @@
   }
 }
 /* ---- 固定ヘッダー ----
-   基本は上端から下端まで不透明のバー。ガラスにせず、行の文字が背後・隙間・上の余白から透けないようにする。
-   例外は「Home セクションの先頭（スクロールほぼ 0）」だけで、そのときはバーを消して
-   パネルの周りから星空を見せる（パネル自体はほぼ不透明のまま）。Header がスクロールを見て
-   <html data-header-solid> を付け外しする。JS 無しでは data-home-section が無いので常に不透明。
+   背景は main と同じ宇宙空間のまま見せる：ページ先頭（どのセクションでも、JS 無しでも）はバーを
+   透明にし、2 枚のパネル（ほぼ不透明）の周りから星空が見える。
+   スクロールした間だけ上端から下端まで不透明のバーにし、本文が背後・隙間から透けないようにする。
+   Header（と layout の inline script）がスクロールを見て <html data-header-solid> を付け外しする。
+   JS 無しでは、対応ブラウザならスクロール連動の CSS アニメーションで同じ切り替えをする。
    --header-h は Header が実測して入れる。JS 無しのときは下の固定値（スマホ 1 行 /
    640〜767px は 2 枚が縦に積む / 768px 以上は横並び）に戻る */
 :root {
@@ -423,15 +424,33 @@
   }
 }
 .site-header {
-  background-color: rgb(7 7 11);
-  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
   transition:
     background-color 0.18s ease-out,
     border-color 0.18s ease-out;
 }
-:root[data-home-section="home"]:not([data-header-solid]) .site-header {
-  background-color: transparent;
-  border-color: transparent;
+:root[data-header-solid] .site-header {
+  background-color: rgb(7 7 11);
+  border-color: rgb(255 255 255 / 0.08);
+}
+/* JS 無し（data-home-section が付かない）：先頭 4px のスクロールで不透明にする */
+@supports (animation-timeline: scroll()) {
+  :root:not([data-home-section]) .site-header {
+    animation: site-header-solid linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 5px;
+  }
+}
+@keyframes site-header-solid {
+  from {
+    background-color: transparent;
+    border-color: transparent;
+  }
+  to {
+    background-color: rgb(7 7 11);
+    border-color: rgb(255 255 255 / 0.08);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .site-header {
