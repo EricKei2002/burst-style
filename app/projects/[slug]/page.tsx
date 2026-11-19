@@ -74,7 +74,7 @@ export default async function ProjectPage({
           <BackButton />
           <header className="mb-12">
             <div className="flex flex-col gap-6">
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[6px] border border-zinc-800 bg-zinc-900/50">
                 <Image
                   src={project.image}
                   alt={project.title}
@@ -189,7 +189,7 @@ export default async function ProjectPage({
             </div>
 
             <div className="space-y-8">
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
+              <div className="rounded-[6px] border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
                 <h3 className="text-sm font-medium text-zinc-400">Links</h3>
                 <div className="flex flex-col gap-3">
                   {project.siteUrl && (
@@ -241,7 +241,7 @@ export default async function ProjectPage({
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
+              <div className="rounded-[6px] border border-zinc-800 bg-zinc-900/30 p-6 space-y-4">
                 <h3 className="text-sm font-medium text-zinc-400">
                   Tech Stack
                 </h3>

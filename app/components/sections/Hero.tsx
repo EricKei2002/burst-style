@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useRef, useEffect, useState } from "react";
-import MagneticButton from "../ui/MagneticButton";
-import { useSiteCopy } from "../../lib/locale";
+import { useLocale, useSiteCopy } from "../../lib/locale";
+import { sectionPageLabel } from "../../lib/homeSections";
 import dynamic from "next/dynamic";
 
 const GlitchText = dynamic(() => import("../ui/GlitchText"), {
@@ -13,8 +13,14 @@ const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
   ssr: false,
 });
 
+/**
+ * Home の最初の画面。中央に浮かぶカードではなく、左に寄せた計器の読み出しとして組む。
+ * - 見出しは大きく字間を詰め、左揃え。PC では右側を宇宙（3D）に空けておく
+ * - 本文は行長を決めて左揃え。左に短い計器ラベルの列を置き、罫線と余白だけで区切る
+ */
 export default function Top() {
   const copy = useSiteCopy();
+  const { locale } = useLocale();
   const [descriptionVisible, setDescriptionVisible] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
@@ -65,83 +71,107 @@ export default function Top() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showDescription]);
 
+  const ja = locale === "ja";
+
   return (
-    <section
-      id="top"
-      className="relative flex min-h-screen w-full flex-col overflow-hidden"
-    >
-      <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
-        <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
-            <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
-              <span className="flex items-center justify-center">
-                <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
-                <span className="title-char">Hello, I&apos;m</span>
-              </span>
-              <span className="flex items-center justify-center">
-                <span className="font-mono pb-2 inline-block">
-                  <GlitchText text="Eric Kei." />
-                </span>
-                <span className="animate-pulse font-mono text-fuchsia-300 ml-1 pb-2">
-                  _
-                </span>
-              </span>
-            </h1>
+    <section id="top" className="relative min-h-screen w-full">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8 lg:pt-14">
+        {/* 読み出しの列：PC では左 2/3 ほどだけを使い、右は宇宙に空ける */}
+        <div className="instrument-panel px-5 pt-4 pb-7 sm:px-8 sm:pt-5 sm:pb-9 lg:w-[min(100%,56rem)]">
+          <p
+            aria-hidden="true"
+            className="instrument-label enter-rise flex items-center justify-between gap-4 border-b border-white/10 pb-3"
+          >
+            <span>[{sectionPageLabel("home")}] ~/home</span>
+            <span className="tabular-nums text-zinc-400">
+              tty0 · {ja ? "JA" : "EN"}
+            </span>
+          </p>
 
-            <div className="max-w-3xl w-full shrink-0 px-4 mt-8 text-left">
-              <div className="loading-text h-[5.25rem] md:h-16 font-mono text-green-300 text-xl md:text-2xl mb-8 mt-4">
-                {copy.hero.establishing}
-                <br />
-                {copy.hero.question}{" "}
-                <MagneticButton className="ml-2 inline-block">
-                  <button
-                    type="button"
-                    onClick={showDescription}
-                    className={`trigger-btn rounded border px-2 py-0.5 transition-[color,background-color,border-color,scale] duration-150 ease-out motion-safe:active:scale-[0.97] inline-block font-mono text-xs ${
-                      descriptionVisible
-                        ? "border-zinc-700 bg-zinc-900 text-zinc-400 cursor-default pointer-events-none"
-                        : "border-green-300/45 bg-zinc-950 text-green-100 cursor-pointer animate-pulse hover:bg-fuchsia-500/20 hover:text-fuchsia-100"
-                    }`}
-                  >
-                    /Enter
-                    {/* 読み上げ名に表示テキスト「/Enter」を含めるため、aria-labelではなく補足テキストで説明する */}
-                    <span className="sr-only"> {copy.hero.enterAria}</span>
-                  </button>
-                </MagneticButton>
-              </div>
-              <p className="h-[7.125rem] md:h-[6.5rem] text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6">
-                <span
-                  className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
-                >
-                  {copy.hero.tagline1}
-                </span>
-                <br className="hidden sm:block" />
-                <span
-                  className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
-                >
-                  {copy.hero.tagline2}
-                </span>
-              </p>
-            </div>
-          </div>
+          <h1 className="enter-rise mt-8 text-left text-white [--i:1] sm:mt-12">
+            <span className="block font-mono text-lg font-normal tracking-normal text-green-300 sm:text-2xl">
+              <span className="text-[rgb(var(--planet-accent))]">&gt;</span>{" "}
+              <span className="title-char">Hello, I&apos;m</span>
+            </span>
+            <span className="mt-2 flex items-end font-sans text-[clamp(3.25rem,12vw,9.5rem)] leading-[0.88] font-black tracking-[-0.055em] sm:mt-3">
+              <span className="inline-block pb-[0.06em]">
+                <GlitchText text="Eric Kei." />
+              </span>
+              <span
+                aria-hidden="true"
+                className="hero-cursor ml-[0.06em] font-mono text-[0.5em] leading-none text-[rgb(var(--planet-accent))]"
+              >
+                _
+              </span>
+            </span>
+          </h1>
+
+          {/* 計器ラベル（左）と読み出し（右）の 2 列。スマホではラベルが上に乗る */}
+          <dl className="mt-10 grid gap-x-8 gap-y-2 border-t border-white/10 pt-6 font-mono sm:mt-14 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-y-6">
+            <dt className="instrument-label enter-rise pt-1 [--i:2]">
+              {ja ? "接続" : "link"}
+            </dt>
+            <dd className="loading-text enter-rise text-base leading-relaxed text-green-300 [--i:2] max-[389px]:min-h-[6.5rem] sm:text-xl">
+              {copy.hero.establishing}
+              <br />
+              {copy.hero.question}{" "}
+              <button
+                type="button"
+                onClick={showDescription}
+                className={`trigger-btn ml-1 inline-block rounded-[3px] border px-2 py-0.5 align-middle font-mono text-xs transition-[color,background-color,border-color,scale] duration-150 ease-out motion-safe:active:scale-[0.97] ${
+                  descriptionVisible
+                    ? "pointer-events-none cursor-default border-zinc-700 bg-zinc-900 text-zinc-400"
+                    : "hero-enter-key cursor-pointer border-green-300/50 bg-zinc-950 text-green-100 hover:border-[rgb(var(--planet-accent))] hover:text-white"
+                }`}
+              >
+                /Enter
+                {/* 読み上げ名に表示テキスト「/Enter」を含めるため、aria-labelではなく補足テキストで説明する */}
+                <span className="sr-only"> {copy.hero.enterAria}</span>
+              </button>
+            </dd>
+            <dt className="instrument-label enter-rise mt-4 pt-1 [--i:3] sm:mt-0">
+              {ja ? "概要" : "brief"}
+            </dt>
+            {/* 行長は和文で 34 字前後、欧文で 65 字前後に収める。
+                サーバーは英語で描き、ブラウザが日本語なら描画後に切り替わるので、
+                英語の高さ（長いほう）を最小の高さとして確保し、下のカルーセルを動かさない */}
+            <dd className="enter-rise min-h-[10.75rem] max-w-[34em] text-[15px] leading-[1.8] text-green-200 [--i:3] max-[389px]:min-h-[14rem] sm:min-h-[11.5rem] sm:text-base md:min-h-[8rem]">
+              <span
+                className={`desc-char block transition-opacity duration-200 ease-out ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
+              >
+                {copy.hero.tagline1}
+              </span>
+              <span
+                className={`desc-char mt-2 block transition-opacity duration-200 ease-out ${descriptionVisible ? "opacity-100 delay-75" : "opacity-0"}`}
+              >
+                {copy.hero.tagline2}
+              </span>
+            </dd>
+          </dl>
         </div>
+      </div>
 
-        {/* テックカルーセル（全幅） */}
-        <div className="relative z-10 mt-10 w-full min-h-[320px] sm:mt-12">
+      {/* テックカルーセル（全幅）。見出しは左寄せの計器ラベルと罫線にする */}
+      <div className="relative z-10 mt-14 min-h-[320px] w-full sm:mt-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2
-            className={`mx-auto mb-8 flex w-fit rounded-md border border-green-300/40 bg-zinc-950/95 px-4 py-2 text-center font-mono text-xl text-green-100 tech-carousel-title transition-opacity duration-500 md:text-2xl ${
+            className={`tech-carousel-title flex items-center gap-3 font-mono text-lg text-green-100 transition-opacity duration-200 md:text-xl ${
               skillsVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            &gt; My Skills
+            <span className="rounded-[3px] border border-white/15 bg-[rgb(7_7_11/0.95)] px-2.5 py-1">
+              <span className="text-[rgb(var(--planet-accent))]">&gt;</span> My
+              Skills
+            </span>
+            <span aria-hidden="true" className="h-px flex-1 bg-white/15" />
           </h2>
-          <div ref={carouselTriggerRef} className="min-h-[240px]">
-            {showTechCarousel ? (
-              <TechCarousel />
-            ) : (
-              <div className="h-[240px]" aria-hidden="true" />
-            )}
-          </div>
+        </div>
+        <div ref={carouselTriggerRef} className="min-h-[240px]">
+          {showTechCarousel ? (
+            <TechCarousel />
+          ) : (
+            <div className="h-[240px]" aria-hidden="true" />
+          )}
         </div>
       </div>
     </section>

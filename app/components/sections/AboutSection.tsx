@@ -831,13 +831,13 @@ export default function AboutSection() {
         {/* ヘッダー */}
         <header className="about-header instrument-panel mb-16 max-w-2xl p-6">
           <p
-            className={`mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
+            className={`enter-rise mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
           >
             <span aria-hidden="true">[{sectionPageLabel("about")}] </span>
             ~/about
           </p>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="enter-rise font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
               <DecryptedText text="About Me" animateOnHover speed={30} />
             </h2>
 

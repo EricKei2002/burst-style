@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import {
   HOME_SECTIONS,
@@ -33,15 +34,55 @@ export default function Header({
   const copy = useSiteCopy();
   const index = HOME_SECTIONS.indexOf(active);
 
+  // 現在地は塗りではなく、下の目盛り（.nav-tick）が滑って示す。文字は白く太くするだけ
   const linkClass =
-    "relative inline-flex h-full w-full items-center justify-center rounded-md px-1.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 max-sm:active:bg-fuchsia-500/10 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
+    "relative inline-flex h-full w-full items-center justify-center rounded-[3px] px-1.5 text-green-100 transition-[color,scale] duration-150 ease-out hover:text-white focus-visible:text-white motion-safe:active:scale-[0.97] aria-[current=page]:font-semibold aria-[current=page]:text-white sm:h-auto sm:min-h-8 sm:w-auto";
+
+  const listRef = useRef<HTMLUListElement>(null);
+  const tickRef = useRef<HTMLLIElement>(null);
+
+  // 目盛りを現在地のリンクの下へ動かす（transform だけを動かす。幅は scaleX で合わせる）
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const tick = tickRef.current;
+    if (!list || !tick || !enhanced) return;
+    const place = () => {
+      const link = list.querySelector<HTMLElement>('[aria-current="page"]');
+      if (!link) {
+        tick.dataset.ready = "";
+        tick.style.opacity = "0";
+        return;
+      }
+      const l = list.getBoundingClientRect();
+      const r = link.getBoundingClientRect();
+      // スマホの下部タブ（fixed）は区画より少し短く、PC は文字幅（左右の余白 6px を除く）に合わせる
+      const inset =
+        getComputedStyle(list).position === "fixed"
+          ? Math.min(18, r.width * 0.2)
+          : 6;
+      const x = r.left - l.left + inset;
+      const w = Math.max(8, r.width - inset * 2);
+      tick.style.opacity = "1";
+      tick.style.transform = `translate3d(${x}px,0,0) scaleX(${w})`;
+      // 最初の配置はアニメーションさせない（読み込み直後に横から滑ってこないように）
+      if (tick.dataset.ready === undefined) {
+        requestAnimationFrame(() => {
+          tick.dataset.ready = "";
+        });
+      }
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(list);
+    return () => ro.disconnect();
+  }, [active, enhanced, locale]);
 
   return (
     <header className="sticky inset-x-0 top-0 z-30 sm:mt-5">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:py-5 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
         <div
           aria-hidden="true"
-          className="hidden min-h-[68px] w-full items-center rounded-xl border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm tracking-wide text-green-100 sm:inline-flex sm:text-base lg:max-w-[340px]"
+          className="hidden min-h-[68px] w-full items-center rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-4 py-2.5 font-mono text-sm tracking-wide text-green-100 sm:inline-flex sm:text-base lg:max-w-[340px]"
         >
           <span className="font-semibold text-green-100">Burst Style</span>
         </div>
@@ -51,7 +92,7 @@ export default function Header({
             preloadShaderTransition();
             void import("../visuals/PlanetInterior");
           }}
-          className="relative w-full rounded-xl border border-green-300/40 bg-zinc-950/95 px-3 py-1 font-mono text-xs tracking-wide text-left text-green-100 sm:min-h-[68px] sm:px-4 sm:py-2.5 sm:text-sm lg:max-w-[760px]"
+          className="relative w-full rounded-[6px] border border-green-300/40 bg-zinc-950/95 px-3 py-1 font-mono text-xs tracking-wide text-left text-green-100 sm:min-h-[68px] sm:px-4 sm:py-2.5 sm:text-sm lg:max-w-[760px]"
         >
           <div className="flex min-h-10 items-center justify-between gap-2 sm:min-h-0 sm:justify-start">
             <div className="flex min-w-0 flex-wrap items-center gap-x-0.5 gap-y-0.5">
@@ -95,7 +136,14 @@ export default function Header({
               <LangButtons locale={locale} setLocale={setLocale} copy={copy} />
             </div>
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
-            <ul className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-zinc-950/95 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:static sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+            <ul
+              ref={listRef}
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11/0.97)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0"
+            >
+              {enhanced && (
+                // 現在地の目盛り。スマホは下部タブの上辺、PC はリンクの下を滑る
+                <li ref={tickRef} aria-hidden="true" className="nav-tick" />
+              )}
               {HOME_SECTIONS.map((section, i) => (
                 <li key={section} className="h-full sm:h-auto">
                   <a

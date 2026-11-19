@@ -148,6 +148,7 @@ export default function PlanetInterior({ theme }: Props) {
               sceneRef.current?.dispose();
               sceneRef.current = null;
               root.dataset.planetLoop = "paused";
+              delete root.dataset.planetScene;
             },
             exhibits: projectsData.map((p) => ({
               slug: p.slug,
@@ -168,6 +169,8 @@ export default function PlanetInterior({ theme }: Props) {
         return;
       }
       sceneRef.current = scene;
+      // 駐機窓の段階ラベル（接近 → 駐機）を CSS で切り替える合図
+      root.dataset.planetScene = "ready";
       sync();
       // 組み立て中にテーマが変わっていたら、分割して追いつく（同じテーマなら何もしない）
       const catchUp = new FrameSlicer({ urgent: true });
@@ -247,6 +250,7 @@ export default function PlanetInterior({ theme }: Props) {
     window.addEventListener("home-section-change", onScroll);
 
     const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    let inspectBay: HTMLElement | null = null;
     const onPointer = (e: PointerEvent) => {
       const s = sceneRef.current;
       if (!s) return;
@@ -258,8 +262,21 @@ export default function PlanetInterior({ theme }: Props) {
       }
       // 駐機窓の上では、看板に乗ったときだけ指のカーソルにする
       const bay = (e.target as Element | null)?.closest?.("[data-hangar-bay]");
+      if (inspectBay && inspectBay !== bay) {
+        delete inspectBay.dataset.inspect;
+        inspectBay = null;
+      }
       if (bay instanceof HTMLElement) {
-        bay.style.cursor = s.pickExhibit(e.clientX, e.clientY) ? "pointer" : "";
+        const over = Boolean(s.pickExhibit(e.clientX, e.clientY));
+        bay.style.cursor = over ? "pointer" : "";
+        // 看板に乗っている間は段階ラベルを「点検」にする
+        if (over) {
+          bay.dataset.inspect = "";
+          inspectBay = bay;
+        } else {
+          delete bay.dataset.inspect;
+          inspectBay = null;
+        }
       }
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
@@ -329,6 +346,8 @@ export default function PlanetInterior({ theme }: Props) {
       sceneRef.current = null;
       syncRef.current = () => {};
       delete root.dataset.planetLoop;
+      delete root.dataset.planetScene;
+      if (inspectBay) delete inspectBay.dataset.inspect;
     };
   }, []);
 

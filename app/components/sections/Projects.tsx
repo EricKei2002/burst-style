@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import TiltCard from "../ui/TiltCard";
 
 import { projectsData } from "../../lib/data";
 import { useLocale, useSiteCopy } from "../../lib/locale";
@@ -60,7 +59,7 @@ export default function Projects() {
         {/* 見出しの計器と、駐機機体を見せる窓（PC は横並び、スマホは縦） */}
         <div className="grid gap-4 lg:grid-cols-12 lg:gap-6">
           <div className="instrument-panel self-start p-5 sm:p-6 lg:col-span-5">
-            <p className="instrument-label mb-4 flex items-center justify-between gap-3">
+            <p className="instrument-label enter-rise mb-4 flex items-center justify-between gap-3">
               <span>
                 <span aria-hidden="true">
                   [{sectionPageLabel("projects")}]{" "}
@@ -72,7 +71,7 @@ export default function Projects() {
                 {ja ? "件" : "items"}
               </span>
             </p>
-            <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="enter-rise mb-4 font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
               Projects
             </h2>
             <p className="text-[15px] leading-relaxed text-zinc-100">
@@ -113,9 +112,17 @@ export default function Projects() {
               aria-hidden="true"
               className="hangar-bay__corner hangar-bay__corner--br"
             />
-            <p className="instrument-tag absolute top-2 left-3">
-              PAD-01 · {ja ? "駐機中" : "docked"}
-            </p>
+            {/* 駐機の段階。どれが点くかは CSS が決める（3D の準備完了は <html data-planet-scene>、
+                看板に乗っている間は駐機窓の data-inspect）。読み上げには出さない */}
+            <ol
+              aria-hidden="true"
+              className="hangar-stage instrument-tag absolute top-2 left-3"
+            >
+              <li className="hangar-stage__pad">PAD-01</li>
+              <li data-stage="approach">{ja ? "接近" : "approach"}</li>
+              <li data-stage="docked">{ja ? "駐機" : "docked"}</li>
+              <li data-stage="inspect">{ja ? "点検" : "inspect"}</li>
+            </ol>
             <p className="instrument-tag absolute right-3 bottom-2 max-sm:hidden">
               {ja ? "看板を選ぶと作品が開く" : "select a sign to open"}
             </p>
@@ -138,9 +145,10 @@ export default function Projects() {
               index === projectsData.length - 1 &&
               projectsData.length % 2 === 1;
             return (
-              <TiltCard
+              <div
                 key={project.slug}
-                className={`h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
+                className={`enter-rise h-full ${isDanglingLast ? "md:col-span-2" : ""}`}
+                style={{ "--i": Math.min(index, 4) } as CSSProperties}
               >
                 <Link
                   href={`/projects/${project.slug}`}
@@ -166,11 +174,11 @@ export default function Projects() {
                     e.preventDefault();
                     handleNavigation(`/projects/${project.slug}`);
                   }}
-                  className="project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 text-left transition-colors duration-300 ease-out hover:border-fuchsia-400/60 hover:bg-zinc-900/90"
+                  className="project-card group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.96)] text-left transition-[border-color,scale] duration-200 ease-out hover:border-[rgb(var(--planet-accent)/0.7)] motion-safe:active:scale-[0.99]"
                 >
                   {/* 画像コンテナ */}
                   <div className="relative aspect-video w-full overflow-hidden bg-zinc-800">
-                    <div className="absolute inset-0 z-10 bg-zinc-950/20 transition-colors group-hover:bg-transparent" />
+                    <div className="absolute inset-0 z-10 bg-zinc-950/25 transition-opacity duration-200 ease-out group-hover:opacity-0" />
                     <Image
                       src={project.image}
                       // 見出し（h3）と同じ文言を二重に読ませない
@@ -188,13 +196,15 @@ export default function Projects() {
                   {/* コンテンツ */}
                   <div className="flex flex-1 flex-col justify-between p-6 sm:p-8">
                     <div>
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold text-white group-hover:text-fuchsia-300 transition-colors">
-                          {project.title}
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h3 className="font-sans text-xl font-bold tracking-tight text-white sm:text-2xl">
+                          <span className="project-card__title">
+                            {project.title}
+                          </span>
                         </h3>
                         <span
                           aria-hidden="true"
-                          className="shrink-0 font-mono text-xs text-zinc-300 transition-colors group-hover:text-fuchsia-300"
+                          className="shrink-0 font-mono text-xs text-zinc-300 transition-colors duration-150 group-hover:text-[rgb(var(--planet-accent))]"
                         >
                           cd ./{project.slug}
                         </span>
@@ -216,48 +226,68 @@ export default function Projects() {
                     </div>
                   </div>
                 </Link>
-              </TiltCard>
+              </div>
             );
           })}
         </div>
 
-        {/* 文字だけの作品一覧：3D もカード画像もなしで、全作品の説明を読める */}
+        {/* 文字だけの作品一覧：3D もカード画像もなしで、全作品の説明を読める。
+            番号・題名・タグ・説明を罫線で区切った索引として組む（行に乗ると左の目盛りと下線が走る） */}
         <section
           id="projects-index"
           aria-labelledby="projects-index-title"
-          className="instrument-panel mt-16 scroll-mt-28 p-5 sm:mt-24 sm:p-8"
+          className="instrument-panel mt-16 scroll-mt-28 px-5 pt-5 pb-2 sm:mt-24 sm:px-8 sm:pt-7"
         >
-          <p className="instrument-label mb-3">ls -l ./projects --text</p>
-          <h3
-            id="projects-index-title"
-            className="mb-2 text-2xl font-bold tracking-tight text-white"
-          >
-            {ja ? "作品一覧（テキスト）" : "Project index (text)"}
-          </h3>
-          <p className="mb-8 text-sm leading-relaxed text-zinc-300">
-            {ja
-              ? "画像や 3D を使わずに、すべての作品の概要を読めます。"
-              : "Every project summary, without images or 3D."}
-          </p>
-          <ol className="divide-y divide-white/10 border-y border-white/10">
+          <div className="grid gap-x-8 gap-y-2 border-b border-white/10 pb-5 md:grid-cols-[4.5rem_minmax(0,1fr)_auto] md:items-end">
+            <p className="instrument-label md:pb-1">ls -l</p>
+            <div>
+              <h3
+                id="projects-index-title"
+                className="font-sans text-2xl font-black tracking-[-0.03em] text-white sm:text-3xl"
+              >
+                {ja ? "作品一覧（テキスト）" : "Project index (text)"}
+              </h3>
+              <p className="mt-2 max-w-[40em] text-sm leading-relaxed text-zinc-300">
+                {ja
+                  ? "画像や 3D を使わずに、すべての作品の概要を読めます。"
+                  : "Every project summary, without images or 3D."}
+              </p>
+            </div>
+            <p
+              aria-hidden="true"
+              className="font-mono text-xs tabular-nums text-zinc-400 md:pb-1"
+            >
+              {String(projectsData.length).padStart(2, "0")}{" "}
+              {ja ? "件" : "entries"}
+            </p>
+          </div>
+          <ol className="projects-index">
             {projectsData.map((raw, index) => {
               const project = getLocalizedProject(raw, locale);
               return (
                 <li
                   key={project.slug}
-                  className="grid gap-x-8 gap-y-3 py-6 md:grid-cols-[4.5rem_minmax(0,16rem)_minmax(0,1fr)]"
+                  className="projects-index__row group relative grid gap-x-8 gap-y-3 border-b border-white/10 py-7 last:border-b-0 md:grid-cols-[4.5rem_minmax(0,18rem)_minmax(0,1fr)] md:py-9"
                 >
                   <span
                     aria-hidden="true"
-                    className="font-mono text-sm tabular-nums text-zinc-400"
+                    className="projects-index__no font-mono text-sm tabular-nums text-zinc-400"
                   >
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    <h4 className="text-lg font-semibold text-white">
+                    <h4 className="font-sans text-2xl leading-tight font-bold tracking-[-0.03em] text-white sm:text-[1.75rem]">
                       <Link
                         href={`/projects/${project.slug}`}
                         prefetch={false}
+                        onPointerEnter={() => {
+                          preloadShaderTransition();
+                          router.prefetch(`/projects/${project.slug}`);
+                        }}
+                        onFocus={() => {
+                          preloadShaderTransition();
+                          router.prefetch(`/projects/${project.slug}`);
+                        }}
                         onClick={(e) => {
                           if (
                             e.button !== 0 ||
@@ -270,18 +300,31 @@ export default function Projects() {
                           e.preventDefault();
                           handleNavigation(`/projects/${project.slug}`);
                         }}
-                        className="underline decoration-fuchsia-300/50 underline-offset-4 hover:text-fuchsia-200 hover:decoration-fuchsia-200"
+                        className="projects-index__link"
                       >
                         {project.title}
                       </Link>
                     </h4>
-                    <p className="mt-2 font-mono text-xs leading-relaxed text-fuchsia-200">
-                      {project.tags.map((tag) => `#${tag}`).join("  ")}
-                    </p>
+                    <ul
+                      aria-label={ja ? "タグ" : "Tags"}
+                      className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-xs leading-relaxed text-zinc-300"
+                    >
+                      {project.tags.map((tag) => (
+                        <li key={tag} className="projects-index__tag">
+                          #{tag}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <div className="space-y-3 text-[15px] leading-relaxed text-zinc-200">
+                  <div className="max-w-[42em] space-y-3 text-[15px] leading-relaxed text-zinc-200">
                     <p className="text-zinc-50">{project.description}</p>
                     <p>{project.detailedDescription}</p>
+                    <p
+                      aria-hidden="true"
+                      className="projects-index__open font-mono text-xs text-[rgb(var(--planet-accent))]"
+                    >
+                      cd ./{project.slug} →
+                    </p>
                   </div>
                 </li>
               );

@@ -105,11 +105,11 @@ export default function ContactSection({
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="instrument-panel mb-16 max-w-2xl p-6">
-          <p className="instrument-label mb-4 text-sm">
+          <p className="instrument-label enter-rise mb-4 text-sm">
             <span aria-hidden="true">[{sectionPageLabel("contact")}] </span>
             ~/contact
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
+          <h2 className="enter-rise mb-6 font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
             <DecryptedText text="Get In Touch" animateOnHover speed={30} />
           </h2>
           <p className="text-zinc-200 leading-relaxed">
@@ -120,7 +120,7 @@ export default function ContactSection({
         </div>
 
         <div className="relative mx-auto max-w-3xl">
-          <div className="relative w-full rounded-2xl border border-zinc-800 bg-[rgb(7_7_11/0.95)] p-8 sm:p-12 overflow-hidden">
+          <div className="relative w-full rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.95)] p-8 sm:p-12 overflow-hidden">
             {!isSent ? (
               <form
                 ref={formRef}
@@ -290,7 +290,7 @@ export default function ContactSection({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-[color,background-color,scale] duration-150 ease-out hover:bg-fuchsia-500/20 hover:text-fuchsia-100 motion-safe:enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-[color,background-color,scale] duration-150 ease-out hover:border-[rgb(var(--planet-accent))] hover:text-white motion-safe:enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="relative z-10 flex items-center gap-2">
                         {isSubmitting
