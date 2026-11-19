@@ -20,7 +20,7 @@ export default function Home() {
   const turnstileSiteKey = getTurnstileSiteKey();
 
   return (
-    <div className="flex flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0">
+    <div className="flex flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom)+2.75rem)] sm:pb-0">
       {/* Home / Projects / About / Contact はメニューで 1 つずつ切り替えて表示する */}
       <HomeSections
         home={
