@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "spell": "cspell .",
-    "test:timing": "npx --yes tsx app/lib/spaceshipVideoPreload.test.ts",
+    "test:timing": "npx --yes tsx app/lib/hangarTransitionTiming.test.ts",
     "test:contact": "npx --yes tsx app/api/contact/validateContactForm.test.ts",
     "measure:transition": "node scripts/measure-project-transition.mjs"
   },
