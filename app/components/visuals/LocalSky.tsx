@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname } from "next/navigation";
-import { isHomePath } from "../../lib/planets";
 import {
   HOME_SECTION_EVENT,
   isHomeSection,
@@ -28,6 +27,9 @@ import {
 
 // 雨粒の Canvas は雨のときだけ要る。最初の JS から外し、雨になってから読み込む
 const RainCanvas = dynamic(() => import("./RainCanvas"), { ssr: false });
+
+/** 左端の時刻を重ねて描かない要素（計器パネルと About のプロフィールカード） */
+const SKY_AVOID = ".instrument-panel, [data-sky-avoid]";
 
 type SkyState = {
   phase: SkyPhase;
@@ -75,7 +77,8 @@ export default function LocalSky() {
     window.addEventListener(HOME_SECTION_EVENT, sync);
     return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
   }, [pathname]);
-  const showEarthSky = isHomePath(pathname) && homeSection === "home";
+  // 空の色・天気は宇宙の背景（作品詳細以外のすべて）に重ねる。詳細は惑星の地表なので出さない
+  const showEarthSky = !pathname.startsWith("/projects/");
   const [sky, setSky] = useState<SkyState | null>(null);
   const [env, setEnv] = useState({ lite: false, hidden: false, ja: false });
   /** 丸めた位置（API から）。取れるまでは時計ベース */
@@ -177,6 +180,65 @@ export default function LocalSky() {
     };
   }, []);
 
+  // 狭い画面では左端の時刻がパネル（作品一覧など）の左縁に乗る。重なっている間だけ時刻を隠す。
+  // スクロール・リサイズ・ページ内ジャンプのたびに、時刻とパネルの矩形を直接比べる（1 フレームに 1 回まで）。
+  // IntersectionObserver の rootMargin で時刻の矩形まで縮める方式は、本番環境で判定が抜けることがあった。
+  // PC の左余白ではどれとも重ならないので出たまま
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [covered, setCovered] = useState(false);
+  const hasSky = sky !== null;
+  useEffect(() => {
+    const dock = dockRef.current;
+    if (!dock) return;
+    let frame = 0;
+    const check = () => {
+      frame = 0;
+      // visibility: hidden でもレイアウトは残るので、隠している間も矩形は取れる
+      const r = dock.getBoundingClientRect();
+      if (!r.width || !r.height) {
+        setCovered(false);
+        return;
+      }
+      let hit = false;
+      for (const el of document.querySelectorAll(SKY_AVOID)) {
+        const p = el.getBoundingClientRect();
+        if (
+          p.width > 0 &&
+          p.height > 0 &&
+          p.left < r.right &&
+          p.right > r.left &&
+          p.top < r.bottom &&
+          p.bottom > r.top
+        ) {
+          hit = true;
+          break;
+        }
+      }
+      setCovered(hit);
+    };
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(check);
+    };
+    schedule();
+    // 時刻の文字数（都市名・天気の有無）が変わったときも測り直す
+    const ro = new ResizeObserver(schedule);
+    ro.observe(dock);
+    // 捕捉段階で拾い、ページ全体だけでなく内側のスクロール領域の動きにも反応する
+    document.addEventListener("scroll", schedule, {
+      passive: true,
+      capture: true,
+    });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("hashchange", schedule);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      ro.disconnect();
+      document.removeEventListener("scroll", schedule, { capture: true });
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("hashchange", schedule);
+    };
+  }, [hasSky, pathname, homeSection]);
+
   // 星空背景（StarBackground / ShootingStars / globals.css）が読む値を <html> に置く
   useEffect(() => {
     if (!sky) return;
@@ -240,7 +302,11 @@ export default function LocalSky() {
           )}
         </>
       )}
-      <div className="fixed bottom-24 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5">
+      <div
+        ref={dockRef}
+        data-covered={covered ? "" : undefined}
+        className="local-sky-dock fixed bottom-32 left-0 z-20 flex flex-col items-start gap-2 sm:left-0.5 md:bottom-24"
+      >
         {/* 計器表示。ホバー・フォーカス（キーボード）・タップで短い説明を出す */}
         <div className="group relative">
           <button

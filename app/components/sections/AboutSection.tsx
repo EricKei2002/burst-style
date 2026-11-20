@@ -36,7 +36,7 @@ function AboutContactCtaLink({ isProfessional }: { isProfessional: boolean }) {
       className={`inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-[color,background-color,border-color,scale] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black motion-safe:active:scale-[0.97] ${
         isProfessional
           ? "border-blue-500/50 text-blue-200 hover:bg-blue-500/10 focus-visible:ring-blue-500"
-          : "border-fuchsia-500/50 text-fuchsia-200 hover:bg-fuchsia-500/10 focus-visible:ring-fuchsia-500"
+          : "border-[rgb(var(--planet-accent)/0.5)] text-[rgb(var(--planet-accent))] hover:bg-[rgb(var(--planet-accent)/0.1)] focus-visible:ring-[rgb(var(--planet-accent))]"
       }`}
     >
       {copy.about.contactCta}
@@ -76,7 +76,7 @@ const ServerSpecs = () => (
         <div className="text-zinc-400 text-xs uppercase tracking-wider mb-0.5">
           Model
         </div>
-        <div className="font-semibold text-fuchsia-400">
+        <div className="font-semibold text-[rgb(var(--planet-accent))]">
           Raspberry Pi 4 Model B
         </div>
       </div>
@@ -183,7 +183,7 @@ function TimelineVideoCard({
             className="absolute inset-0 flex items-center justify-center bg-black/30 transition hover:bg-black/20"
             aria-label={copy.about.videoPlay(title)}
           >
-            <span className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/60 bg-black/70 px-4 py-2 font-mono text-xs text-fuchsia-300">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--planet-accent)/0.6)] bg-black/70 px-4 py-2 font-mono text-xs text-[rgb(var(--planet-accent))]">
               ▶ Play Video
             </span>
           </button>
@@ -216,7 +216,7 @@ const timeline: TimelineItem[] = [
         </p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Init]
             </span>
             <span>新規ユーザー「Eric Kei」を作成。</span>
@@ -266,7 +266,7 @@ const timeline: TimelineItem[] = [
             <span>ビジュアルスクリプト（Scratch）モジュールを実装。</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Improve]
             </span>
             <span>論理演算と創造性アルゴリズムを改善。</span>
@@ -305,7 +305,7 @@ const timeline: TimelineItem[] = [
             <span>C#言語サポートとVisual Studio環境を追加。</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Build]
             </span>
             <span>自作電卓アプリケーションをデプロイ。</span>
@@ -327,7 +327,7 @@ const timeline: TimelineItem[] = [
     ),
     tags: ["C#", "Windows Forms", "Algorithms"],
     extraComponent: (
-      <div id="about-lab-csharp" className="scroll-mt-32 w-full">
+      <div id="about-lab-csharp" className="w-full">
         <CsharpCalculator />
       </div>
     ),
@@ -383,7 +383,7 @@ const timeline: TimelineItem[] = [
         </p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Access]
             </span>
             <span>
@@ -475,7 +475,7 @@ const timeline: TimelineItem[] = [
             <span>オンラインフレンドを物理接続（カナダ）へ同期。</span>
           </li>
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Improve]
             </span>
             <span>英語通信プラグインとグローバルマップデータを拡張。</span>
@@ -549,7 +549,7 @@ const timeline: TimelineItem[] = [
         </p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Add]
             </span>
             <span>TypeScript & React サポートを追加。</span>
@@ -579,7 +579,7 @@ const timeline: TimelineItem[] = [
     tags: ["Web Development", "TypeScript", "Frontend", "Study"],
     githubUrl: "https://github.com/EricKei2002/Todo-with-Typescript",
     extraComponent: (
-      <div id="about-lab-todo" className="scroll-mt-32 w-full">
+      <div id="about-lab-todo" className="w-full">
         <TodoAppDemo />
       </div>
     ),
@@ -641,7 +641,7 @@ const timeline: TimelineItem[] = [
         </p>
         <ul className="list-none space-y-2 pl-2">
           <li className="flex gap-2">
-            <span className="text-fuchsia-400 font-mono text-xs shrink-0 mt-1">
+            <span className="text-[rgb(var(--planet-accent))] font-mono text-xs shrink-0 mt-1">
               [Ship]
             </span>
             <span>フロントエンドエンジニアとしてプロダクト開発の一員に。</span>
@@ -664,7 +664,7 @@ const timeline: TimelineItem[] = [
                 href="https://drill.burst.style"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
+                className="underline decoration-dotted underline-offset-2 hover:text-[rgb(var(--planet-accent))]"
               >
                 AWS学習アプリ
               </a>
@@ -690,13 +690,13 @@ const timeline: TimelineItem[] = [
         </p>
         <p>
           現在は会社に所属しながら、プライベートでは個人開発や AWS SAA（AWS
-          Certified Solutions Architect –
-          Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
+          Certified Solutions
+          Architect&nbsp;–&nbsp;Associate）の資格取得に向けた勉強も続けています。学習を継続する仕組みとして、毎日10問の演習アプリ「
           <a
             href="https://drill.burst.style"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-dotted underline-offset-2 hover:text-fuchsia-300"
+            className="underline decoration-dotted underline-offset-2 hover:text-[rgb(var(--planet-accent))]"
           >
             AWS学習アプリ
           </a>
@@ -831,13 +831,13 @@ export default function AboutSection() {
         {/* ヘッダー */}
         <header className="about-header instrument-panel mb-16 max-w-2xl p-6">
           <p
-            className={`mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
+            className={`enter-rise mb-4 font-mono text-sm transition-colors duration-300 ${isProfessional ? "text-blue-400" : "text-[rgb(var(--planet-accent))]"}`}
           >
             <span aria-hidden="true">[{sectionPageLabel("about")}] </span>
             ~/about
           </p>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h2 className="enter-rise font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
               <DecryptedText text="About Me" animateOnHover speed={30} />
             </h2>
 
@@ -850,7 +850,7 @@ export default function AboutSection() {
                 onClick={() => setIsProfessional(false)}
                 className={`px-4 py-1.5 rounded-full text-xs font-mono transition-colors duration-200 ${
                   !isProfessional
-                    ? "bg-fuchsia-600/20 text-fuchsia-400 border border-fuchsia-500/30"
+                    ? "bg-[rgb(var(--planet-accent)/0.15)] text-[rgb(var(--planet-accent))] border border-[rgb(var(--planet-accent)/0.3)]"
                     : "border border-transparent text-zinc-400 hover:text-zinc-300"
                 }`}
               >
@@ -900,14 +900,14 @@ export default function AboutSection() {
                 {/* ドット */}
                 <div className="absolute left-[13px] top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#0a0a0a] ring-1 ring-zinc-700 sm:left-[29px]">
                   <div
-                    className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${isProfessional ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" : "bg-fuchsia-500 shadow-[0_0_8px_rgba(236,72,153,0.8)]"}`}
+                    className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${isProfessional ? "bg-blue-500" : "bg-[rgb(var(--planet-accent))]"}`}
                   />
                 </div>
 
                 <div className="group rounded-xl border border-zinc-800 bg-[rgb(7_7_11/0.95)] p-6 transition hover:border-zinc-700 hover:bg-zinc-900">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                     <h3
-                      className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-fuchsia-400"}`}
+                      className={`text-lg font-semibold text-zinc-200 transition-colors duration-300 ${isProfessional ? "group-hover:text-blue-400" : "group-hover:text-[rgb(var(--planet-accent))]"}`}
                     >
                       {item.title}
                     </h3>
@@ -1014,7 +1014,7 @@ export default function AboutSection() {
                     {item.tags.map((t) => (
                       <span
                         key={t}
-                        className="font-mono text-xs text-fuchsia-200"
+                        className="font-mono text-xs text-[rgb(var(--planet-accent))]"
                       >
                         #{t}
                       </span>
@@ -1024,7 +1024,7 @@ export default function AboutSection() {
                         href={item.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-zinc-800 ${isProfessional ? "text-blue-400" : "text-fuchsia-400"}`}
+                        className={`flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-xs font-medium transition-colors hover:bg-zinc-800 ${isProfessional ? "text-blue-400" : "text-[rgb(var(--planet-accent))]"}`}
                       >
                         <svg
                           className="w-3.5 h-3.5"

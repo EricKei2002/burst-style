@@ -54,20 +54,18 @@ export default function NowSectionView({
   return (
     <section id="now" className="relative w-full py-24 sm:py-32">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mb-12 max-w-2xl rounded-2xl border border-white/10 bg-black/85 p-6 backdrop-blur-sm">
-          <div className="mb-4 flex items-center gap-2 text-fuchsia-100">
+        <div className="instrument-panel mb-12 max-w-2xl p-6">
+          <div className="instrument-label mb-4 flex items-center gap-2">
             <span className="h-px w-8 bg-current"></span>
-            <span className="font-mono text-sm font-semibold tracking-wider uppercase">
-              {copy.now.label}
-            </span>
+            <span className="font-semibold uppercase">{copy.now.label}</span>
           </div>
-          <h2 className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h2 className="mb-6 font-sans text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
             {copy.now.heading}
           </h2>
           <p className="leading-relaxed text-zinc-50">{copy.now.intro}</p>
         </div>
 
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
             const relative = item.date
               ? formatRelative(item.date, renderedAt, locale)
@@ -75,7 +73,7 @@ export default function NowSectionView({
             return (
               <li
                 key={item.id}
-                className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/85 p-6 backdrop-blur-sm transition-colors hover:border-zinc-600 hover:bg-zinc-900/90"
+                className="flex min-w-0 flex-col gap-3 rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.95)] p-6 transition-colors duration-150 hover:border-[rgb(var(--planet-accent)/0.6)]"
               >
                 <div className="flex items-center justify-between gap-3">
                   {item.href ? (

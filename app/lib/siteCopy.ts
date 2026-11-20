@@ -13,6 +13,27 @@ export function buildSiteCopy(locale: Locale) {
       }),
       langEn: pick(locale, { en: "EN", ja: "EN" }),
       langJa: pick(locale, { en: "JA", ja: "JA" }),
+      /** 下部タブ・ヘッダーメニューに常設する作品一覧（#projects-index）へのリンク */
+      indexLink: pick(locale, { en: "/Index", ja: "/一覧" }),
+      /**
+       * スマホの下部タブ（5 区画）だけで使う短いラベル。320px でも 12px で収まるように短くする。
+       * 表示が元の語と同じ（/Home・/Index・/About）なら aria-label は付けず、見えている文字を読ませる
+       */
+      tabShort: {
+        home: "/Home",
+        projects: "/Work",
+        index: pick(locale, { en: "/Index", ja: "/一覧" }),
+        about: "/About",
+        contact: "/Mail",
+      },
+      /**
+       * 短いラベルが元の語と違うタブの読み上げ名（WCAG 2.5.3 Label in Name）。
+       * スマホで見える語（Work / Mail）で始め、PC で見える語（Projects / Contact）も含める
+       */
+      tabName: {
+        projects: "Work (Projects)",
+        contact: "Mail (Contact)",
+      } as Partial<Record<"home" | "projects" | "about" | "contact", string>>,
     },
     hero: {
       establishing: "> ESTABLISHING CONNECTION...",
@@ -25,11 +46,11 @@ export function buildSiteCopy(locale: Locale) {
         ja: "詳細を表示する",
       }),
       tagline1: pick(locale, {
-        en: '"Burst Style" — creativity that explodes into unfamiliar, memorable experiences.',
-        ja: "「Burst Style」— 創造性を爆発させ、未知の体験を形にする。",
+        en: '"Burst Style": creativity that explodes into unfamiliar, memorable experiences.',
+        ja: "「Burst Style」\u00a0—\u00a0創造性を爆発させ、未知の体験を形にする。",
       }),
       tagline2: pick(locale, {
-        en: "As a web engineer, I ship value that breaks the usual frame—with passion as the engine.",
+        en: "As a web engineer, I ship value that breaks the usual frame, with passion as the engine.",
         ja: "Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。",
       }),
     },
@@ -39,7 +60,7 @@ export function buildSiteCopy(locale: Locale) {
         ja: "既成概念を打ち砕き、記憶に残る体験を。",
       }),
       introLine2: pick(locale, {
-        en: "Burst Style—where design and engineering meet.",
+        en: "Burst Style, where design and engineering meet.",
         ja: "デザインと技術を融合した『Burst Style』の実践。",
       }),
     },
@@ -115,7 +136,7 @@ export function buildSiteCopy(locale: Locale) {
         "saa-drill": {
           name: "SAA Drill",
           summary: pick(locale, {
-            en: "AWS Solutions Architect – Associate (SAA) practice drill. Next.js 16 on Vercel.",
+            en: "AWS Solutions Architect Associate (SAA) practice drill. Next.js 16 on Vercel.",
             ja: "AWS SAA（Solutions Architect Associate）向けの演習ドリル。Next.js 16 / Vercel。",
           }),
         },
@@ -130,7 +151,7 @@ export function buildSiteCopy(locale: Locale) {
     },
     about: {
       intro: pick(locale, {
-        en: "Background and milestones in a timeline—how I grew into the work I do now.",
+        en: "Background and milestones in a timeline: how I grew into the work I do now.",
         ja: "技術と経験を積み上げてきた背景を、タイムライン形式で紹介します。",
       }),
       contactCta: pick(locale, { en: "Contact", ja: "お問い合わせ" }),
@@ -163,7 +184,7 @@ export function buildSiteCopy(locale: Locale) {
     },
     contact: {
       leadLine1: pick(locale, {
-        en: "New projects, collaboration, or a casual hello—",
+        en: "New projects, collaboration, or a casual hello.",
         ja: "新しいプロジェクト、コラボレーション、またはカジュアルな挨拶まで。",
       }),
       leadLine2: pick(locale, {

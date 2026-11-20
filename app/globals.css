@@ -36,7 +36,8 @@
 }
 
 :where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 2px solid #f0abfc;
+  /* 惑星ごとのアクセント（--planet-accent は下の「計器」で定義。未定義でも fuchsia に戻る） */
+  outline: 2px solid rgb(var(--planet-accent, 240 171 252));
   outline-offset: 3px;
   box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.9);
 }
@@ -355,6 +356,16 @@
   writing-mode: vertical-rl;
   rotate: 180deg;
 }
+/* パネルが左端の時刻に重なっている間は時刻を隠す（LocalSky が data-covered を付ける） */
+.local-sky-dock {
+  transition:
+    opacity 150ms ease-out,
+    visibility 150ms;
+}
+.local-sky-dock[data-covered] {
+  opacity: 0;
+  visibility: hidden;
+}
 /* ---- トップのセクション切り替え（Home / Projects / About / Contact）----
    <html data-home-section> は JS が動くときだけ付く（layout の inline script）。
    属性が無い＝JS 無しでは全セクションを縦に並べて表示する */
@@ -391,19 +402,71 @@
     transition: none;
   }
 }
-/* JS 無しで縦に並べたとき、固定ヘッダーの下に見出しが隠れないようにする */
-:root:not([data-home-section]) .home-panel > section {
-  scroll-margin-top: 4.5rem;
+/* ---- 固定ヘッダー ----
+   背景は main と同じ宇宙空間のまま見せる：ページ先頭（どのセクションでも、JS 無しでも）はバーを
+   透明にし、2 枚のパネル（ほぼ不透明）の周りから星空が見える。
+   スクロールした間だけ上端から下端まで不透明のバーにし、本文が背後・隙間から透けないようにする。
+   Header（と layout の inline script）がスクロールを見て <html data-header-solid> を付け外しする。
+   JS 無しでは、対応ブラウザならスクロール連動の CSS アニメーションで同じ切り替えをする。
+   --header-h は Header が実測して入れる。JS 無しのときは下の固定値（スマホ 1 行 /
+   640〜767px は 2 枚が縦に積む / 768px 以上は横並び）に戻る */
+:root {
+  --header-h-fallback: 4.5rem;
 }
 @media (min-width: 640px) {
-  :root:not([data-home-section]) .home-panel > section {
-    scroll-margin-top: 9.5rem;
+  :root {
+    --header-h-fallback: 12.5rem;
   }
+}
+@media (min-width: 768px) {
+  :root {
+    --header-h-fallback: 8.125rem;
+  }
+}
+.site-header {
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.18s ease-out,
+    border-color 0.18s ease-out;
+}
+:root[data-header-solid] .site-header {
+  background-color: rgb(7 7 11);
+  border-color: rgb(255 255 255 / 0.08);
+}
+/* JS 無し（data-home-section が付かない）：先頭 4px のスクロールで不透明にする */
+@supports (animation-timeline: scroll()) {
+  :root:not([data-home-section]) .site-header {
+    animation: site-header-solid linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 5px;
+  }
+}
+@keyframes site-header-solid {
+  from {
+    background-color: transparent;
+    border-color: transparent;
+  }
+  to {
+    background-color: rgb(7 7 11);
+    border-color: rgb(255 255 255 / 0.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
+}
+/* アンカー・スキップリンク・フォーカス移動で跳んだ先をヘッダーの下に出す。
+   余白はここ 1 か所だけ（要素側の scroll-margin-top / scroll-mt-* は付けない。二重になる） */
+html {
+  scroll-padding-top: calc(var(--header-h, var(--header-h-fallback)) + 0.75rem);
 }
 
 /* ---- 計器（世界の上に乗る UI）----
-   半透明のガラスではなく、ほぼ不透明の黒い計器盤。縁は細い線、左に惑星色の目盛り。
-   惑星ごとの色は <html data-home-section> と詳細ページの [data-planet] で切り替える */
+   半透明のガラスではなく、ほぼ不透明の黒い計器盤。縁は細い線、左にセクション色の目盛り。
+   色は <html data-home-section> で切り替える（既定は Home / Projects / 作品詳細 / 404 の
+   フクシア）。どれも宇宙の暗い背景と計器盤の黒（rgb 7 7 11）の上で WCAG AA 以上 */
 :root {
   --planet-accent: 240 171 252;
   --planet-accent-2: 103 232 249;
@@ -420,8 +483,8 @@
   position: relative;
   border: 1px solid rgb(255 255 255 / 0.12);
   border-radius: 6px;
-  /* 惑星の空の上でも本文の AA を保つため、ほぼ不透明にする */
-  background: rgb(7 7 11 / 0.95);
+  /* 惑星の空や後ろの作品サムネイルが透けないよう、下部タブと同じ完全な不透明にする */
+  background: rgb(7 7 11);
   box-shadow:
     inset 2px 0 0 rgb(var(--planet-accent) / 0.85),
     0 1px 0 rgb(255 255 255 / 0.04) inset;
@@ -443,73 +506,227 @@
   background: rgb(7 7 11 / 0.9);
   border: 1px solid rgb(var(--planet-accent) / 0.45);
 }
-/* 駐機窓：中身は 3D。四隅の照準だけを描く */
-.hangar-bay__corner {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-color: rgb(var(--planet-accent-2) / 0.8);
-  border-style: solid;
-  border-width: 0;
-  pointer-events: none;
-}
-.hangar-bay__corner--tl {
-  top: 0;
-  left: 0;
-  border-top-width: 1.5px;
-  border-left-width: 1.5px;
-}
-.hangar-bay__corner--tr {
-  top: 0;
-  right: 0;
-  border-top-width: 1.5px;
-  border-right-width: 1.5px;
-}
-.hangar-bay__corner--bl {
-  bottom: 0;
-  left: 0;
-  border-bottom-width: 1.5px;
-  border-left-width: 1.5px;
-}
-.hangar-bay__corner--br {
-  bottom: 0;
-  right: 0;
-  border-bottom-width: 1.5px;
-  border-right-width: 1.5px;
-}
-/* JS 無し（縦に並ぶ表示）では 3D が無いので駐機窓は畳む */
-:root:not([data-home-section]) .hangar-bay {
-  display: none;
-}
 
-/* ---- 作品一覧へのスキップ（常に見える）----
-   PC はヘッダー上の余白、スマホは下部タブの上に小さく置く */
+/* ---- 作品一覧へのスキップ ----
+   640px 以上とトップ以外（作品詳細・404）は画面上端に吊るして常に見せる。
+   スマホのトップはフォーカスされるまで視覚的に隠し（本文に重ねない）、
+   フォーカス時だけ下部タブの直上に出す。タッチでは下部タブの /Index が常設の入口 */
 .skip-to-work {
   position: fixed;
   z-index: 100;
+  top: 0;
   right: 0.75rem;
-  bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.06em;
   line-height: 1;
-  padding: 7px 9px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  border-radius: 0 0 4px 4px;
   color: rgb(250 250 250);
   background: rgb(7 7 11 / 0.94);
   border: 1px solid rgb(var(--planet-accent) / 0.55);
+  border-top: 0;
   text-decoration: none;
 }
 .skip-to-work:hover {
   color: rgb(var(--planet-accent));
 }
+/* トップ（下部タブあり）だけ、タブの直上に置く。作品詳細や 404 は上に吊るす */
+@media (max-width: 639px) {
+  :root[data-home-section] .skip-to-work {
+    top: auto;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
+    padding: 7px 9px;
+    border-top: 1px solid rgb(var(--planet-accent) / 0.55);
+    border-radius: 4px;
+  }
+  /* 定番の visually-hidden。display / visibility は使わず、Tab で届くまま見た目だけ消す */
+  :root[data-home-section] .skip-to-work:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+  }
+}
 @media (min-width: 640px) {
   .skip-to-work {
-    top: 0;
-    bottom: auto;
     right: 1.5rem;
-    padding: 4px 8px;
-    border-top: 0;
-    border-radius: 0 0 4px 4px;
+  }
+}
+
+/* ---- EKF-51: 計器らしい動きとタイポグラフィ ----
+   動かすのは transform と opacity だけ。150–250ms。reduced-motion では止める */
+:root {
+  --ui-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* セクション入場：見出しと計器ラベルを少しずつずらして出す（--i が段）。
+   初回表示（LCP）では動かさず、メニューで切り替えたあとだけ掛ける */
+.home-sections.is-animated .home-panel:not(.is-leaving) .enter-rise {
+  animation: enter-rise 0.22s var(--ui-ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms + 40ms);
+}
+@keyframes enter-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+}
+
+/* ヒーローのカーソルと /Enter キー：点滅は不透明度の段切り替えだけ */
+.hero-cursor {
+  animation: hero-blink 1.1s steps(1, end) infinite;
+}
+@keyframes hero-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.hero-enter-key {
+  position: relative;
+}
+.hero-enter-key::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: -4px;
+  height: 1px;
+  background: rgb(var(--planet-accent));
+  animation: hero-blink 1.1s steps(1, end) infinite;
+}
+
+/* ナビの現在地：塗りではなく、目盛りが滑る。幅は 1px の線を scaleX で伸ばす */
+.nav-tick {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 1px;
+  height: 2px;
+  transform-origin: 0 50%;
+  background: rgb(var(--planet-accent));
+  pointer-events: none;
+  opacity: 0;
+}
+.nav-tick[data-ready] {
+  transition:
+    transform 0.24s var(--ui-ease-out),
+    opacity 0.15s ease-out;
+}
+@media (min-width: 640px) {
+  .nav-tick {
+    top: auto;
+    bottom: -3px;
+  }
+}
+
+/* 作品カード：浮かせず光らせず、題名の下線だけが走る */
+.project-card__title {
+  background: linear-gradient(
+      rgb(var(--planet-accent)),
+      rgb(var(--planet-accent))
+    )
+    0 100% / 100% 1px no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.22s var(--ui-ease-out);
+}
+.project-card:hover .project-card__title,
+.project-card:focus-visible .project-card__title {
+  background-size: 100% 1px;
+}
+
+/* 文字だけの作品索引：行に乗る／フォーカスすると、左の目盛りが伸び、題名の下線が走り、
+   行き先（cd ./slug →）が右からすっと出る */
+.projects-index__row::before {
+  content: "";
+  position: absolute;
+  left: -0.75rem;
+  top: 1.75rem;
+  bottom: 1.75rem;
+  width: 2px;
+  background: rgb(var(--planet-accent));
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 0.22s var(--ui-ease-out);
+}
+@media (min-width: 640px) {
+  .projects-index__row::before {
+    left: -1.25rem;
+  }
+}
+.projects-index__link {
+  color: inherit;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0% 2px
+    no-repeat;
+  padding-bottom: 2px;
+  transition:
+    background-size 0.22s var(--ui-ease-out),
+    color 0.15s ease-out;
+}
+/* 行全体をリンクの当たり判定にする（説明文は選択できるよう前面に出す） */
+.projects-index__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.projects-index__row p,
+.projects-index__row ul {
+  position: relative;
+}
+.projects-index__no {
+  transition: color 0.15s ease-out;
+}
+.projects-index__open {
+  opacity: 0;
+  transform: translate3d(-6px, 0, 0);
+  transition:
+    opacity 0.18s ease-out,
+    transform 0.22s var(--ui-ease-out);
+}
+.projects-index__row:hover::before,
+.projects-index__row:focus-within::before {
+  transform: scaleY(1);
+}
+.projects-index__row:hover .projects-index__link,
+.projects-index__row:focus-within .projects-index__link {
+  background-size: 100% 2px;
+  color: rgb(var(--planet-accent));
+}
+.projects-index__row:hover .projects-index__no,
+.projects-index__row:focus-within .projects-index__no {
+  color: rgb(250 250 250) !important;
+}
+.projects-index__row:hover .projects-index__open,
+.projects-index__row:focus-within .projects-index__open {
+  opacity: 1;
+  transform: none;
+}
+/* 触れない端末では行き先を常に出す（ホバーで出す前提にしない） */
+@media (hover: none) {
+  .projects-index__open {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-sections.is-animated .home-panel:not(.is-leaving) .enter-rise {
+    animation: none;
+  }
+  .hero-cursor,
+  .hero-enter-key::after {
+    animation: none;
+  }
+  .nav-tick[data-ready],
+  .project-card__title,
+  .projects-index__row::before,
+  .projects-index__link,
+  .projects-index__open {
+    transition: none;
   }
 }

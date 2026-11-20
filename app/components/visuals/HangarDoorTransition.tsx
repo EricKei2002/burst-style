@@ -48,9 +48,9 @@ export default function HangarDoorTransition() {
     }
   }, [pathname, phase, setPhase]);
 
-  // シェーダーが遷移を描いている間は扉を出さない
+  // 扉を選んだ遷移のときだけ閉じる（ワープ中・覆わない切り替えでは出さない）
   const isClosed =
-    overlay !== "shader" && (phase === "closing" || phase === "closed");
+    overlay === "hangar" && (phase === "closing" || phase === "closed");
 
   const leftDoorClass = isClosed ? "translate-x-0" : "-translate-x-full";
 

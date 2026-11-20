@@ -1,7 +1,7 @@
 import { HANGAR_NAVIGATE_AFTER_CLOSE_MS } from "./hangarTransitionTiming";
 
-/** ページ遷移で画面を覆う演出の種類 */
-export type PageTransitionOverlay = "hangar" | "shader";
+/** ページ遷移で画面を覆う演出の種類（none は覆わずにそのまま切り替える） */
+export type PageTransitionOverlay = "hangar" | "shader" | "none";
 
 /** ワープで閉じる（加速して覆う）長さ（ms） */
 export const SHADER_WARP_CLOSE_MS = 1400;
@@ -30,19 +30,24 @@ export const SHADER_FLY_OPEN_MS = 800;
 
 export const SHADER_FLY_OPEN_TO_IDLE_MS = SHADER_FLY_OPEN_MS + 60;
 
-/** シェーダーが使えて動きが許可されているときだけワープを選ぶ */
+/**
+ * シェーダーが使えて動きが許可されているときだけワープを選ぶ。
+ * それ以外は fallback（既定はハンガー扉、ワープ単独のときは none = 普通の切り替え）。
+ */
 export function pickPageTransitionOverlay(opts: {
   shaderReady: boolean;
   reducedMotion: boolean;
+  fallback?: Exclude<PageTransitionOverlay, "shader">;
 }): PageTransitionOverlay {
-  return opts.shaderReady && !opts.reducedMotion ? "shader" : "hangar";
+  if (opts.shaderReady && !opts.reducedMotion) return "shader";
+  return opts.fallback ?? "hangar";
 }
 
 /** 閉じ始めてから router.push するまでの待機 */
 export function navigateDelayFor(overlay: PageTransitionOverlay): number {
-  return overlay === "shader"
-    ? SHADER_NAVIGATE_AFTER_CLOSE_MS
-    : HANGAR_NAVIGATE_AFTER_CLOSE_MS;
+  if (overlay === "shader") return SHADER_NAVIGATE_AFTER_CLOSE_MS;
+  if (overlay === "hangar") return HANGAR_NAVIGATE_AFTER_CLOSE_MS;
+  return 0;
 }
 
 export function prefersReducedMotion(): boolean {

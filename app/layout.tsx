@@ -3,7 +3,7 @@ import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
 import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
-// three / 宇宙船演出は ShaderPageTransition 内で動的 import（初期 JS に含めない）
+// three / ワープ（宇宙船演出はフラグ次第）は ShaderPageTransition 内で動的 import（初期 JS に含めない）
 import ShaderPageTransition from "./components/visuals/ShaderPageTransition";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
@@ -74,8 +74,12 @@ const personJsonLd = {
   ],
 };
 
+// 復元されたスクロール位置が先頭でなければ、描画前に不透明バーにする
+const headerSolidInitScript = `try{var s=function(){var r=document.documentElement;if(window.scrollY>4)r.dataset.headerSolid="";else delete r.dataset.headerSolid};s();window.addEventListener("pageshow",s);}catch(e){}`;
+
 // LocaleProviderのuseEffectより前（初回描画前）にhtml[lang]を確定させ、
 // 日本語表示中なのに lang="en" のまま読み上げ・翻訳判定される時間をなくす
+
 const localeInitScript = `try{var l=localStorage.getItem(${JSON.stringify(LOCALE_STORAGE_KEY)});if(l!=="en"&&l!=="ja"){l=navigator.language.toLowerCase().indexOf("ja")===0?"ja":"en"}document.documentElement.lang=l}catch(e){}`;
 
 export default function RootLayout({
@@ -89,6 +93,8 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: localeInitScript }} />
         {/* トップの直リンク（#projects など）で、最初から該当セクションだけを表示する */}
         <script dangerouslySetInnerHTML={{ __html: homeSectionInitScript }} />
+        {/* スクロール位置の復元より前に、ずれていたら不透明バーを付ける（水和前の透明ちらつきを防ぐ） */}
+        <script dangerouslySetInnerHTML={{ __html: headerSolidInitScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
@@ -96,7 +102,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
-        <LocalSky />
         <HangarDoorTransition />
         <ShaderPageTransition />
         <SmoothScroll>
@@ -105,6 +110,9 @@ export default function RootLayout({
             <main className="min-h-screen w-full">{children}</main>
           </LocaleProvider>
         </SmoothScroll>
+        {/* 空のレイヤーは z-index が負なので DOM の位置は見た目に関係しない。
+            左下の計器ボタンが Tab 順でスキップリンクより先に来ないよう、末尾に置く */}
+        <LocalSky />
       </body>
     </html>
   );

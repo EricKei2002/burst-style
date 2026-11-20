@@ -29,6 +29,35 @@ function testOverlayChoice() {
   );
 }
 
+function testNoneFallback() {
+  // 宇宙船を止めている間は、ワープできなければ覆わずに普通に切り替える
+  assert.equal(
+    pickPageTransitionOverlay({
+      shaderReady: false,
+      reducedMotion: false,
+      fallback: "none",
+    }),
+    "none",
+  );
+  assert.equal(
+    pickPageTransitionOverlay({
+      shaderReady: true,
+      reducedMotion: true,
+      fallback: "none",
+    }),
+    "none",
+  );
+  assert.equal(
+    pickPageTransitionOverlay({
+      shaderReady: true,
+      reducedMotion: false,
+      fallback: "none",
+    }),
+    "shader",
+  );
+  assert.equal(navigateDelayFor("none"), 0);
+}
+
 function testDelays() {
   assert.equal(navigateDelayFor("hangar"), HANGAR_NAVIGATE_AFTER_CLOSE_MS);
   assert.equal(navigateDelayFor("shader"), SHADER_NAVIGATE_AFTER_CLOSE_MS);
@@ -45,5 +74,6 @@ function testDelays() {
 }
 
 testOverlayChoice();
+testNoneFallback();
 testDelays();
 console.log("pageTransitionTiming.test.ts: ok");
