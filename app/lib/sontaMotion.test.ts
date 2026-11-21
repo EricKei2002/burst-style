@@ -7,18 +7,31 @@ import {
   damp,
   linearToSrgb255,
   nextBlinkDelay,
+  offAxisStretch,
   POINTER_PITCH_CAP,
   POINTER_YAW_CAP,
   pointerToLook,
   SONTA_BASE_PITCH,
   SONTA_BASE_YAW,
   SONTA_GLB_URL,
+  SONTA_OVERLAY_ASPECT,
+  SONTA_OVERLAY_BOB,
+  SONTA_OVERLAY_FOV_DEG,
+  SONTA_OVERLAY_FRAME,
+  SONTA_OVERLAY_GAP,
+  SONTA_OVERLAY_MAX_H,
+  SONTA_OVERLAY_MIN_H,
+  SONTA_OVERLAY_ROLL,
+  SONTA_OVERLAY_SEARCH_TOP,
   SONTA_PITCH_MAX,
   SONTA_PITCH_MIN,
   SONTA_STATIC_LOOK,
   SONTA_YAW_LIMIT,
   sontaDriftArea,
   sontaDriftPose,
+  sontaOverlayBox,
+  sontaOverlayCameraDistance,
+  sontaOverlayWobble,
   stepLook,
   SWING_AMPLITUDE,
   SWING_PERIOD_S,
@@ -26,6 +39,8 @@ import {
   THUMBS_CLIP_S,
   THUMBS_REST,
   thumbsUpEnvelope,
+  type ScreenRect,
+  type SontaOverlayBox,
 } from "./sontaMotion";
 
 function assert(cond: unknown, msg: string) {
@@ -248,6 +263,268 @@ assert(thumbsUpEnvelope(NaN) === THUMBS_REST, "rest at NaN");
   // 1.95 秒（終わる直前）にはほぼ何も足さない → Idle へなめらかに戻る
   const late = thumbsUpEnvelope(1.95);
   assert(late.amount < 1e-6 && late.hop === 0, "settles before the end");
+}
+
+// ---- スマホの専用 Canvas ----
+
+// 原因の確認：画角 75°・390×844 の左下（旧 TALL の中央）では、視線から約 30° 外れて
+// 約 15% 伸びる（軸ごとの縮め直しでは斜めの伸びが消えず、約 11% の楕円化が残っていた）。
+// 画角 24° で枠の中心を光軸に合わせると 1.00、枠の角でも 1.06 以内
+{
+  const tall = sontaDriftArea(390 / 844);
+  const cx = (tall.xMin + tall.xMax) / 2;
+  const cy = (tall.yMin + tall.yMax) / 2;
+  const old = offAxisStretch(cx, cy, 390 / 844, 75);
+  assert(old > 1.14 && old < 1.16, `old corner stretch ~1.149: ${old}`);
+  assert(offAxisStretch(0, 0, 390 / 844, 24) === 1, "centre is undistorted");
+  // 専用 Canvas の縦横比は SONTA_OVERLAY_ASPECT（約 1.14）。その前後でも 1.06 以内
+  for (const a of [0.9, SONTA_OVERLAY_ASPECT, 1.2]) {
+    for (const [x, y] of [
+      [1, 1],
+      [-1, 1],
+      [1, -1],
+      [-1, -1],
+    ]) {
+      const s = offAxisStretch(x, y, a, SONTA_OVERLAY_FOV_DEG);
+      assert(s <= 1.06, `overlay corner stretch (aspect ${a}): ${s}`);
+    }
+  }
+}
+
+// 枠は、GLB の頂点から求めた基本の向き 27° ± 15°（12〜42°）の輪郭（x −0.675〜0.703、y −0.03〜1.22）を、
+// 揺れの余白つきで収める
+{
+  const f = SONTA_OVERLAY_FRAME;
+  const wobbleX = 1.22 * Math.sin(SONTA_OVERLAY_ROLL);
+  assert(f.cx - f.w / 2 <= -0.675 - wobbleX, "frame covers the left edge");
+  assert(f.cx + f.w / 2 >= 0.703 + wobbleX, "frame covers the right edge");
+  assert(f.cy - f.h / 2 <= -0.03 - SONTA_OVERLAY_BOB, "frame covers feet");
+  assert(f.cy + f.h / 2 >= 1.22 + SONTA_OVERLAY_BOB, "frame covers antennas");
+  assert(near(SONTA_OVERLAY_ASPECT, f.w / f.h), "aspect");
+}
+
+// カメラ：どの縦横比でも、枠の上下左右の端が画面（±1）の内側に収まる
+for (const a of [0.8, SONTA_OVERLAY_ASPECT, 1.2, 1.6]) {
+  const d = sontaOverlayCameraDistance(a);
+  const t = Math.tan((SONTA_OVERLAY_FOV_DEG * DEG) / 2);
+  const f = SONTA_OVERLAY_FRAME;
+  assert(f.h / 2 / (d * t) <= 1 + 1e-9, `fits vertically (aspect ${a})`);
+  assert(f.w / 2 / (d * t * a) <= 1 + 1e-9, `fits horizontally (${a})`);
+}
+assert(
+  sontaOverlayCameraDistance(NaN) === sontaOverlayCameraDistance(1),
+  "camera distance survives NaN",
+);
+
+// 揺れ：動きを減らす設定は時間によらずゼロ。通常は範囲内で、実際に動く
+{
+  const z = sontaOverlayWobble(12.3, true);
+  assert(z.bobY === 0 && z.rotX === 0 && z.rotZ === 0, "reduced wobble is 0");
+  let moved = 0;
+  for (let t = 0; t < 120; t += 0.21) {
+    const w = sontaOverlayWobble(t);
+    assert(Math.abs(w.bobY) <= SONTA_OVERLAY_BOB + 1e-12, "bob bound");
+    assert(Math.abs(w.rotZ) <= SONTA_OVERLAY_ROLL + 1e-12, "roll bound");
+    assert(Math.abs(w.rotX) <= 0.02 + 1e-12, "pitch wobble bound");
+    moved = Math.max(moved, Math.abs(w.bobY));
+  }
+  assert(moved > SONTA_OVERLAY_BOB * 0.9, "wobble moves");
+  assert(sontaOverlayWobble(NaN).bobY === 0, "wobble NaN");
+}
+
+// 箱の算出：障害物（My Skills・Skip・ボトムナビ・計器表示・カード）のどれにも、間隔を空けて重ならない
+const overlapsRect = (b: SontaOverlayBox, o: ScreenRect, gap: number) =>
+  b.left < o.right + gap &&
+  b.left + b.width > o.left - gap &&
+  b.top < o.bottom + gap &&
+  b.top + b.height > o.top - gap;
+function assertClear(
+  vp: { width: number; height: number },
+  obstacles: ScreenRect[],
+  label: string,
+): SontaOverlayBox | null {
+  const b = sontaOverlayBox(vp, obstacles);
+  if (!b) return null;
+  assert(
+    b.height >= SONTA_OVERLAY_MIN_H && b.height <= SONTA_OVERLAY_MAX_H,
+    `${label}: height in range ${b.height}`,
+  );
+  assert(b.left >= SONTA_OVERLAY_GAP, `${label}: inside left`);
+  assert(b.left + b.width <= vp.width - SONTA_OVERLAY_GAP, `${label}: right`);
+  assert(b.top >= vp.height * SONTA_OVERLAY_SEARCH_TOP, `${label}: top`);
+  assert(b.top + b.height <= vp.height - SONTA_OVERLAY_GAP, `${label}: bottom`);
+  for (const o of obstacles) {
+    assert(
+      !overlapsRect(b, o, SONTA_OVERLAY_GAP),
+      `${label}: clear of ${JSON.stringify(o)} (box ${JSON.stringify(b)})`,
+    );
+  }
+  assert(b.width === Math.floor(b.height * SONTA_OVERLAY_ASPECT), "aspect");
+  return b;
+}
+const rect = (left: number, top: number, right: number, bottom: number) => ({
+  left,
+  top,
+  right,
+  bottom,
+});
+// 390×844 の実測（Playwright、スクロール 0）。カードの下端は My Skills の上 − mt-10(40px) から
+const OBSTACLES_390 = [
+  rect(24, 93, 366, 653), // ヒーローのカード
+  rect(111.8, 693, 278.2, 739), // My Skills
+  rect(226.9, 753, 378, 780), // Skip to work index
+  rect(0, 788, 390, 844), // ボトムナビ
+  rect(0, 692.9, 27, 745), // 計器表示（時刻）
+  rect(-769, 836, 6580, 902), // 技術カルーセルの帯（ボトムナビの下に隠れている）
+];
+const box390 = assertClear({ width: 390, height: 844 }, OBSTACLES_390, "390");
+assert(box390 !== null, "390×844 has room for Sonta-kun");
+// 旧：モデルの高さ 59px（画面の 0.07）。いまは枠の高さ 87px（モデルの高さ 約 75px）
+assert(
+  box390 !== null && box390.height >= 85,
+  `390×844 is clearly bigger: ${box390?.height}`,
+);
+// 枠は My Skills の右、Skip の上のすき間に入る
+assert(
+  box390 !== null && box390.left > 278.2 && box390.top + box390.height < 753,
+  `390×844 sits right of My Skills: ${JSON.stringify(box390)}`,
+);
+
+// 障害物が動く・増えると、枠は避ける（小さくなる・場所を変える・出さない）
+{
+  const shifted = OBSTACLES_390.map((o) => ({
+    ...o,
+    top: o.top + 30,
+    bottom: o.bottom + 30,
+  }));
+  assertClear({ width: 390, height: 844 }, shifted, "390 shifted");
+  const more = [...OBSTACLES_390, rect(284, 600, 390, 760)];
+  assertClear({ width: 390, height: 844 }, more, "390 + right block");
+}
+
+// 430×932・375×667：重ならない（収まらなければ null で出さない）
+// 実測（Playwright）。技術カルーセルの帯（ul）は横に画面の外まで伸びる（-1453〜5896）。
+// 430×932 ではカードの帯（y 816〜882）がボトムナビの上に見える
+const CAROUSEL_430 = rect(-1453, 816, 5896, 882);
+const OBSTACLES_430 = [
+  rect(24, 108, 406, 620),
+  rect(132, 674, 298, 720),
+  rect(267, 841, 418, 868),
+  rect(0, 876, 430, 932),
+  rect(0, 781, 27, 833),
+  CAROUSEL_430,
+];
+const box430 = assertClear({ width: 430, height: 932 }, OBSTACLES_430, "430");
+assert(
+  box430 !== null && box430.height >= 90,
+  `430×932 has room: ${box430?.height}`,
+);
+// カルーセルの帯の上（端から端まで）には重ならない。以前の箱（帯の後ろに隠れた）は出さない
+assert(
+  box430 !== null && box430.top + box430.height <= CAROUSEL_430.top - 6,
+  `430×932 stays above the carousel band: ${JSON.stringify(box430)}`,
+);
+// 帯を外した（旧）障害物では下左に置いていた＝帯を入れたことで場所が変わった
+{
+  const old = sontaOverlayBox(
+    { width: 430, height: 932 },
+    OBSTACLES_430.slice(0, 5),
+  );
+  assert(
+    old !== null && old.top + old.height > CAROUSEL_430.top,
+    "without the band the box would sit behind the carousel",
+  );
+}
+// 画面の外へはみ出す矩形は、画面の内側として扱う（左右どちらへはみ出しても同じ）
+{
+  const inside = sontaOverlayBox({ width: 430, height: 932 }, [
+    ...OBSTACLES_430.slice(0, 5),
+    rect(0, 816, 430, 882),
+  ]);
+  assert(
+    JSON.stringify(inside) === JSON.stringify(box430),
+    "off-screen overflow is clamped to the viewport",
+  );
+  // 画面の外だけにある矩形は無視する
+  const away = sontaOverlayBox({ width: 430, height: 932 }, [
+    rect(500, 0, 900, 900),
+    rect(-300, 0, -10, 900),
+  ]);
+  assert(
+    away?.height === SONTA_OVERLAY_MAX_H,
+    "fully off-screen rects ignored",
+  );
+}
+// 414×896・393×852（実測）
+const OBSTACLES_414 = [
+  rect(24, 94, 390, 606),
+  rect(124, 646, 290, 692),
+  rect(251, 805, 402, 832),
+  rect(0, 840, 414, 896),
+  rect(0, 745, 27, 797),
+  rect(-1459, 788, 5890, 854),
+];
+assert(
+  assertClear({ width: 414, height: 896 }, OBSTACLES_414, "414") !== null,
+  "414×896 has room",
+);
+const OBSTACLES_393 = [
+  rect(24, 94, 369, 654),
+  rect(113, 694, 280, 740),
+  rect(230, 761, 381, 788),
+  rect(0, 796, 393, 852),
+  rect(0, 701, 27, 753),
+  rect(-1456, 836, 5893, 902),
+];
+assert(
+  assertClear({ width: 393, height: 852 }, OBSTACLES_393, "393") !== null,
+  "393×852 has room",
+);
+// 360×780：カードが y=702 まで伸びて空きがないので出さない
+const OBSTACLES_360 = [
+  rect(24, 94, 336, 702),
+  rect(97, 742, 263, 788),
+  rect(209, 713, 360, 740),
+  rect(0, 748, 372, 804),
+  rect(0, 653, 27, 705),
+  rect(-2927, 884, 4422, 950),
+];
+assert(
+  assertClear({ width: 360, height: 780 }, OBSTACLES_360, "360") === null,
+  "360×780 has no free gap → hidden",
+);
+// 375×667 はカードが画面の下（y=701）まで伸びて空きがないので、出さない
+const OBSTACLES_375 = [
+  rect(24, 93, 351, 701),
+  rect(104.3, 741, 270.7, 787),
+  rect(211.9, 576, 363, 603),
+  rect(0, 611, 375, 667),
+  rect(0, 515.9, 27, 568),
+];
+assert(
+  assertClear({ width: 375, height: 667 }, OBSTACLES_375, "375") === null,
+  "375×667 has no free gap → hidden",
+);
+
+// 何もなければ上限の大きさで左下、枠が入らないほど詰まっていれば null、壊れた入力でも落ちない
+{
+  const free = sontaOverlayBox({ width: 390, height: 844 }, []);
+  assert(free !== null && free.height === SONTA_OVERLAY_MAX_H, "free → max");
+  assert(
+    free !== null &&
+      free.top + free.height === 844 - SONTA_OVERLAY_GAP &&
+      free.left === SONTA_OVERLAY_GAP,
+    "free → bottom-left",
+  );
+  const full = [rect(0, 0, 390, 844)];
+  assert(sontaOverlayBox({ width: 390, height: 844 }, full) === null, "full");
+  assert(sontaOverlayBox({ width: 0, height: 0 }, []) === null, "no viewport");
+  const junk = [rect(NaN, 0, 10, 10), rect(5, 5, 5, 50), rect(9, 9, 1, 1)];
+  assert(
+    sontaOverlayBox({ width: 390, height: 844 }, junk)?.height ===
+      SONTA_OVERLAY_MAX_H,
+    "ignores broken or empty rects",
+  );
 }
 
 console.log("sontaMotion tests passed");
