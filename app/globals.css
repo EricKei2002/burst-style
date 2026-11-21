@@ -521,6 +521,35 @@
 .skip-to-work:hover {
   color: rgb(var(--planet-accent));
 }
+/* そんたくんが避ける「予約枠」。見えるリンクと同じ見た目・位置で、見えず・触れず・読み上げられない */
+.skip-to-work-slot {
+  visibility: hidden;
+  pointer-events: none;
+}
+/* 見えるリンクだけを、他の要素と重ならない位置へずらす（予約枠は既定の位置のまま。
+   そんたくんの枠は変わらない）。範囲は「もともと重なる高さ」だけに絞る */
+/* 320 幅・高さ 555〜588: カード（下端 450）と My Skills（上端 490）の間へ。
+   589 以上ではずらした先がそんたくんの枠に当たるので、ここまで */
+@media (max-width: 359px) and (min-height: 555px) and (max-height: 588px) {
+  .skip-to-work:not(.skip-to-work-slot) {
+    top: 28.5rem;
+    bottom: auto;
+  }
+}
+/* 360〜374 幅・高さ 778〜784: My Skills の下端（692）とボトムナビの間で、3px 下げる */
+@media (min-width: 360px) and (max-width: 374px) and (min-height: 778px) and (max-height: 784px) {
+  .skip-to-work:not(.skip-to-work-slot) {
+    bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.1875rem);
+  }
+}
+/* 400〜639 幅・高さ 853 以上: My Skills のすぐ上（6px 空け）へ。
+   My Skills の上端 = max(646, 100vh − 258)、Skip の高さ 27 */
+@media (min-width: 400px) and (max-width: 639px) and (min-height: 853px) {
+  .skip-to-work:not(.skip-to-work-slot) {
+    top: max(38.3125rem, calc(100vh - 18.1875rem));
+    bottom: auto;
+  }
+}
 @media (min-width: 640px) {
   .skip-to-work {
     top: 0;
