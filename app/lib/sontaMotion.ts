@@ -460,12 +460,16 @@ export function sontaOverlayBox(
   const vh = viewport.height;
   if (!(vw > 0 && vh > 0)) return null;
   const gap = SONTA_OVERLAY_GAP;
-  const blockers = obstacles.filter(
-    (o) =>
-      Number.isFinite(o.left + o.top + o.right + o.bottom) &&
-      o.right > o.left &&
-      o.bottom > o.top,
-  );
+  // 画面の外へはみ出す矩形（横に流れるカルーセルの帯など）は、画面の内側だけにして扱う
+  const blockers = obstacles
+    .filter((o) => Number.isFinite(o.left + o.top + o.right + o.bottom))
+    .map((o) => ({
+      left: Math.max(o.left, 0),
+      right: Math.min(o.right, vw),
+      top: Math.max(o.top, 0),
+      bottom: Math.min(o.bottom, vh),
+    }))
+    .filter((o) => o.right > o.left && o.bottom > o.top);
   const minTop = vh * SONTA_OVERLAY_SEARCH_TOP;
   for (let h = SONTA_OVERLAY_MAX_H; h >= SONTA_OVERLAY_MIN_H; h--) {
     const w = Math.floor(h * SONTA_OVERLAY_ASPECT);

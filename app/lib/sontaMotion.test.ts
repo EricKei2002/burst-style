@@ -375,6 +375,7 @@ const OBSTACLES_390 = [
   rect(226.9, 753, 378, 780), // Skip to work index
   rect(0, 788, 390, 844), // ボトムナビ
   rect(0, 692.9, 27, 745), // 計器表示（時刻）
+  rect(-769, 836, 6580, 902), // 技術カルーセルの帯（ボトムナビの下に隠れている）
 ];
 const box390 = assertClear({ width: 390, height: 844 }, OBSTACLES_390, "390");
 assert(box390 !== null, "390×844 has room for Sonta-kun");
@@ -402,18 +403,95 @@ assert(
 }
 
 // 430×932・375×667：重ならない（収まらなければ null で出さない）
-// 実測（Playwright）
+// 実測（Playwright）。技術カルーセルの帯（ul）は横に画面の外まで伸びる（-1453〜5896）。
+// 430×932 ではカードの帯（y 816〜882）がボトムナビの上に見える
+const CAROUSEL_430 = rect(-1453, 816, 5896, 882);
 const OBSTACLES_430 = [
-  rect(24, 107, 406, 619),
-  rect(131.8, 673, 298.2, 719),
-  rect(266.9, 841, 418, 868),
+  rect(24, 108, 406, 620),
+  rect(132, 674, 298, 720),
+  rect(267, 841, 418, 868),
   rect(0, 876, 430, 932),
-  rect(0, 780.9, 27, 833),
+  rect(0, 781, 27, 833),
+  CAROUSEL_430,
 ];
 const box430 = assertClear({ width: 430, height: 932 }, OBSTACLES_430, "430");
 assert(
   box430 !== null && box430.height >= 90,
   `430×932 has room: ${box430?.height}`,
+);
+// カルーセルの帯の上（端から端まで）には重ならない。以前の箱（帯の後ろに隠れた）は出さない
+assert(
+  box430 !== null && box430.top + box430.height <= CAROUSEL_430.top - 6,
+  `430×932 stays above the carousel band: ${JSON.stringify(box430)}`,
+);
+// 帯を外した（旧）障害物では下左に置いていた＝帯を入れたことで場所が変わった
+{
+  const old = sontaOverlayBox(
+    { width: 430, height: 932 },
+    OBSTACLES_430.slice(0, 5),
+  );
+  assert(
+    old !== null && old.top + old.height > CAROUSEL_430.top,
+    "without the band the box would sit behind the carousel",
+  );
+}
+// 画面の外へはみ出す矩形は、画面の内側として扱う（左右どちらへはみ出しても同じ）
+{
+  const inside = sontaOverlayBox({ width: 430, height: 932 }, [
+    ...OBSTACLES_430.slice(0, 5),
+    rect(0, 816, 430, 882),
+  ]);
+  assert(
+    JSON.stringify(inside) === JSON.stringify(box430),
+    "off-screen overflow is clamped to the viewport",
+  );
+  // 画面の外だけにある矩形は無視する
+  const away = sontaOverlayBox({ width: 430, height: 932 }, [
+    rect(500, 0, 900, 900),
+    rect(-300, 0, -10, 900),
+  ]);
+  assert(
+    away?.height === SONTA_OVERLAY_MAX_H,
+    "fully off-screen rects ignored",
+  );
+}
+// 414×896・393×852（実測）
+const OBSTACLES_414 = [
+  rect(24, 94, 390, 606),
+  rect(124, 646, 290, 692),
+  rect(251, 805, 402, 832),
+  rect(0, 840, 414, 896),
+  rect(0, 745, 27, 797),
+  rect(-1459, 788, 5890, 854),
+];
+assert(
+  assertClear({ width: 414, height: 896 }, OBSTACLES_414, "414") !== null,
+  "414×896 has room",
+);
+const OBSTACLES_393 = [
+  rect(24, 94, 369, 654),
+  rect(113, 694, 280, 740),
+  rect(230, 761, 381, 788),
+  rect(0, 796, 393, 852),
+  rect(0, 701, 27, 753),
+  rect(-1456, 836, 5893, 902),
+];
+assert(
+  assertClear({ width: 393, height: 852 }, OBSTACLES_393, "393") !== null,
+  "393×852 has room",
+);
+// 360×780：カードが y=702 まで伸びて空きがないので出さない
+const OBSTACLES_360 = [
+  rect(24, 94, 336, 702),
+  rect(97, 742, 263, 788),
+  rect(209, 713, 360, 740),
+  rect(0, 748, 372, 804),
+  rect(0, 653, 27, 705),
+  rect(-2927, 884, 4422, 950),
+];
+assert(
+  assertClear({ width: 360, height: 780 }, OBSTACLES_360, "360") === null,
+  "360×780 has no free gap → hidden",
 );
 // 375×667 はカードが画面の下（y=701）まで伸びて空きがないので、出さない
 const OBSTACLES_375 = [
