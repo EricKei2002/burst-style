@@ -905,4 +905,118 @@ const OBSTACLES_320_SHORT = [
   );
 }
 
+// EKF-58：Now セクションの横はみ出し（ページ幅 371/372）を直した後の実測（Playwright、本番ビルド、EN）。
+// レイアウトビューポート = 画面なので、Skip・計器・ボトムナビが本来の位置（画面の下端）に来る。
+// カードは Hero で縮めてある。JA は Skip の左端だけ違う（183 / 223 / 238 / 253）。箱は同じ
+{
+  type Fixed = {
+    label: string;
+    vp: { width: number; height: number };
+    skipLeft: number;
+    jaSkipLeft: number;
+    obstacles: ScreenRect[];
+    expected: SontaOverlayBox;
+  };
+  const fixed: Fixed[] = [
+    {
+      label: "320×568",
+      vp: { width: 320, height: 568 },
+      skipLeft: 156.9,
+      jaSkipLeft: 183,
+      obstacles: [
+        rect(0, 416.9, 27, 469),
+        rect(156.9, 477, 308, 504),
+        rect(0, 512, 320, 568),
+        rect(16, 74, 304, 450),
+        rect(76.8, 490, 243.2, 536),
+        rect(-1113, 632, 6236, 698),
+      ],
+      expected: { left: 30, top: 468, width: 43, height: 41 },
+    },
+    {
+      label: "360×780",
+      vp: { width: 360, height: 780 },
+      skipLeft: 196.9,
+      jaSkipLeft: 223,
+      obstacles: [
+        rect(0, 628.9, 27, 681),
+        rect(196.9, 689, 348, 716),
+        rect(0, 724, 360, 780),
+        rect(24, 94, 336, 606),
+        rect(96.8, 646, 263.2, 692),
+        rect(0, 788, 7349, 854),
+      ],
+      expected: { left: 270, top: 612, width: 74, height: 71 },
+    },
+    {
+      label: "375×667",
+      vp: { width: 375, height: 667 },
+      skipLeft: 211.9,
+      jaSkipLeft: 238,
+      obstacles: [
+        rect(0, 515.9, 27, 568),
+        rect(211.9, 576, 363, 603),
+        rect(0, 611, 375, 667),
+        rect(16, 74, 359, 450),
+        rect(104.3, 490, 270.7, 536),
+        rect(0, 632, 7349, 698),
+      ],
+      expected: { left: 277, top: 482, width: 92, height: 88 },
+    },
+    {
+      label: "390×844",
+      vp: { width: 390, height: 844 },
+      skipLeft: 226.9,
+      jaSkipLeft: 253,
+      obstacles: [
+        rect(0, 692.9, 27, 745),
+        rect(226.9, 753, 378, 780),
+        rect(0, 788, 390, 844),
+        rect(24, 94, 366, 606),
+        rect(111.8, 646, 278.2, 692),
+        rect(0, 788, 7349, 854),
+      ],
+      expected: { left: 285, top: 653, width: 99, height: 94 },
+    },
+  ];
+  for (const c of fixed) {
+    const withHeader = [...c.obstacles, header(c.vp.width)];
+    // 見える範囲 = innerWidth/innerHeight（はみ出さない）
+    const v = sontaVisibleViewport(c.vp, c.vp);
+    assert(
+      v.width === c.vp.width && v.height === c.vp.height,
+      `${c.label}: viewport`,
+    );
+    const b = assertClearSmall(v, withHeader, `${c.label} fixed`);
+    assert(
+      boxJson(b) === boxJson(c.expected),
+      `${c.label} (no overflow): ${boxJson(b)}`,
+    );
+    assert(
+      (b?.height ?? 0) >= SONTA_OVERLAY_SMALL_MIN_H,
+      `${c.label}: box is visible`,
+    );
+    const ja = withHeader.map((o) =>
+      o.left === c.skipLeft ? { ...o, left: c.jaSkipLeft } : o,
+    );
+    assert(
+      boxJson(sontaOverlayBox(v, ja)) === boxJson(b),
+      `${c.label} JA: same box`,
+    );
+    assert(
+      boxJson(sontaOverlayBox(v, [...withHeader].reverse())) === boxJson(b),
+      `${c.label}: independent of obstacle order`,
+    );
+  }
+  // 360×780 は通常の探索（56px 以上）に戻る。320×568 は縮小探索（最小 38px）
+  assert(
+    fixed[1].expected.height >= SONTA_OVERLAY_MIN_H,
+    "360 uses normal search",
+  );
+  assert(
+    fixed[0].expected.height < SONTA_OVERLAY_MIN_H,
+    "320 uses small search",
+  );
+}
+
 console.log("sontaMotion tests passed");

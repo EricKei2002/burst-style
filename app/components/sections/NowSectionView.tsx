@@ -67,7 +67,7 @@ export default function NowSectionView({
           <p className="leading-relaxed text-zinc-50">{copy.now.intro}</p>
         </div>
 
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
             const relative = item.date
               ? formatRelative(item.date, renderedAt, locale)

@@ -34,7 +34,7 @@ export default function Header({
   const index = HOME_SECTIONS.indexOf(active);
 
   const linkClass =
-    "relative inline-flex h-full w-full items-center justify-center rounded-md px-1.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 max-sm:active:bg-fuchsia-500/10 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
+    "relative inline-flex h-full w-full items-center justify-center rounded-md px-0.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 max-sm:active:bg-fuchsia-500/10 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:px-1.5 sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
 
   return (
     <header data-sonta-avoid="" className="sticky inset-x-0 top-0 z-30 sm:mt-5">
@@ -97,7 +97,7 @@ export default function Header({
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
             <ul
               data-sonta-avoid=""
-              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-zinc-950/95 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:static sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-zinc-950/95 px-2 pt-1 pb-[calc(0.375rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:static sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
             >
               {HOME_SECTIONS.map((section, i) => (
                 <li key={section} className="h-full sm:h-auto">
