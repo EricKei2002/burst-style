@@ -706,7 +706,9 @@ assert(
   "independent of obstacle order",
 );
 
-// 375×667（実測）：カードが画面の下まで続き、40px の空きがないので出さない
+// 375×667（実測）。ここは Hero の short-phone（カードを縮める）を足す前の配置の記録：
+// カードが画面の下まで続き、40px の空きがないので出さない（アルゴリズムの境界の確認として残す）。
+// カードを縮めた後の配置は、下の OBSTACLES_375_SHORT
 const OBSTACLES_375 = [
   rect(0, 515.9, 27, 568),
   rect(211.9, 576, 363, 603),
@@ -719,7 +721,8 @@ assert(
   sontaOverlayBox({ width: 375, height: 667 }, OBSTACLES_375) === null,
   "375×667 has no room for the minimum → hidden",
 );
-// 320×568（実測）。ページが横にはみ出し（ボトムナビ 371px 幅）、innerWidth 371 / innerHeight 659
+// 320×568（実測、カードを縮める前の配置の記録）。ページが横にはみ出し（ボトムナビ 371px 幅）、
+// innerWidth 371 / innerHeight 659。縮めた後は OBSTACLES_320_SHORT
 const OBSTACLES_320 = [
   rect(0, 507.9, 27, 560),
   rect(207.9, 568, 359, 595),
@@ -743,6 +746,85 @@ const OBSTACLES_320 = [
   assert(
     raw !== null && raw.left + raw.width > 320,
     `unclamped 371×659 would put the box off-screen: ${boxJson(raw)}`,
+  );
+}
+
+// 縦の短い小画面（max-width 639px かつ max-height 700px）では Hero のカードを縮める
+// （上端 74・下端 488、見出し 30px）ので、カードの下の My Skills の右に、通常の探索（56px 以上）で入る。
+// 以下は縮めた後の実測（Playwright、本番ビルド、EN。JA は Skip ボタンの幅だけ違う）
+const OBSTACLES_375_SHORT = [
+  rect(0, 515.9, 27, 568), // 計器表示（時刻）
+  rect(211.9, 576, 363, 603), // Skip to work index
+  rect(0, 611, 375, 667), // ボトムナビ
+  rect(24, 74, 351, 488), // ヒーローのカード（縮めた後）
+  rect(104.3, 528, 270.7, 574), // My Skills
+  rect(-1114.6, 670, 6234.4, 736), // 技術カルーセルの帯（画面の下）
+  header(375),
+];
+const OBSTACLES_320_SHORT = [
+  rect(0, 507.9, 27, 560),
+  rect(207.9, 568, 359, 595),
+  rect(0, 603, 371, 659),
+  rect(24, 74, 296, 488),
+  rect(76.8, 528, 243.2, 574),
+  rect(-1113, 670, 6236, 736),
+  header(320),
+];
+{
+  const b375 = assertClear(
+    { width: 375, height: 667 },
+    OBSTACLES_375_SHORT,
+    "375 short",
+  );
+  assert(
+    boxJson(b375) ===
+      JSON.stringify({ left: 277, top: 494, width: 80, height: 76 }),
+    `375×667 (card shrunk): ${boxJson(b375)}`,
+  );
+  assert(
+    (b375?.height ?? 0) >= SONTA_OVERLAY_MIN_H,
+    "375×667 (card shrunk) uses the normal search",
+  );
+  // JA は Skip ボタンが狭い（左端 238）。箱は同じ
+  const ja375 = OBSTACLES_375_SHORT.map((o) =>
+    o.left === 211.9 ? { ...o, left: 238 } : o,
+  );
+  assert(
+    boxJson(sontaOverlayBox({ width: 375, height: 667 }, ja375)) ===
+      boxJson(b375),
+    "375×667 JA: same box",
+  );
+  assert(
+    boxJson(
+      sontaOverlayBox(
+        { width: 375, height: 667 },
+        [...OBSTACLES_375_SHORT].reverse(),
+      ),
+    ) === boxJson(b375),
+    "375×667 (card shrunk): independent of obstacle order",
+  );
+
+  // 320×568：ページは横にはみ出す（371×659）が、見える範囲 320×568 の中に収まる
+  const vis = sontaVisibleViewport(
+    { width: 371, height: 659 },
+    { width: 320, height: 568 },
+  );
+  const b320 = assertClear(vis, OBSTACLES_320_SHORT, "320 short");
+  assert(
+    boxJson(b320) ===
+      JSON.stringify({ left: 250, top: 501, width: 64, height: 61 }),
+    `320×568 (card shrunk): ${boxJson(b320)}`,
+  );
+  assert(
+    (b320?.height ?? 0) >= SONTA_OVERLAY_MIN_H,
+    "320×568 (card shrunk) uses the normal search",
+  );
+  const ja320 = OBSTACLES_320_SHORT.map((o) =>
+    o.left === 207.9 ? { ...o, left: 234 } : o,
+  );
+  assert(
+    boxJson(sontaOverlayBox(vis, ja320)) === boxJson(b320),
+    "320×568 JA: same box",
   );
 }
 
