@@ -16,4 +16,4 @@ function testHangarTimingRelationships() {
 }
 
 testHangarTimingRelationships();
-console.log("spaceshipVideoPreload.test.ts: ok");
+console.log("hangarTransitionTiming.test.ts: ok");

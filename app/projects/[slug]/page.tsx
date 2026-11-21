@@ -66,7 +66,6 @@ export default async function ProjectPage({
 
   return (
     <>
-      {/* ページを開いた直後に動画を全画面表示するイントロ演出 */}
       <ProjectIntro />
       <article className="min-h-screen px-3 pt-24 pb-16 sm:px-6 lg:px-8">
         {/* 惑星の空の上でも本文の AA を保つ、ほぼ不透明の計器盤 */}
