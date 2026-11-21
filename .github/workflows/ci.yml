@@ -26,6 +26,9 @@ jobs:
 
       - run: npx prettier --check app
 
+      # ブラウザ・サーバー不要の Node 単体テスト
+      - run: npm test
+
       - run: npm run build
         env:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}

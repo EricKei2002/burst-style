@@ -146,7 +146,7 @@ function TimelineVideoCard({
 }) {
   const copy = useSiteCopy();
   const cardRef = useRef<HTMLDivElement>(null);
-  const posterSrc = VIDEO_POSTERS[src] ?? "/icon.jpg";
+  const posterSrc = VIDEO_POSTERS[src] ?? "/profile-new.jpg";
 
   useEffect(() => {
     if (!isActive) return;

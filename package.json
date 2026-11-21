@@ -12,14 +12,18 @@
     "spell": "cspell .",
     "test:timing": "npx --yes tsx app/lib/hangarTransitionTiming.test.ts",
     "test:contact": "npx --yes tsx app/api/contact/validateContactForm.test.ts",
-    "measure:transition": "node scripts/measure-project-transition.mjs"
+    "test:page-transition": "npx --yes tsx app/lib/pageTransitionTiming.test.ts",
+    "test:solar": "npx --yes tsx app/lib/solar.test.ts",
+    "test:local-sky": "npx --yes tsx app/lib/localSky.test.ts",
+    "test:planets": "npx --yes tsx app/lib/planets.test.ts",
+    "test:home-sections": "npx --yes tsx app/lib/homeSections.test.ts",
+    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.4.1",
     "@react-three/fiber": "^9.4.2",
     "@studio-freight/react-lenis": "^0.0.47",
     "@types/three": "^0.182.0",
-    "critters": "^0.0.23",
     "gsap": "^3.13.0",
     "next": "^16.4.5",
     "react": "19.2.0",
@@ -35,7 +39,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "baseline-browser-mapping": "^2.9.19",
     "cspell": "^8.19.3",
     "eslint": "^9",
     "eslint-config-next": "^16.4.5",
