@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* 縦の短い小さい画面（375×667・320×568 など）。sm（640px〜）とは重ならない */
+@custom-variant short-phone (@media (max-width: 639px) and (max-height: 700px));
+
 @theme inline {
   --font-sans: Helvetica, Arial, sans-serif;
   --font-mono:
