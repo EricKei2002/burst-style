@@ -27,9 +27,7 @@ jobs:
       - run: npx prettier --check app
 
       # ブラウザ・サーバー不要の Node 単体テスト
-      - run: npm run test:timing
-
-      - run: npm run test:contact
+      - run: npm test
 
       - run: npm run build
         env:
