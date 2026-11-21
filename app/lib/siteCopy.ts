@@ -233,5 +233,20 @@ export function buildSiteCopy(locale: Locale) {
         ja: "< 別のメッセージを送る",
       }),
     },
+    /** 作品ページ（/projects/sonta-kun）の 3D の Sontaくん */
+    sonta: {
+      imageAlt: pick(locale, {
+        en: "Sonta-kun, a round blue-and-orange robot giving a thumbs-up and holding a schedule clipboard, with the tagline “The first AI that reads the air”",
+        ja: "親指を立てて予定表を持つ、青とオレンジの丸いロボット「Sontaくん」と「空気を読む、はじめてのAI」のキャッチコピー",
+      }),
+      thumbsUpAria: pick(locale, {
+        en: "Sonta-kun 3D model — press to get a thumbs-up",
+        ja: "Sontaくんの 3D モデル — 押すとサムズアップします",
+      }),
+      staticAria: pick(locale, {
+        en: "Sonta-kun 3D model (still pose)",
+        ja: "Sontaくんの 3D モデル（静止ポーズ）",
+      }),
+    },
   };
 }

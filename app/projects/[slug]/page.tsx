@@ -9,6 +9,14 @@ import ProjectDocs from "../../components/ui/ProjectDocs";
 import BackButton from "../../components/ui/BackButton";
 // ProjectIntroは"use client"のServer Componentから直接importできる
 import ProjectIntro from "../../components/visuals/ProjectIntro";
+import SontaShowcase from "../../components/visuals/SontaShowcase";
+import { buildSiteCopy } from "../../lib/siteCopy";
+
+/** 3D モデルを見せる作品（このページだけヒーロー枠が SontaShowcase になる） */
+const SONTA_SLUG = "sonta-kun";
+const HERO_BOX_CLASS =
+  "relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50";
+const HERO_SIZES = "(min-width: 944px) 896px, calc(100vw - 48px)";
 
 export function generateStaticParams() {
   return projectsData.map((project) => ({
@@ -63,6 +71,7 @@ export default async function ProjectPage({
 
   const locale = await getServerLocale();
   const project = getLocalizedProject(raw, locale);
+  const sontaCopy = buildSiteCopy(locale).sonta;
 
   return (
     <>
@@ -73,18 +82,30 @@ export default async function ProjectPage({
           <BackButton />
           <header className="mb-12">
             <div className="flex flex-col gap-6">
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50">
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                  // LCP 画像: 先読みし、取得の優先度を上げる（Next 16 では priority の代わりに preload）
-                  preload
-                  fetchPriority="high"
-                  sizes="(min-width: 944px) 896px, calc(100vw - 48px)"
+              {raw.slug === SONTA_SLUG ? (
+                // Sontaくんだけ、同じ枠の中で 3D モデルを見せる（画像は読み込み中・失敗時の代わり）
+                <SontaShowcase
+                  className={HERO_BOX_CLASS}
+                  image={project.image}
+                  imageAlt={sontaCopy.imageAlt}
+                  actionLabel={sontaCopy.thumbsUpAria}
+                  staticLabel={sontaCopy.staticAria}
+                  sizes={HERO_SIZES}
                 />
-              </div>
+              ) : (
+                <div className={HERO_BOX_CLASS}>
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    // LCP 画像: 先読みし、取得の優先度を上げる（Next 16 では priority の代わりに preload）
+                    preload
+                    fetchPriority="high"
+                    sizes={HERO_SIZES}
+                  />
+                </div>
+              )}
 
               <div className="space-y-4">
                 <h1 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
