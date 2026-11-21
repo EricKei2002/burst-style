@@ -12,6 +12,11 @@ const TheSun = lazy(() => import("./TheSun"));
 const Moon = lazy(() => import("./Moon"));
 const Earth = lazy(() => import("./Earth"));
 const ShootingStars = lazy(() => import("./ShootingStars"));
+// 宇宙を漂う Sontaくん（GLB とローダーは作品ページと共用。同じ Canvas に乗せて WebGL を増やさない）
+const SontaDrift = lazy(() => import("./SontaDrift"));
+
+/** 天体が出てから、この時間内の空き時間で Sontaくんを読み込む */
+const SONTA_IDLE_TIMEOUT_MS = 3000;
 
 export default function StarBackground() {
   const observerRef = useRef<HTMLDivElement>(null);
@@ -96,6 +101,26 @@ export default function StarBackground() {
     return () => clearTimeout(timer);
   }, [isReady, showCelestialBodies]);
 
+  // Sontaくんは天体と同じ品質の段階（極端な低スペック・節約モードでは出さない）で、
+  // 天体が出たあとの空き時間に読み込む（初回描画・星の立ち上がりを邪魔しない）
+  const [showSonta, setShowSonta] = useState(false);
+  useEffect(() => {
+    if (!showCelestialsNow || !showCelestialBodies) return;
+    const saveData =
+      (navigator as Navigator & { connection?: { saveData?: boolean } })
+        .connection?.saveData === true;
+    if (saveData) return;
+    const activate = () => setShowSonta(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, {
+        timeout: SONTA_IDLE_TIMEOUT_MS,
+      });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(activate, 1000);
+    return () => clearTimeout(timer);
+  }, [showCelestialsNow, showCelestialBodies]);
+
   if (starCount === 0) {
     return (
       <div
@@ -135,6 +160,7 @@ export default function StarBackground() {
           <Suspense fallback={null}>
             {showCelestialsNow && <ShootingStars />}
           </Suspense>
+          <Suspense fallback={null}>{showSonta && <SontaDrift />}</Suspense>
         </Canvas>
       )}
     </div>
