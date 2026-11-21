@@ -1,8 +1,11 @@
 import {
   AnimationMixer,
+  Euler,
   LoopOnce,
   LoopRepeat,
+  Quaternion,
   TextureLoader,
+  Vector3,
   type AnimationAction,
   type AnimationClip,
   type AnimationMixerEventMap,
@@ -12,9 +15,16 @@ import {
 } from "three";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import {
+  createLookState,
   nextBlinkDelay,
+  POINTER_IDLE_S,
   SONTA_CLIPS,
   SONTA_GLB_URL,
+  SONTA_STATIC_LOOK,
+  stepLook,
+  THUMBS_ARM_GAIN,
+  thumbsUpEnvelope,
+  type SontaLook,
 } from "../../lib/sontaMotion";
 
 /**
@@ -60,10 +70,16 @@ export type SontaRigOptions = {
   blink: boolean;
 };
 
+/** ポインターの位置（中心 0・端 ±1、x は右・y は上が正）。入力がなければ null */
+export type SontaPointer = { nx: number; ny: number } | null;
+
 export type SontaRig = {
   root: Object3D;
-  /** 毎フレーム呼ぶ（dt は秒） */
-  update(dt: number): void;
+  /**
+   * 毎フレーム呼ぶ（dt は秒）。向き（斜め 3/4＋スイング＋ポインター追従）と
+   * サムズアップの強調もここで当てる（root の回転・位置・拡大率と、頭のボーン）
+   */
+  update(dt: number, pointer?: SontaPointer): void;
   /** サムズアップを 1 回再生して Idle に戻る。再生を始めたら true */
   thumbsUp(): boolean;
   dispose(): void;
@@ -76,6 +92,92 @@ const MAX_DT_S = 0.1;
 
 function findClip(clips: AnimationClip[], name: string): AnimationClip | null {
   return clips.find((c) => c.name === name) ?? null;
+}
+
+const amplified = new WeakMap<AnimationClip, AnimationClip>();
+
+/**
+ * A_ThumbsUp の右腕の回転を、クリップの最初の姿勢からのずれごと THUMBS_ARM_GAIN 倍にした複製。
+ * キーの時刻はそのままなので、タイミングと Idle への戻りは元のクリップと同じ。GLB は変えない
+ */
+function amplifyThumbsClip(clip: AnimationClip): AnimationClip {
+  const cached = amplified.get(clip);
+  if (cached) return cached;
+  const out = clip.clone();
+  const q0 = new Quaternion();
+  const qi = new Quaternion();
+  const delta = new Quaternion();
+  const axis = new Vector3();
+  for (const track of out.tracks) {
+    const dot = track.name.lastIndexOf(".");
+    const bone = track.name.slice(0, dot);
+    const gain = THUMBS_ARM_GAIN[bone];
+    if (!gain || track.name.slice(dot + 1) !== "quaternion") continue;
+    const v = track.values;
+    q0.fromArray(v, 0);
+    const q0inv = q0.clone().invert();
+    for (let i = 0; i < v.length; i += 4) {
+      qi.fromArray(v, i);
+      delta.copy(q0inv).multiply(qi);
+      if (delta.w < 0) delta.set(-delta.x, -delta.y, -delta.z, -delta.w);
+      const angle = 2 * Math.acos(Math.min(1, delta.w));
+      const s = Math.sqrt(Math.max(0, 1 - delta.w * delta.w));
+      if (angle < 1e-5 || s < 1e-6) continue;
+      axis.set(delta.x / s, delta.y / s, delta.z / s);
+      delta.setFromAxisAngle(axis, angle * gain);
+      qi.copy(q0).multiply(delta).toArray(v, i);
+    }
+  }
+  amplified.set(clip, out);
+  return out;
+}
+
+/**
+ * ページ全体のポインター（マウス・ペン）を受け、最後の位置を覚えておく。
+ * - リスナーは passive。React の再描画はしない（毎フレーム read で読む）
+ * - タッチは acceptTouch が true を返したときだけ受ける（作品ページの枠の中だけ、など）
+ * - 窓の外へ出た・タブを離れた・POINTER_IDLE_S 秒動かない、のどれかで null に戻る
+ */
+export function trackPointer(opts: {
+  acceptTouch?(e: PointerEvent): boolean;
+}): { read(): { x: number; y: number } | null; dispose(): void } {
+  let x = 0;
+  let y = 0;
+  let at = -Infinity;
+  const onMove = (e: PointerEvent) => {
+    if (e.pointerType === "touch" && !opts.acceptTouch?.(e)) return;
+    x = e.clientX;
+    y = e.clientY;
+    at = performance.now();
+  };
+  const onOut = (e: PointerEvent) => {
+    if (!e.relatedTarget && e.pointerType !== "touch") at = -Infinity;
+  };
+  const onBlur = () => {
+    at = -Infinity;
+  };
+  const passive = { passive: true } as const;
+  window.addEventListener("pointermove", onMove, passive);
+  window.addEventListener("pointerdown", onMove, passive);
+  document.addEventListener("pointerout", onOut, passive);
+  window.addEventListener("blur", onBlur);
+  return {
+    read() {
+      if (performance.now() - at > POINTER_IDLE_S * 1000) return null;
+      return { x, y };
+    },
+    dispose() {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onMove);
+      document.removeEventListener("pointerout", onOut);
+      window.removeEventListener("blur", onBlur);
+    },
+  };
+}
+
+function applyLook(root: Object3D, look: SontaLook) {
+  // Euler の XYZ 順：先に左右を向けてから、カメラに対して前へ傾ける
+  root.rotation.set(look.pitch, look.bodyYaw, 0);
 }
 
 /** 読み込み済みの GLB から、独立して動かせる Sontaくんを 1 体作る */
@@ -106,8 +208,9 @@ export async function createSontaRig(opts: SontaRigOptions): Promise<SontaRig> {
   idle?.setLoop(LoopRepeat, Infinity).play();
 
   if (!opts.animate) {
-    // 最初のフレームの姿勢を当てたまま、以後は時間を進めない
+    // 最初のフレームの姿勢を当て、斜め 3/4 の向きで止める（正面にはしない）。以後は時間を進めない
     mixer.update(0);
+    applyLook(root, SONTA_STATIC_LOOK);
     return {
       root,
       update() {},
@@ -121,7 +224,7 @@ export async function createSontaRig(opts: SontaRigOptions): Promise<SontaRig> {
 
   let thumbs: AnimationAction | null = null;
   if (thumbsClip) {
-    thumbs = mixer.clipAction(thumbsClip);
+    thumbs = mixer.clipAction(amplifyThumbsClip(thumbsClip));
     thumbs.setLoop(LoopOnce, 1);
     thumbs.clampWhenFinished = true;
   }
@@ -147,10 +250,18 @@ export async function createSontaRig(opts: SontaRigOptions): Promise<SontaRig> {
   // 最初の瞬きは少し早めに
   let blinkIn = nextBlinkDelay() * 0.5;
 
+  const head = root.getObjectByName("Head") ?? null;
+  const look = createLookState();
+  const headTurn = new Quaternion();
+  const headEuler = new Euler(0, 0, 0, "YXZ");
+  // スイングの位相。0 から始めると最初は基本の向き（27°）から振り始める
+  let elapsed = 0;
+
   return {
     root,
-    update(dt) {
+    update(dt, pointer = null) {
       const step = Math.min(Math.max(dt, 0), MAX_DT_S);
+      elapsed += step;
       if (blink) {
         blinkIn -= step;
         if (blinkIn <= 0) {
@@ -159,6 +270,26 @@ export async function createSontaRig(opts: SontaRigOptions): Promise<SontaRig> {
         }
       }
       mixer.update(step);
+
+      const env = thumbsUpEnvelope(
+        thumbsPlaying && thumbs ? thumbs.time : null,
+      );
+      const l = stepLook(
+        look,
+        { t: elapsed, pointer, twist: env.twist, thumbs: env.amount },
+        step,
+      );
+      applyLook(root, l);
+      // サムズアップ：足元を支点に跳ね、縦に伸び縮み（横は体積をおおむね保つ）
+      root.position.y = env.hop;
+      const side = 1 / Math.sqrt(env.squashY);
+      root.scale.set(side, env.squashY, side);
+      if (head) {
+        // ミキサーが当てた頭の回転に、追従ぶん（体より少し多め）と、かしげ・うなずきを足す。
+        // 頭のボーンの軸はモデルの軸とそろっている（Y が上、Z が正面）
+        headEuler.set(l.headPitch + env.headNod, l.headYaw, env.headRoll);
+        head.quaternion.multiply(headTurn.setFromEuler(headEuler));
+      }
     },
     thumbsUp() {
       if (!thumbs || !idle || thumbsPlaying) return false;

@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { NoToneMapping, SRGBColorSpace } from "three";
-import { createSontaRig, type SontaRig } from "./sontaRig";
+import {
+  createSontaRig,
+  trackPointer,
+  type SontaPointer,
+  type SontaRig,
+} from "./sontaRig";
 
 export type SontaShowcaseApi = {
   thumbsUp(): boolean;
@@ -20,14 +25,24 @@ type Props = {
   onError(): void;
 };
 
-/** モデル（高さ約 1.22）を 16:9 の枠に収めるカメラ */
+const LOOK_AT_Y = 0.6;
+/** カメラは少し上から（仰角 5°）。モデルの前傾 6° と合わせて、ヘルメットの上面の丸みが見える */
+const CAMERA_ELEVATION = (5 * Math.PI) / 180;
+const CAMERA_DISTANCE = 3.3;
+/**
+ * モデル（高さ約 1.22）を 16:9 の枠に収めるカメラ。以前（30°・3.7）より少し寄って画角を広げ、
+ * 手前の腕・アンテナと奥の体のずれ（遠近感）を少し強める
+ */
 const CAMERA = {
-  position: [0, 0.68, 3.7] as [number, number, number],
-  fov: 30,
+  position: [
+    0,
+    LOOK_AT_Y + CAMERA_DISTANCE * Math.sin(CAMERA_ELEVATION),
+    CAMERA_DISTANCE * Math.cos(CAMERA_ELEVATION),
+  ] as [number, number, number],
+  fov: 34,
   near: 0.1,
   far: 50,
 };
-const LOOK_AT_Y = 0.6;
 
 function SontaActor({
   reduced,
@@ -37,8 +52,31 @@ function SontaActor({
   const [rig, setRig] = useState<SontaRig | null>(null);
   const invalidate = useThree((s) => s.invalidate);
   const camera = useThree((s) => s.camera);
+  const canvas = useThree((s) => s.gl.domElement);
   const readyRef = useRef(onReady);
   const errorRef = useRef(onError);
+  const pointerRef = useRef<ReturnType<typeof trackPointer> | null>(null);
+
+  // ポインター追従（動きを減らす設定では付けない）。マウスはページのどこでも、
+  // タッチは枠の中で触れた・なぞったときだけ向きを少し変える
+  useEffect(() => {
+    if (reduced) return;
+    const inside = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      return (
+        e.clientX >= r.left &&
+        e.clientX <= r.right &&
+        e.clientY >= r.top &&
+        e.clientY <= r.bottom
+      );
+    };
+    const tracker = trackPointer({ acceptTouch: inside });
+    pointerRef.current = tracker;
+    return () => {
+      tracker.dispose();
+      pointerRef.current = null;
+    };
+  }, [reduced, canvas]);
 
   useEffect(() => {
     readyRef.current = onReady;
@@ -81,7 +119,18 @@ function SontaActor({
   }, [rig, invalidate]);
 
   useFrame((_, delta) => {
-    rig?.update(delta);
+    if (!rig) return;
+    const p = pointerRef.current?.read() ?? null;
+    let pointer: SontaPointer = null;
+    if (p) {
+      // 枠の中心を 0、枠の端を ±1 に（枠の外は頭打ち）
+      const r = canvas.getBoundingClientRect();
+      pointer = {
+        nx: (p.x - (r.left + r.width / 2)) / Math.max(1, r.width / 2),
+        ny: -(p.y - (r.top + r.height / 2)) / Math.max(1, r.height / 2),
+      };
+    }
+    rig.update(delta, pointer);
   });
 
   if (!rig) return null;

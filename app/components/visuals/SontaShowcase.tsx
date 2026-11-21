@@ -201,8 +201,9 @@ export default function SontaShowcase({
             onKeyDown={onKeyDown}
             onPointerEnter={onPointerEnter}
             // フォーカスの枠はサイト共通の :focus-visible（globals.css）。外側に 5px 出るので、
-            // 枠の overflow-hidden で切れないよう 6px 内側に置く
-            className="absolute inset-1.5 cursor-pointer rounded-xl"
+            // 枠の overflow-hidden で切れないよう 6px 内側に置く。
+            // touch-pan-y：縦のスクロールはそのまま、横になぞると Sontaくんの向きが少し変わる
+            className="absolute inset-1.5 cursor-pointer touch-pan-y rounded-xl"
           />
         ) : (
           <div
