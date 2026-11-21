@@ -14,7 +14,7 @@ export default function SkipToWork() {
     // next/link は同じパスのハッシュ移動を router で済ませてしまい、HomeSections の
     // セクション切り替え（と JS 無しの通常のアンカー）を通らないので素の <a> にする
     // eslint-disable-next-line @next/next/no-html-link-for-pages
-    <a href="/#projects-index" className="skip-to-work">
+    <a href="/#projects-index" className="skip-to-work" data-sonta-avoid="">
       {locale === "ja" ? "作品一覧へスキップ" : "Skip to work index"}
     </a>
   );

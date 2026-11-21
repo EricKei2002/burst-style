@@ -340,6 +340,21 @@
   }
 }
 
+/* スマホのトップで漂う Sontaくんの専用 Canvas（SontaDriftOverlay）。
+   .star-bg の外に置くので、星空の減光（--sky-weather-dim）も色かぶりも受けない。
+   z-index は veil(-40)・haze(-39)・雨と雪(-38)・濡れた地面(-37) の上、本文の下。操作は受けない */
+.sonta-overlay {
+  position: fixed;
+  z-index: -36;
+  pointer-events: none;
+  contain: layout paint;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sonta-overlay {
+    animation: local-sky-fade-in 0.8s ease both;
+  }
+}
+
 /* 動きを減らす設定では雨と雪を出さず、もやも止める（色と星の明るさだけ変える） */
 @media (prefers-reduced-motion: reduce) {
   .local-sky-precip,

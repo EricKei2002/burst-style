@@ -72,7 +72,10 @@ export default function Top() {
     >
       <div className="relative flex flex-1 flex-col pt-8 sm:pt-10 lg:pt-12">
         <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
-          <div className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5">
+          <div
+            data-sonta-avoid=""
+            className="flex w-full max-w-5xl min-h-[32rem] md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 text-center bg-black border border-zinc-800 rounded-2xl p-8 shadow-2xl ring-1 ring-white/5"
+          >
             <h1 className="text-5xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
               <span className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
@@ -129,6 +132,7 @@ export default function Top() {
         {/* テックカルーセル（全幅） */}
         <div className="relative z-10 mt-10 w-full min-h-[320px] sm:mt-12">
           <h2
+            data-sonta-avoid=""
             className={`mx-auto mb-8 flex w-fit rounded-md border border-green-300/40 bg-zinc-950/95 px-4 py-2 text-center font-mono text-xl text-green-100 tech-carousel-title transition-opacity duration-500 md:text-2xl ${
               skillsVisible ? "opacity-100" : "opacity-0"
             }`}

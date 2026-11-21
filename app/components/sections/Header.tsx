@@ -95,7 +95,10 @@ export default function Header({
               <LangButtons locale={locale} setLocale={setLocale} copy={copy} />
             </div>
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
-            <ul className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-zinc-950/95 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:static sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+            <ul
+              data-sonta-avoid=""
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-zinc-950/95 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] backdrop-blur-md sm:static sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-6 sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none"
+            >
               {HOME_SECTIONS.map((section, i) => (
                 <li key={section} className="h-full sm:h-auto">
                   <a

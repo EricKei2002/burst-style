@@ -342,6 +342,161 @@ const DRIFT_X_PERIOD_S = 47;
 const DRIFT_Y_PERIOD_S = 31;
 const BOB_PERIOD_S = 4.2;
 
+// ---------------------------------------------------------------------------
+// スマホ（幅 768 未満）の専用 Canvas：本文のすき間に置く小さな枠
+//
+// 共有の星空 Canvas（画角 75°）の隅に置くと、視線から約 30° 外れて体が斜めに 11% 歪み、
+// 描画も 1x・アンチエイリアスなしで荒くなる。さらに星空の減光・色かぶりも受ける。
+// そこで、スマホだけ Sontaくん専用の小さな Canvas を星空の外に置く。画角は狭く（12°）、
+// 体の中心を光軸に合わせるので、画面端の透視の歪みが出ない（画角が広いと手前の腕・体が拡大され、
+// 上下が枠で切れる）。
+// ---------------------------------------------------------------------------
+
+export type ScreenRect = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+
+export type SontaOverlayBox = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+/** 専用 Canvas のカメラの縦の画角（度） */
+export const SONTA_OVERLAY_FOV_DEG = 12;
+/**
+ * モデル空間の描画範囲（足元 y=0・高さ 1.22）。GLB の頂点から、基本の向き 27° を中心に
+ * 左右 15°（12〜42°）振ったときの輪郭の横の範囲が x = −0.675〜0.703、縦が y = −0.03〜1.22
+ * （前傾 6° 込み、正射影）。揺れ（上下 SONTA_OVERLAY_BOB・傾き SONTA_OVERLAY_ROLL）、Idle の動き、
+ * 手前に出る腕・体の遠近による拡大（距離 約 6.7 で最大 約 10%）の余白を足した（実機で切れないことを確認済み）
+ */
+export const SONTA_OVERLAY_FRAME = { cx: 0, cy: 0.59, w: 1.56, h: 1.48 };
+/** 枠の高さ（CSS px）の下限・上限。下限より小さくしか置けない画面では出さない */
+export const SONTA_OVERLAY_MIN_H = 56;
+export const SONTA_OVERLAY_MAX_H = 96;
+/** 本文・ボタン・画面の端から空ける間隔（CSS px） */
+export const SONTA_OVERLAY_GAP = 6;
+/** 置く範囲：画面の上からこの割合より下だけ（ヘッダー・カードの上部は避ける） */
+export const SONTA_OVERLAY_SEARCH_TOP = 0.45;
+/** 揺れの大きさ（モデルの単位・ラジアン）。漂う代わりに、その場でゆっくり上下・傾く */
+export const SONTA_OVERLAY_BOB = 0.025;
+export const SONTA_OVERLAY_ROLL = 0.03;
+
+/**
+ * 画面上の位置（ndc、-1..1）にある小さな物体が、平面への透視投影で視線の外向きに伸びる倍率
+ * （1 / cos θ、θ は光軸からの角度）。画角 75°・縦長の左下では約 1.15、画面の中心では 1
+ */
+export function offAxisStretch(
+  ndcX: number,
+  ndcY: number,
+  aspect: number,
+  fovDeg: number,
+): number {
+  const halfH = Math.tan((fovDeg * DEG) / 2);
+  const rx = ndcX * halfH * aspect;
+  const ry = ndcY * halfH;
+  return Math.sqrt(1 + rx * rx + ry * ry);
+}
+
+/** 枠の縦横比（幅 / 高さ） */
+export const SONTA_OVERLAY_ASPECT =
+  SONTA_OVERLAY_FRAME.w / SONTA_OVERLAY_FRAME.h;
+
+/** 枠がちょうど収まるカメラの距離。boxAspect は Canvas の幅 / 高さ */
+export function sontaOverlayCameraDistance(boxAspect: number): number {
+  const t = Math.tan((SONTA_OVERLAY_FOV_DEG * DEG) / 2);
+  const a = Number.isFinite(boxAspect) && boxAspect > 0 ? boxAspect : 1;
+  return Math.max(
+    SONTA_OVERLAY_FRAME.h / 2 / t,
+    SONTA_OVERLAY_FRAME.w / 2 / (t * a),
+  );
+}
+
+/** 専用 Canvas の揺れ。reduced（動きを減らす設定）は時間によらずすべて 0 */
+export function sontaOverlayWobble(
+  t: number,
+  reduced = false,
+): { bobY: number; rotX: number; rotZ: number } {
+  if (reduced || !Number.isFinite(t)) return { bobY: 0, rotX: 0, rotZ: 0 };
+  const tau = Math.PI * 2;
+  return {
+    bobY: Math.sin((t / BOB_PERIOD_S) * tau) * SONTA_OVERLAY_BOB,
+    rotX: Math.sin((t / BOB_PERIOD_S) * tau + 1.3) * 0.02,
+    rotZ: Math.sin((t / DRIFT_X_PERIOD_S) * tau * 2) * SONTA_OVERLAY_ROLL,
+  };
+}
+
+function overlaps(
+  l: number,
+  t: number,
+  r: number,
+  b: number,
+  o: ScreenRect,
+  gap: number,
+): boolean {
+  return (
+    l < o.right + gap &&
+    r > o.left - gap &&
+    t < o.bottom + gap &&
+    b > o.top - gap
+  );
+}
+
+/**
+ * 障害物（本文のカード・ボタン・ナビなど。画面の座標、スクロール 0 のとき）のどれにも
+ * 間隔 SONTA_OVERLAY_GAP 以内に近づかず、画面内の下側（SONTA_OVERLAY_SEARCH_TOP より下）に
+ * 収まる、いちばん大きな枠を返す。高さは MIN_H〜MAX_H、横は縦横比 SONTA_OVERLAY_ASPECT。
+ * 同じ大きさなら、より下・より左を選ぶ。収まらなければ null（出さない）
+ */
+export function sontaOverlayBox(
+  viewport: { width: number; height: number },
+  obstacles: readonly ScreenRect[],
+): SontaOverlayBox | null {
+  const vw = viewport.width;
+  const vh = viewport.height;
+  if (!(vw > 0 && vh > 0)) return null;
+  const gap = SONTA_OVERLAY_GAP;
+  const blockers = obstacles.filter(
+    (o) =>
+      Number.isFinite(o.left + o.top + o.right + o.bottom) &&
+      o.right > o.left &&
+      o.bottom > o.top,
+  );
+  const minTop = vh * SONTA_OVERLAY_SEARCH_TOP;
+  for (let h = SONTA_OVERLAY_MAX_H; h >= SONTA_OVERLAY_MIN_H; h--) {
+    const w = Math.floor(h * SONTA_OVERLAY_ASPECT);
+    // 候補の位置は整数（障害物の側へ寄るほうは切り上げ、反対側は切り捨てて、間隔を割らない）
+    const xs = new Set<number>([gap, Math.floor(vw - gap - w)]);
+    const ys = new Set<number>([Math.ceil(minTop), Math.floor(vh - gap - h)]);
+    for (const o of blockers) {
+      xs.add(Math.ceil(o.right + gap));
+      xs.add(Math.floor(o.left - gap - w));
+      ys.add(Math.ceil(o.bottom + gap));
+      ys.add(Math.floor(o.top - gap - h));
+    }
+    let best: SontaOverlayBox | null = null;
+    for (const top of ys) {
+      for (const left of xs) {
+        const right = left + w;
+        const bottom = top + h;
+        if (left < gap || right > vw - gap || top < minTop || bottom > vh - gap)
+          continue;
+        if (blockers.some((o) => overlaps(left, top, right, bottom, o, gap)))
+          continue;
+        if (!best || top > best.top || (top === best.top && left < best.left)) {
+          best = { left, top, width: w, height: h };
+        }
+      }
+    }
+    if (best) return best;
+  }
+  return null;
+}
+
 /** 画面の縦横比に応じた漂う範囲 */
 export function sontaDriftArea(aspect: number): SontaDriftArea {
   return aspect < 1 ? TALL : WIDE;

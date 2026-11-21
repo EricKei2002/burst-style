@@ -14,6 +14,9 @@ const Earth = lazy(() => import("./Earth"));
 const ShootingStars = lazy(() => import("./ShootingStars"));
 // 宇宙を漂う Sontaくん（GLB とローダーは作品ページと共用。同じ Canvas に乗せて WebGL を増やさない）
 const SontaDrift = lazy(() => import("./SontaDrift"));
+// スマホ（幅 768 未満）では、共有 Canvas の隅ではなく専用の小さな Canvas に出す
+// （星空の減光・色かぶりを受けず、dpr・アンチエイリアス・画角を Sontaくん向けにできる）
+const SontaDriftOverlay = lazy(() => import("./SontaDriftOverlay"));
 
 /** 天体が出てから、この時間内の空き時間で Sontaくんを読み込む */
 const SONTA_IDLE_TIMEOUT_MS = 3000;
@@ -131,38 +134,48 @@ export default function StarBackground() {
   }
 
   return (
-    <div
-      ref={observerRef}
-      className="star-bg fixed inset-0 -z-50 h-full w-full bg-[#050505]"
-      aria-hidden="true"
-    >
-      {isReady && (
-        <Canvas
-          camera={{ position: [0, 0, 1] }}
-          gl={{
-            alpha: false,
-            antialias: false,
-            powerPreference: "high-performance",
-          }}
-          dpr={isMobile ? [0.75, 1] : [1, 1.1]}
-        >
-          <ambientLight intensity={0.1} />
-          <Suspense fallback={null}>
-            {showCelestialBodies && showCelestialsNow && <TheSun />}
-            {showCelestialBodies && showCelestialsNow && <Moon />}
-            {showCelestialBodies && showCelestialsNow && <Earth />}
-          </Suspense>
+    <>
+      <div
+        ref={observerRef}
+        className="star-bg fixed inset-0 -z-50 h-full w-full bg-[#050505]"
+        aria-hidden="true"
+      >
+        {isReady && (
+          <Canvas
+            camera={{ position: [0, 0, 1] }}
+            gl={{
+              alpha: false,
+              antialias: false,
+              powerPreference: "high-performance",
+            }}
+            dpr={isMobile ? [0.75, 1] : [1, 1.1]}
+          >
+            <ambientLight intensity={0.1} />
+            <Suspense fallback={null}>
+              {showCelestialBodies && showCelestialsNow && <TheSun />}
+              {showCelestialBodies && showCelestialsNow && <Moon />}
+              {showCelestialBodies && showCelestialsNow && <Earth />}
+            </Suspense>
 
-          <StarfieldGravity
-            count={starCount}
-            strength={isMobile ? 0.38 : 0.68}
-          />
-          <Suspense fallback={null}>
-            {showCelestialsNow && <ShootingStars />}
-          </Suspense>
-          <Suspense fallback={null}>{showSonta && <SontaDrift />}</Suspense>
-        </Canvas>
+            <StarfieldGravity
+              count={starCount}
+              strength={isMobile ? 0.38 : 0.68}
+            />
+            <Suspense fallback={null}>
+              {showCelestialsNow && <ShootingStars />}
+            </Suspense>
+            <Suspense fallback={null}>
+              {showSonta && !isMobile && <SontaDrift />}
+            </Suspense>
+          </Canvas>
+        )}
+      </div>
+      {/* .star-bg の外（減光・もやの上、本文の下）。pointer-events:none・aria-hidden */}
+      {isMobile && showSonta && (
+        <Suspense fallback={null}>
+          <SontaDriftOverlay />
+        </Suspense>
       )}
-    </div>
+    </>
   );
 }
