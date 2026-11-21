@@ -17,8 +17,9 @@
     "test:local-sky": "npx --yes tsx app/lib/localSky.test.ts",
     "test:planets": "npx --yes tsx app/lib/planets.test.ts",
     "test:home-sections": "npx --yes tsx app/lib/homeSections.test.ts",
+    "test:site-copy": "npx --yes tsx app/lib/siteCopy.test.ts",
     "test:sonta": "npx --yes tsx app/lib/sontaMotion.test.ts",
-    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta"
+    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.4.1",

@@ -28,6 +28,8 @@ export function buildSiteCopy(locale: Locale) {
         en: '"Burst Style" — creativity that explodes into unfamiliar, memorable experiences.',
         ja: "「Burst Style」— 創造性を爆発させ、未知の体験を形にする。",
       }),
+      // tagline1 と tagline2 の間。スマホでは改行が無いので、英語だけ空白でつなぐ（和文の句点の後には空けない）
+      taglineSeparator: pick(locale, { en: " ", ja: "" }),
       tagline2: pick(locale, {
         en: "As a web engineer, I ship value that breaks the usual frame—with passion as the engine.",
         ja: "Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。",

@@ -905,4 +905,230 @@ const OBSTACLES_320_SHORT = [
   );
 }
 
+// EKF-58：Now セクションの横はみ出し（ページ幅 371/372）を直した後の実測（Playwright、本番ビルド、EN）。
+// レイアウトビューポート = 画面なので、Skip・計器・ボトムナビが本来の位置（画面の下端）に来る。
+// カードは Hero で縮めてある。JA は Skip の左端だけ違う（183 / 223 / 238 / 253）。箱は同じ
+// そんたくんが避けるのは Skip の「予約枠」（既定の位置の見えない span）。見える Skip は、
+// 小さい画面で重ならない位置へずれる（visibleSkip。globals.css）。箱は予約枠で決まるので変わらない
+
+// 見える Skip の検証用（接するだけなら重ならない）
+const rectsIntersect = (a: ScreenRect, b: ScreenRect) =>
+  a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+const boxRect = (b: SontaOverlayBox): ScreenRect =>
+  rect(b.left, b.top, b.left + b.width, b.top + b.height);
+
+{
+  type Fixed = {
+    label: string;
+    vp: { width: number; height: number };
+    skipLeft: number;
+    jaSkipLeft: number;
+    // 見える Skip（EN）。重ならない位置へずらしたあと。null = ずらさない（予約枠と同じ）
+    visibleSkip: ScreenRect | null;
+    obstacles: ScreenRect[];
+    expected: SontaOverlayBox;
+  };
+  const fixed: Fixed[] = [
+    {
+      label: "320×568",
+      vp: { width: 320, height: 568 },
+      skipLeft: 156.9,
+      jaSkipLeft: 183,
+      visibleSkip: rect(156.9, 456, 308, 483),
+      obstacles: [
+        rect(0, 416.9, 27, 469),
+        rect(156.9, 477, 308, 504),
+        rect(0, 512, 320, 568),
+        rect(16, 74, 304, 450),
+        rect(76.8, 490, 243.2, 536),
+        rect(-1113, 632, 6236, 698),
+      ],
+      expected: { left: 30, top: 468, width: 43, height: 41 },
+    },
+    {
+      label: "360×780",
+      vp: { width: 360, height: 780 },
+      skipLeft: 196.9,
+      jaSkipLeft: 223,
+      visibleSkip: rect(196.9, 694, 348, 721),
+      obstacles: [
+        rect(0, 628.9, 27, 681),
+        rect(196.9, 689, 348, 716),
+        rect(0, 724, 360, 780),
+        rect(24, 94, 336, 606),
+        rect(96.8, 646, 263.2, 692),
+        rect(0, 788, 7349, 854),
+      ],
+      expected: { left: 270, top: 612, width: 74, height: 71 },
+    },
+    {
+      label: "375×667",
+      vp: { width: 375, height: 667 },
+      skipLeft: 211.9,
+      jaSkipLeft: 238,
+      visibleSkip: null,
+      obstacles: [
+        rect(0, 515.9, 27, 568),
+        rect(211.9, 576, 363, 603),
+        rect(0, 611, 375, 667),
+        rect(16, 74, 359, 450),
+        rect(104.3, 490, 270.7, 536),
+        rect(0, 632, 7349, 698),
+      ],
+      expected: { left: 277, top: 482, width: 92, height: 88 },
+    },
+    {
+      label: "390×844",
+      vp: { width: 390, height: 844 },
+      skipLeft: 226.9,
+      jaSkipLeft: 253,
+      visibleSkip: null,
+      obstacles: [
+        rect(0, 692.9, 27, 745),
+        rect(226.9, 753, 378, 780),
+        rect(0, 788, 390, 844),
+        rect(24, 94, 366, 606),
+        rect(111.8, 646, 278.2, 692),
+        rect(0, 788, 7349, 854),
+      ],
+      expected: { left: 285, top: 653, width: 99, height: 94 },
+    },
+    {
+      label: "430×932",
+      vp: { width: 430, height: 932 },
+      skipLeft: 266.9,
+      jaSkipLeft: 293,
+      visibleSkip: rect(266.9, 641, 418, 668),
+      obstacles: [
+        rect(0, 780.9, 27, 833),
+        rect(266.9, 841, 418, 868),
+        rect(0, 876, 430, 932),
+        rect(24, 108, 406, 620),
+        rect(131.8, 674, 298.2, 720),
+        rect(-845.1, 816, 6503.9, 882),
+      ],
+      expected: { left: 305, top: 714, width: 101, height: 96 },
+    },
+  ];
+  for (const c of fixed) {
+    const withHeader = [...c.obstacles, header(c.vp.width)];
+    // 見える範囲 = innerWidth/innerHeight（はみ出さない）
+    const v = sontaVisibleViewport(c.vp, c.vp);
+    assert(
+      v.width === c.vp.width && v.height === c.vp.height,
+      `${c.label}: viewport`,
+    );
+    const b = assertClearSmall(v, withHeader, `${c.label} fixed`);
+    assert(
+      boxJson(b) === boxJson(c.expected),
+      `${c.label} (no overflow): ${boxJson(b)}`,
+    );
+    assert(
+      (b?.height ?? 0) >= SONTA_OVERLAY_SMALL_MIN_H,
+      `${c.label}: box is visible`,
+    );
+    const ja = withHeader.map((o) =>
+      o.left === c.skipLeft ? { ...o, left: c.jaSkipLeft } : o,
+    );
+    assert(
+      boxJson(sontaOverlayBox(v, ja)) === boxJson(b),
+      `${c.label} JA: same box`,
+    );
+    assert(
+      boxJson(sontaOverlayBox(v, [...withHeader].reverse())) === boxJson(b),
+      `${c.label}: independent of obstacle order`,
+    );
+    // 見える Skip：予約枠以外の障害物・ヘッダー・箱のどれにも重ならない（EN / JA）
+    const slot = withHeader.find((o) => o.left === c.skipLeft)!;
+    const others = withHeader.filter((o) => o !== slot);
+    for (const [name, left] of [
+      ["EN", c.skipLeft],
+      ["JA", c.jaSkipLeft],
+    ] as const) {
+      const base = c.visibleSkip ?? slot;
+      const vis = {
+        ...base,
+        left,
+        right: base.right,
+      };
+      assert(
+        !others.some((o) => rectsIntersect(vis, o)),
+        `${c.label} ${name}: visible Skip overlaps another element`,
+      );
+      assert(
+        !rectsIntersect(vis, boxRect(b!)),
+        `${c.label} ${name}: visible Skip overlaps Sonta box`,
+      );
+    }
+    // 回帰の証拠：ずらす前（予約枠の位置）の Skip は、320 / 360 では My Skills と、
+    // 430 では技術カルーセルの帯と重なっていた
+    if (c.visibleSkip) {
+      assert(
+        others.some((o) => rectsIntersect(slot, o)),
+        `${c.label}: the default Skip position overlapped something`,
+      );
+    }
+  }
+  // 360×780 は通常の探索（56px 以上）に戻る。320×568 は縮小探索（最小 38px）
+  assert(
+    fixed[1].expected.height >= SONTA_OVERLAY_MIN_H,
+    "360 uses normal search",
+  );
+  assert(
+    fixed[0].expected.height < SONTA_OVERLAY_MIN_H,
+    "320 uses small search",
+  );
+}
+
+// 高さの範囲（globals.css の media 範囲の根拠）。画面の下端基準の障害物は、高さ H に合わせて動く。
+// 320 幅：H=555〜588 で、ずらした Skip（上端 456）が箱・障害物に当たらない。589 では箱に当たる
+{
+  const skip320 = rect(156.9, 456, 308, 483);
+  const obsAt = (H: number) => [
+    rect(0, H - 151.1, 27, H - 99),
+    rect(156.9, H - 91, 308, H - 64), // Skip の予約枠
+    rect(0, H - 56, 320, H),
+    rect(16, 74, 304, 450),
+    rect(76.8, 490, 243.2, 536),
+    rect(-1113, 632, 6236, 698),
+    header(320),
+  ];
+  const clearAt = (H: number) => {
+    const obs = obsAt(H);
+    const b = sontaOverlayBox({ width: 320, height: H }, obs);
+    const others = obs.filter((_, i) => i !== 1);
+    return (
+      !others.some((o) => rectsIntersect(skip320, o)) &&
+      !(b && rectsIntersect(skip320, boxRect(b)))
+    );
+  };
+  for (let H = 555; H <= 588; H++) {
+    assert(clearAt(H), `320×${H}: moved Skip is clear`);
+  }
+  assert(!clearAt(589), "320×589: moved Skip hits Sonta box (upper bound)");
+}
+// 360 幅：H=778〜784 で、3px 下げた Skip（bottom = H − 59）が My Skills・箱に当たらない
+{
+  for (let H = 778; H <= 784; H++) {
+    const skipBottom = H - 59;
+    const skip = rect(196.9, skipBottom - 27, 348, skipBottom);
+    const obs = [
+      rect(0, H - 151.1, 27, H - 99),
+      rect(196.9, H - 91, 348, H - 64), // Skip の予約枠
+      rect(0, H - 56, 360, H),
+      rect(24, 94, 336, 606),
+      rect(96.8, H - 134, 263.2, H - 88), // My Skills（H=780 で 646〜692）
+      rect(0, H + 8, 7349, H + 74),
+      header(360),
+    ];
+    const b = sontaOverlayBox({ width: 360, height: H }, obs);
+    const others = obs.filter((_, i) => i !== 1);
+    assert(
+      !others.some((o) => rectsIntersect(skip, o)) &&
+        !(b && rectsIntersect(skip, boxRect(b))),
+      `360×${H}: moved Skip is clear`,
+    );
+  }
+}
+
 console.log("sontaMotion tests passed");

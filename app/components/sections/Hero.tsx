@@ -71,12 +71,12 @@ export default function Top() {
       className="relative flex min-h-screen w-full flex-col overflow-hidden"
     >
       <div className="relative flex flex-1 flex-col pt-8 short-phone:pt-3 sm:pt-10 lg:pt-12">
-        <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6">
+        <div className="container relative z-10 mx-auto flex w-full flex-1 items-center justify-center px-6 short-phone:px-4">
           <div
             data-sonta-avoid=""
-            className="flex w-full max-w-5xl min-h-[32rem] short-phone:min-h-0 md:min-h-[40.125rem] flex-col items-center justify-start space-y-8 short-phone:space-y-4 text-center bg-black border border-zinc-800 rounded-2xl p-8 short-phone:p-5 shadow-2xl ring-1 ring-white/5"
+            className="flex w-full max-w-5xl min-h-[32rem] short-phone:min-h-0 md:min-h-[40.125rem] flex-col items-center justify-start space-y-6 sm:space-y-8 short-phone:space-y-3 text-center bg-black border border-zinc-800 rounded-2xl p-6 sm:p-8 short-phone:p-4 shadow-2xl ring-1 ring-white/5"
           >
-            <h1 className="text-5xl short-phone:text-3xl font-black tracking-tighter text-white sm:text-7xl lg:text-9xl flex flex-col items-center gap-2 shrink-0">
+            <h1 className="text-4xl sm:text-7xl short-phone:text-3xl font-black tracking-tighter text-white lg:text-9xl flex flex-col items-center gap-2 shrink-0">
               <span className="flex items-center justify-center">
                 <span className="font-mono text-fuchsia-300 mr-2">&gt;</span>
                 <span className="title-char">Hello, I&apos;m</span>
@@ -91,8 +91,8 @@ export default function Top() {
               </span>
             </h1>
 
-            <div className="max-w-3xl w-full shrink-0 px-4 short-phone:px-0 mt-8 short-phone:mt-0 text-left">
-              <div className="loading-text h-[5.25rem] short-phone:h-24 md:h-16 font-mono text-green-300 text-xl short-phone:text-base md:text-2xl mb-8 short-phone:mb-3 mt-4 short-phone:mt-0">
+            <div className="max-w-3xl w-full shrink-0 px-0 sm:px-4 mt-0 sm:mt-8 text-left">
+              <div className="loading-text h-[6.25rem] sm:h-[5.25rem] short-phone:h-24 md:h-16 font-mono text-green-300 text-base sm:text-xl md:text-2xl mb-4 sm:mb-8 short-phone:mb-2 mt-0 sm:mt-4">
                 {copy.hero.establishing}
                 <br />
                 {copy.hero.question}{" "}
@@ -112,12 +112,13 @@ export default function Top() {
                   </button>
                 </MagneticButton>
               </div>
-              <p className="h-[7.125rem] short-phone:h-40 md:h-[6.5rem] text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-6 short-phone:mb-0">
+              <p className="h-[11.5rem] short-phone:h-[8.625rem] sm:h-[7.125rem] md:h-[6.5rem] text-sm leading-relaxed text-green-300 sm:text-base font-mono mb-0 sm:mb-6">
                 <span
                   className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
                 >
                   {copy.hero.tagline1}
                 </span>
+                {copy.hero.taglineSeparator}
                 <br className="hidden sm:block" />
                 <span
                   className={`desc-char transition-opacity duration-500 ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
