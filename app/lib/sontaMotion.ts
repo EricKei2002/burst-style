@@ -381,17 +381,18 @@ export const SONTA_OVERLAY_MAX_H = 96;
 /**
  * 小さい画面（通常の探索で入らないとき）の縮小探索での、枠の高さの下限（CSS px）。
  * これより小さくしか置けなければ出さない。
- * - モデルは枠の高さの約 85%（(1.22 + 0.03) / 1.48）なので、枠 40px でモデルは約 34 CSS px
- * - 描画の dpr は最大 2（SontaDriftOverlay の MAX_DPR）。縦 80 device px の枠にモデル約 68 px が入り、
- *   目・顔・アンテナがそれぞれ数 device px 以上を保つ（実機の dpr 2〜3 で目視確認する）
- * - これより小さい（例：25px）と、輪郭が数 px の塊になり、キャラクターと分からない
+ * - モデルは枠の高さの約 84.5%（(1.22 + 0.03) / 1.48）なので、枠 38px でモデルは約 32 CSS px
+ * - 枠の高さ 36・38・40・45・50（モデル約 30・32・34・38・42px）を dpr 2・3 で実際に描いて比べた
+ *   （~/burst-sonta3d-work/v4/minh/）。モデル 32px（枠 38）までは、目・口・両側のアンテナ・胸のパネル・
+ *   体の輪郭がはっきり分かる。モデル 30px（枠 36）では顔が点のようにつぶれ、dpr 2 で目と口の区別が怪しい
+ * - 描画の dpr は最大 2（SontaDriftOverlay の MAX_DPR）。枠 38px は縦 76 device px で、モデル約 64 px
  */
-export const SONTA_OVERLAY_SMALL_MIN_H = 40;
+export const SONTA_OVERLAY_SMALL_MIN_H = 38;
 /** 本文・ボタン・画面の端から空ける間隔（CSS px） */
 export const SONTA_OVERLAY_GAP = 6;
 /**
  * 縮小探索で、間隔 SONTA_OVERLAY_GAP では入らないときに使う狭い間隔（CSS px）。
- * 枠の中には透明な余白（上下 約 8%、左右 約 6% ＝ 40px の枠で約 3px）があるので、
+ * 枠の中には透明な余白（上下 約 8%、左右 約 6% ＝ 38px の枠で約 3px）があるので、
  * 見えている輪郭と障害物の間は 5px 以上空く
  */
 export const SONTA_OVERLAY_SMALL_GAP = 3;

@@ -488,7 +488,12 @@ assert(
 // 実測（Playwright、スクロール 0）。ヘッダー（上の帯、全幅・高さ 62）も障害物に含める
 const HEADER_H = 62;
 const header = (w: number) => rect(0, 0, w, HEADER_H);
-assert(SONTA_OVERLAY_SMALL_MIN_H === 40, "small min height is 40");
+assert(SONTA_OVERLAY_SMALL_MIN_H === 38, "small min height is 38");
+// 枠 38px のモデルの高さは 32px 以上（指定の下限）
+assert(
+  (SONTA_OVERLAY_SMALL_MIN_H * (1.22 + 0.03)) / SONTA_OVERLAY_FRAME.h >= 32,
+  "model at the minimum frame is at least 32 CSS px",
+);
 assert(SONTA_OVERLAY_SMALL_GAP === 3, "small gap is 3");
 assert(
   SONTA_OVERLAY_SMALL_MIN_H < SONTA_OVERLAY_MIN_H,
@@ -664,14 +669,25 @@ assert(
   (box360?.height ?? 99) < SONTA_OVERLAY_MIN_H,
   "360×780 is smaller than the normal minimum",
 );
-// 最小の境界：カードの下端が 1px 下がると入らない（出さない）、ボトムナビが 1px 下がると 41px
+// 最小の境界：カードの下端が下がるほど縮み（1px で 39、2px で最小の 38）、3px 下がると入らない（出さない）。
+// ボトムナビが 1px 下がると 41px
 {
-  const lower = OBSTACLES_360.map((o) =>
-    o.bottom === 702 ? { ...o, bottom: 703 } : o,
+  const cardDown = (d: number) =>
+    OBSTACLES_360.map((o) =>
+      o.bottom === 702 ? { ...o, bottom: 702 + d } : o,
+    );
+  assert(
+    assertClearSmall(VP_360, cardDown(1), "360 card+1")?.height === 39,
+    "360×780: card 1px lower → 39px",
   );
   assert(
-    sontaOverlayBox(VP_360, lower) === null,
-    "360×780: card 1px lower → minimum does not fit → hidden",
+    assertClearSmall(VP_360, cardDown(2), "360 card+2")?.height ===
+      SONTA_OVERLAY_SMALL_MIN_H,
+    "360×780: card 2px lower → exactly the minimum",
+  );
+  assert(
+    sontaOverlayBox(VP_360, cardDown(3)) === null,
+    "360×780: card 3px lower → minimum does not fit → hidden",
   );
   const navLower = OBSTACLES_360.map((o) =>
     o.top === 748 ? { ...o, top: 749 } : o,
@@ -730,7 +746,7 @@ const OBSTACLES_320 = [
   );
 }
 
-// 縮め方：全幅の障害物の間の帯（高さ B）。B が減るほど箱は小さくなり、46 で最小 40、45 で出さない
+// 縮め方：全幅の障害物の間の帯（高さ B）。B が減るほど箱は小さくなり、44 で最小 38、43 で出さない
 {
   const vp = { width: 400, height: 800 };
   const band = (b: number) => [
@@ -764,11 +780,15 @@ const OBSTACLES_320 = [
     );
     prev = box.height;
   }
+  const tight = SONTA_OVERLAY_SMALL_MIN_H + 2 * SONTA_OVERLAY_SMALL_GAP; // 44
   assert(
-    sontaOverlayBox(vp, band(46))?.height === SONTA_OVERLAY_SMALL_MIN_H,
-    "band 46 → exactly the minimum 40",
+    sontaOverlayBox(vp, band(tight))?.height === SONTA_OVERLAY_SMALL_MIN_H,
+    `band ${tight} → exactly the minimum ${SONTA_OVERLAY_SMALL_MIN_H}`,
   );
-  assert(sontaOverlayBox(vp, band(45)) === null, "band 45 → hidden");
+  assert(
+    sontaOverlayBox(vp, band(tight - 1)) === null,
+    `band ${tight - 1} → hidden`,
+  );
   assert(sontaOverlayBox(vp, band(0)) === null, "no band → hidden");
 }
 // ヘッダーとカードの間の帯（画面の上側）にも入る
