@@ -5,22 +5,16 @@ import { useCallback, useEffect, useState, useRef } from "react";
 interface DecryptedTextProps {
   text: string;
   speed?: number;
-  maxIterations?: number;
   className?: string;
-  characters?: string;
   animateOnHover?: boolean;
-  sequential?: boolean;
   ariaLabel?: string;
 }
 
 export default function DecryptedText({
   text,
   speed = 50,
-  maxIterations = 20,
   className = "",
-  characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+",
   animateOnHover = false,
-  sequential = false,
   ariaLabel,
 }: DecryptedTextProps) {
   const [displayText, setDisplayText] = useState(text);
@@ -36,8 +30,10 @@ export default function DecryptedText({
 
   const runScramble = useCallback(() => {
     let iteration = 0;
-    const increment = sequential ? 1 / 3 : 1 / 2;
-    const hardLimit = Math.max(1, maxIterations);
+    const increment = 1 / 2;
+    const hardLimit = Math.max(1, 20);
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
 
     clearScramble();
     intervalRef.current = setInterval(() => {
@@ -58,7 +54,7 @@ export default function DecryptedText({
         setDisplayText(text);
       }
     }, speed);
-  }, [characters, clearScramble, maxIterations, sequential, speed, text]);
+  }, [clearScramble, speed, text]);
 
   useEffect(() => {
     reducedMotionRef.current = window.matchMedia(
