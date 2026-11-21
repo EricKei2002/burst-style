@@ -375,11 +375,26 @@ export const SONTA_OVERLAY_FOV_DEG = 12;
  * 手前に出る腕・体の遠近による拡大（距離 約 6.7 で最大 約 10%）の余白を足した（実機で切れないことを確認済み）
  */
 export const SONTA_OVERLAY_FRAME = { cx: 0, cy: 0.59, w: 1.56, h: 1.48 };
-/** 枠の高さ（CSS px）の下限・上限。下限より小さくしか置けない画面では出さない */
+/** 枠の高さ（CSS px）の上限と、通常の探索（下側の広い場所）での下限 */
 export const SONTA_OVERLAY_MIN_H = 56;
 export const SONTA_OVERLAY_MAX_H = 96;
+/**
+ * 小さい画面（通常の探索で入らないとき）の縮小探索での、枠の高さの下限（CSS px）。
+ * これより小さくしか置けなければ出さない。
+ * - モデルは枠の高さの約 85%（(1.22 + 0.03) / 1.48）なので、枠 40px でモデルは約 34 CSS px
+ * - 描画の dpr は最大 2（SontaDriftOverlay の MAX_DPR）。縦 80 device px の枠にモデル約 68 px が入り、
+ *   目・顔・アンテナがそれぞれ数 device px 以上を保つ（実機の dpr 2〜3 で目視確認する）
+ * - これより小さい（例：25px）と、輪郭が数 px の塊になり、キャラクターと分からない
+ */
+export const SONTA_OVERLAY_SMALL_MIN_H = 40;
 /** 本文・ボタン・画面の端から空ける間隔（CSS px） */
 export const SONTA_OVERLAY_GAP = 6;
+/**
+ * 縮小探索で、間隔 SONTA_OVERLAY_GAP では入らないときに使う狭い間隔（CSS px）。
+ * 枠の中には透明な余白（上下 約 8%、左右 約 6% ＝ 40px の枠で約 3px）があるので、
+ * 見えている輪郭と障害物の間は 5px 以上空く
+ */
+export const SONTA_OVERLAY_SMALL_GAP = 3;
 /** 置く範囲：画面の上からこの割合より下だけ（ヘッダー・カードの上部は避ける） */
 export const SONTA_OVERLAY_SEARCH_TOP = 0.45;
 /** 揺れの大きさ（モデルの単位・ラジアン）。漂う代わりに、その場でゆっくり上下・傾く */
@@ -447,10 +462,72 @@ function overlaps(
 }
 
 /**
+ * 実際に見えている画面の大きさ（CSS px）。
+ * 横にはみ出すページ（小さい画面で本文が画面より広いとき）は、window.innerWidth / innerHeight が
+ * 見える範囲より大きくなる（例：360×780 で 372×804）ため、見える範囲（documentElement の
+ * clientWidth / clientHeight。ピンチズームでは変わらない）との小さいほうを使う
+ */
+export function sontaVisibleViewport(
+  inner: { width: number; height: number },
+  client: { width: number; height: number },
+): { width: number; height: number } {
+  const pick = (a: number, b: number) =>
+    a > 0 && b > 0 ? Math.min(a, b) : a > 0 ? a : b > 0 ? b : 0;
+  return {
+    width: pick(inner.width, client.width),
+    height: pick(inner.height, client.height),
+  };
+}
+
+type Blocker = { left: number; right: number; top: number; bottom: number };
+
+/**
+ * 高さ h・間隔 gap・上端 minTop 以降で、障害物のどれにも重ならない枠をひとつ返す
+ * （同じなら、より下・より左）。なければ null
+ */
+function boxAt(
+  vw: number,
+  vh: number,
+  blockers: readonly Blocker[],
+  h: number,
+  gap: number,
+  minTop: number,
+): SontaOverlayBox | null {
+  const w = Math.floor(h * SONTA_OVERLAY_ASPECT);
+  // 候補の位置は整数（障害物の側へ寄るほうは切り上げ、反対側は切り捨てて、間隔を割らない）
+  const xs = new Set<number>([gap, Math.floor(vw - gap - w)]);
+  const ys = new Set<number>([Math.ceil(minTop), Math.floor(vh - gap - h)]);
+  for (const o of blockers) {
+    xs.add(Math.ceil(o.right + gap));
+    xs.add(Math.floor(o.left - gap - w));
+    ys.add(Math.ceil(o.bottom + gap));
+    ys.add(Math.floor(o.top - gap - h));
+  }
+  let best: SontaOverlayBox | null = null;
+  for (const top of ys) {
+    for (const left of xs) {
+      const right = left + w;
+      const bottom = top + h;
+      if (left < gap || right > vw - gap || top < minTop || bottom > vh - gap)
+        continue;
+      if (blockers.some((o) => overlaps(left, top, right, bottom, o, gap)))
+        continue;
+      if (!best || top > best.top || (top === best.top && left < best.left)) {
+        best = { left, top, width: w, height: h };
+      }
+    }
+  }
+  return best;
+}
+
+/**
  * 障害物（本文のカード・ボタン・ナビなど。画面の座標、スクロール 0 のとき）のどれにも
- * 間隔 SONTA_OVERLAY_GAP 以内に近づかず、画面内の下側（SONTA_OVERLAY_SEARCH_TOP より下）に
- * 収まる、いちばん大きな枠を返す。高さは MIN_H〜MAX_H、横は縦横比 SONTA_OVERLAY_ASPECT。
- * 同じ大きさなら、より下・より左を選ぶ。収まらなければ null（出さない）
+ * 重ならない、いちばん大きな枠を返す。viewport は実際に見えている大きさ（sontaVisibleViewport）。
+ * 1. 通常の探索：間隔 SONTA_OVERLAY_GAP、画面内の下側（SONTA_OVERLAY_SEARCH_TOP より下）、
+ *    高さ MAX_H〜MIN_H。同じ大きさなら、より下・より左。ここで見つかれば、それをそのまま返す
+ * 2. 通常の探索で入らないとき（小さい画面）だけ、縮小探索：画面全体（ヘッダーの下・カードの横なども）で、
+ *    高さ MAX_H〜SMALL_MIN_H、各高さで間隔 GAP → SMALL_GAP の順。最初に見つかった（いちばん大きい）枠を返す
+ * どちらも入らなければ null（出さない）。横は縦横比 SONTA_OVERLAY_ASPECT
  */
 export function sontaOverlayBox(
   viewport: { width: number; height: number },
@@ -459,7 +536,6 @@ export function sontaOverlayBox(
   const vw = viewport.width;
   const vh = viewport.height;
   if (!(vw > 0 && vh > 0)) return null;
-  const gap = SONTA_OVERLAY_GAP;
   // 画面の外へはみ出す矩形（横に流れるカルーセルの帯など）は、画面の内側だけにして扱う
   const blockers = obstacles
     .filter((o) => Number.isFinite(o.left + o.top + o.right + o.bottom))
@@ -472,31 +548,15 @@ export function sontaOverlayBox(
     .filter((o) => o.right > o.left && o.bottom > o.top);
   const minTop = vh * SONTA_OVERLAY_SEARCH_TOP;
   for (let h = SONTA_OVERLAY_MAX_H; h >= SONTA_OVERLAY_MIN_H; h--) {
-    const w = Math.floor(h * SONTA_OVERLAY_ASPECT);
-    // 候補の位置は整数（障害物の側へ寄るほうは切り上げ、反対側は切り捨てて、間隔を割らない）
-    const xs = new Set<number>([gap, Math.floor(vw - gap - w)]);
-    const ys = new Set<number>([Math.ceil(minTop), Math.floor(vh - gap - h)]);
-    for (const o of blockers) {
-      xs.add(Math.ceil(o.right + gap));
-      xs.add(Math.floor(o.left - gap - w));
-      ys.add(Math.ceil(o.bottom + gap));
-      ys.add(Math.floor(o.top - gap - h));
+    const found = boxAt(vw, vh, blockers, h, SONTA_OVERLAY_GAP, minTop);
+    if (found) return found;
+  }
+  for (let h = SONTA_OVERLAY_MAX_H; h >= SONTA_OVERLAY_SMALL_MIN_H; h--) {
+    for (const gap of [SONTA_OVERLAY_GAP, SONTA_OVERLAY_SMALL_GAP]) {
+      // 上端も、画面の端から間隔だけ空ける
+      const found = boxAt(vw, vh, blockers, h, gap, gap);
+      if (found) return found;
     }
-    let best: SontaOverlayBox | null = null;
-    for (const top of ys) {
-      for (const left of xs) {
-        const right = left + w;
-        const bottom = top + h;
-        if (left < gap || right > vw - gap || top < minTop || bottom > vh - gap)
-          continue;
-        if (blockers.some((o) => overlaps(left, top, right, bottom, o, gap)))
-          continue;
-        if (!best || top > best.top || (top === best.top && left < best.left)) {
-          best = { left, top, width: w, height: h };
-        }
-      }
-    }
-    if (best) return best;
   }
   return null;
 }

@@ -37,7 +37,7 @@ export default function Header({
     "relative inline-flex h-full w-full items-center justify-center rounded-md px-1.5 text-green-100 transition-colors hover:text-fuchsia-200 focus-visible:text-green-50 max-sm:active:bg-fuchsia-500/10 aria-[current=page]:bg-fuchsia-500/20 aria-[current=page]:font-semibold aria-[current=page]:text-fuchsia-100 sm:h-auto sm:min-h-8 sm:w-auto sm:aria-[current=page]:underline sm:aria-[current=page]:decoration-fuchsia-300/70 sm:aria-[current=page]:underline-offset-4";
 
   return (
-    <header className="sticky inset-x-0 top-0 z-30 sm:mt-5">
+    <header data-sonta-avoid="" className="sticky inset-x-0 top-0 z-30 sm:mt-5">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:py-5 lg:flex-row lg:items-stretch lg:justify-between lg:gap-6 lg:px-8">
         <div
           aria-hidden="true"

@@ -11,6 +11,7 @@ import {
   sontaOverlayBox,
   sontaOverlayCameraDistance,
   sontaOverlayWobble,
+  sontaVisibleViewport,
   type ScreenRect,
   type SontaOverlayBox,
 } from "../../lib/sontaMotion";
@@ -25,10 +26,11 @@ const SECTION_SETTLE_MS = 350;
 /** 描画ピクセル比の上限。2 を超えても、この大きさの絵ではほとんど差が出ない */
 const MAX_DPR = 2;
 
-/** 固定配置の要素（またはその中）は、スクロールしても動かない */
+/** 固定・張り付き（sticky）配置の要素（またはその中）は、スクロール 0 のときと同じ位置に居続ける */
 function isInFixed(el: HTMLElement): boolean {
   for (let n: HTMLElement | null = el; n; n = n.parentElement) {
-    if (getComputedStyle(n).position === "fixed") return true;
+    const position = getComputedStyle(n).position;
+    if (position === "fixed" || position === "sticky") return true;
   }
   return false;
 }
@@ -134,8 +136,9 @@ function SontaActor({ reduced }: { reduced: boolean }) {
  * スマホ（幅 768 未満）のトップで漂う Sontaくん。星空の Canvas の外に置く専用の小さな Canvas。
  * - 星空（.star-bg）の減光・もや・色かぶりを受けない（z-index は veil・haze・雨・雪の上、本文の下）
  * - 描画は dpr 最大 2・アンチエイリアスあり・画角 12°（体の中心を光軸に合わせる）
- * - 位置と大きさは、本文のカード・「My Skills」・Skip・ボトムナビ・計器表示（[data-sonta-avoid]）の
- *   実際の矩形から sontaOverlayBox が決める。すき間が足りなければ何も出さない
+ * - 位置と大きさは、ヘッダー・本文のカード・「My Skills」・Skip・ボトムナビ・計器表示（[data-sonta-avoid]）の
+ *   実際の矩形から sontaOverlayBox が決める（見えている画面の中だけで探す）。小さい画面では縮めて
+ *   空いている場所に入れ、最小の高さ（SONTA_OVERLAY_SMALL_MIN_H）も入らなければ何も出さない
  * - 操作は受けない（pointer-events:none・aria-hidden・レイキャスト対象外）
  * - 動きを減らす設定：揺れず・振らず、斜め 27° で 1 枚だけ描く
  * - <html data-sonta-drift="running|static" data-sonta-drift-mode="overlay"> で状態を確かめられる
@@ -153,8 +156,13 @@ export default function SontaDriftOverlay() {
     let settle = 0;
     const measure = () => {
       frame = 0;
+      // 横にはみ出すページでは innerWidth が見える範囲より広いので、見える範囲の中だけで探す
+      const de = document.documentElement;
       const next = sontaOverlayBox(
-        { width: window.innerWidth, height: window.innerHeight },
+        sontaVisibleViewport(
+          { width: window.innerWidth, height: window.innerHeight },
+          { width: de.clientWidth, height: de.clientHeight },
+        ),
         measureObstacles(),
       );
       setBox((prev) => (sameBox(prev, next) ? prev : next));

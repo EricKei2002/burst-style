@@ -23,6 +23,8 @@ import {
   SONTA_OVERLAY_MIN_H,
   SONTA_OVERLAY_ROLL,
   SONTA_OVERLAY_SEARCH_TOP,
+  SONTA_OVERLAY_SMALL_GAP,
+  SONTA_OVERLAY_SMALL_MIN_H,
   SONTA_PITCH_MAX,
   SONTA_PITCH_MIN,
   SONTA_STATIC_LOOK,
@@ -32,6 +34,7 @@ import {
   sontaOverlayBox,
   sontaOverlayCameraDistance,
   sontaOverlayWobble,
+  sontaVisibleViewport,
   stepLook,
   SWING_AMPLITUDE,
   SWING_PERIOD_S,
@@ -480,31 +483,304 @@ assert(
   assertClear({ width: 393, height: 852 }, OBSTACLES_393, "393") !== null,
   "393×852 has room",
 );
-// 360×780：カードが y=702 まで伸びて空きがないので出さない
-const OBSTACLES_360 = [
-  rect(24, 94, 336, 702),
-  rect(97, 742, 263, 788),
-  rect(209, 713, 360, 740),
-  rect(0, 748, 372, 804),
-  rect(0, 653, 27, 705),
-  rect(-2927, 884, 4422, 950),
-];
+
+// ---- EKF-57：小さい画面では縮めて空きに入れる／最小も入らなければ出さない ----
+// 実測（Playwright、スクロール 0）。ヘッダー（上の帯、全幅・高さ 62）も障害物に含める
+const HEADER_H = 62;
+const header = (w: number) => rect(0, 0, w, HEADER_H);
+assert(SONTA_OVERLAY_SMALL_MIN_H === 40, "small min height is 40");
+assert(SONTA_OVERLAY_SMALL_GAP === 3, "small gap is 3");
 assert(
-  assertClear({ width: 360, height: 780 }, OBSTACLES_360, "360") === null,
-  "360×780 has no free gap → hidden",
+  SONTA_OVERLAY_SMALL_MIN_H < SONTA_OVERLAY_MIN_H,
+  "small min < normal min",
 );
-// 375×667 はカードが画面の下（y=701）まで伸びて空きがないので、出さない
+
+// 縮小探索で出た箱：高さ 40〜96、間隔 3 以上、画面の内側、どの障害物とも重ならない
+function assertClearSmall(
+  vp: { width: number; height: number },
+  obstacles: ScreenRect[],
+  label: string,
+): SontaOverlayBox | null {
+  const b = sontaOverlayBox(vp, obstacles);
+  if (!b) return null;
+  const g = SONTA_OVERLAY_SMALL_GAP;
+  assert(
+    b.height >= SONTA_OVERLAY_SMALL_MIN_H && b.height <= SONTA_OVERLAY_MAX_H,
+    `${label}: height in range ${b.height}`,
+  );
+  assert(
+    b.width === Math.floor(b.height * SONTA_OVERLAY_ASPECT),
+    `${label}: aspect`,
+  );
+  assert(b.left >= g && b.top >= g, `${label}: inside top-left`);
+  assert(b.left + b.width <= vp.width - g, `${label}: inside right`);
+  assert(b.top + b.height <= vp.height - g, `${label}: inside bottom`);
+  for (const o of obstacles) {
+    assert(
+      !overlapsRect(b, o, g),
+      `${label}: clear of ${JSON.stringify(o)} (box ${JSON.stringify(b)})`,
+    );
+  }
+  return b;
+}
+const boxJson = (b: SontaOverlayBox | null) => JSON.stringify(b);
+
+// 見える範囲：横にはみ出すページでは innerWidth/innerHeight が見える範囲より大きい
+{
+  const v = sontaVisibleViewport(
+    { width: 372, height: 804 },
+    { width: 360, height: 780 },
+  );
+  assert(
+    v.width === 360 && v.height === 780,
+    "visible viewport is the smaller of inner and client",
+  );
+  const same = sontaVisibleViewport(
+    { width: 375, height: 667 },
+    { width: 375, height: 667 },
+  );
+  assert(same.width === 375 && same.height === 667, "no overflow → unchanged");
+  const noClient = sontaVisibleViewport(
+    { width: 390, height: 844 },
+    { width: 0, height: 0 },
+  );
+  assert(noClient.width === 390 && noClient.height === 844, "client 0 → inner");
+  const none = sontaVisibleViewport(
+    { width: 0, height: 0 },
+    { width: 0, height: 0 },
+  );
+  assert(none.width === 0 && none.height === 0, "both 0 → 0");
+}
+
+// 390/430/414/393（最新の実測、ヘッダー込み）：通常の探索の結果が 1px も変わらない
+const MEASURED_REGRESSION: {
+  label: string;
+  vp: { width: number; height: number };
+  obstacles: ScreenRect[];
+  expected: SontaOverlayBox;
+}[] = [
+  {
+    label: "390×844",
+    vp: { width: 390, height: 844 },
+    obstacles: [
+      rect(0, 692.9, 27, 745),
+      rect(226.9, 753, 378, 780),
+      rect(0, 788, 390, 844),
+      rect(24, 94, 366, 654),
+      rect(111.8, 694, 278.2, 740),
+      rect(-1108.4, 836, 6240.6, 902),
+    ],
+    expected: { left: 285, top: 660, width: 91, height: 87 },
+  },
+  {
+    label: "430×932",
+    vp: { width: 430, height: 932 },
+    obstacles: [
+      rect(0, 780.9, 27, 833),
+      rect(266.9, 841, 418, 868),
+      rect(0, 876, 430, 932),
+      rect(24, 108, 406, 620),
+      rect(131.8, 674, 298.2, 720),
+      rect(-1111.5, 816, 6237.5, 882),
+    ],
+    expected: { left: 305, top: 714, width: 101, height: 96 },
+  },
+  {
+    label: "414×896",
+    vp: { width: 414, height: 896 },
+    obstacles: [
+      rect(0, 744.9, 27, 797),
+      rect(250.9, 805, 402, 832),
+      rect(0, 840, 414, 896),
+      rect(24, 94, 390, 606),
+      rect(123.8, 646, 290.2, 692),
+      rect(-1106.9, 788, 6242.1, 854),
+    ],
+    expected: { left: 297, top: 686, width: 101, height: 96 },
+  },
+  {
+    label: "393×852",
+    vp: { width: 393, height: 852 },
+    obstacles: [
+      rect(0, 700.9, 27, 753),
+      rect(229.9, 761, 381, 788),
+      rect(0, 796, 393, 852),
+      rect(24, 94, 369, 654),
+      rect(113.3, 694, 279.7, 740),
+      rect(-1108.4, 836, 6240.6, 902),
+    ],
+    expected: { left: 286, top: 660, width: 100, height: 95 },
+  },
+];
+for (const c of MEASURED_REGRESSION) {
+  const without = sontaOverlayBox(c.vp, c.obstacles);
+  const withHeader = sontaOverlayBox(c.vp, [
+    ...c.obstacles,
+    header(c.vp.width),
+  ]);
+  assert(
+    boxJson(without) === boxJson(c.expected),
+    `${c.label}: box unchanged ${boxJson(without)}`,
+  );
+  assert(
+    boxJson(withHeader) === boxJson(c.expected),
+    `${c.label}: box unchanged with header ${boxJson(withHeader)}`,
+  );
+  assert(
+    (without?.height ?? 0) >= SONTA_OVERLAY_MIN_H,
+    `${c.label}: still the normal search`,
+  );
+}
+// 旧フィクスチャ（ヘッダーなし）でも同じ
+assert(
+  boxJson(sontaOverlayBox({ width: 390, height: 844 }, OBSTACLES_390)) ===
+    boxJson(box390),
+  "390 old fixture unchanged",
+);
+
+// 360×780（実測）：見える範囲は 360×780（innerWidth 372 / innerHeight 804 より小さい）。
+// カード（〜702）とボトムナビ（748〜）の間の 46px に、高さ 40 の箱が入る（間隔 3）
+const OBSTACLES_360 = [
+  rect(0, 652.9, 27, 705),
+  rect(208.9, 713, 360, 740),
+  rect(0, 748, 372, 804),
+  rect(24, 94, 336, 702),
+  rect(96.8, 742, 263.2, 788),
+  rect(-1110, 884, 6239, 950),
+  header(360),
+];
+const VP_360 = sontaVisibleViewport(
+  { width: 372, height: 804 },
+  { width: 360, height: 780 },
+);
+const box360 = assertClearSmall(VP_360, OBSTACLES_360, "360");
+assert(
+  boxJson(box360) ===
+    JSON.stringify({ left: 30, top: 705, width: 42, height: 40 }),
+  `360×780 shrinks to the minimum and fits: ${boxJson(box360)}`,
+);
+// 通常の探索では入らない（ここが縮小探索）
+assert(
+  (box360?.height ?? 99) < SONTA_OVERLAY_MIN_H,
+  "360×780 is smaller than the normal minimum",
+);
+// 最小の境界：カードの下端が 1px 下がると入らない（出さない）、ボトムナビが 1px 下がると 41px
+{
+  const lower = OBSTACLES_360.map((o) =>
+    o.bottom === 702 ? { ...o, bottom: 703 } : o,
+  );
+  assert(
+    sontaOverlayBox(VP_360, lower) === null,
+    "360×780: card 1px lower → minimum does not fit → hidden",
+  );
+  const navLower = OBSTACLES_360.map((o) =>
+    o.top === 748 ? { ...o, top: 749 } : o,
+  );
+  const b = assertClearSmall(VP_360, navLower, "360 nav+1");
+  assert(b?.height === 41, `360×780: nav 1px lower → 41px (${b?.height})`);
+}
+// 同じ入力は同じ結果。障害物の並びを入れ替えても同じ
+assert(
+  boxJson(sontaOverlayBox(VP_360, OBSTACLES_360)) === boxJson(box360),
+  "deterministic",
+);
+assert(
+  boxJson(sontaOverlayBox(VP_360, [...OBSTACLES_360].reverse())) ===
+    boxJson(box360),
+  "independent of obstacle order",
+);
+
+// 375×667（実測）：カードが画面の下まで続き、40px の空きがないので出さない
 const OBSTACLES_375 = [
-  rect(24, 93, 351, 701),
-  rect(104.3, 741, 270.7, 787),
+  rect(0, 515.9, 27, 568),
   rect(211.9, 576, 363, 603),
   rect(0, 611, 375, 667),
-  rect(0, 515.9, 27, 568),
+  rect(24, 94, 351, 702),
+  rect(104.3, 742, 270.7, 788),
+  header(375),
 ];
 assert(
-  assertClear({ width: 375, height: 667 }, OBSTACLES_375, "375") === null,
-  "375×667 has no free gap → hidden",
+  sontaOverlayBox({ width: 375, height: 667 }, OBSTACLES_375) === null,
+  "375×667 has no room for the minimum → hidden",
 );
+// 320×568（実測）。ページが横にはみ出し（ボトムナビ 371px 幅）、innerWidth 371 / innerHeight 659
+const OBSTACLES_320 = [
+  rect(0, 507.9, 27, 560),
+  rect(207.9, 568, 359, 595),
+  rect(0, 603, 371, 659),
+  rect(24, 94, 296, 702),
+  rect(76.8, 742, 243.2, 788),
+  header(320),
+];
+{
+  const vis = sontaVisibleViewport(
+    { width: 371, height: 659 },
+    { width: 320, height: 568 },
+  );
+  assert(vis.width === 320 && vis.height === 568, "320×568 visible viewport");
+  assert(
+    sontaOverlayBox(vis, OBSTACLES_320) === null,
+    "320×568 has no room inside the visible screen → hidden",
+  );
+  // 見える範囲に切り詰めないと、画面の外（x > 320）にはみ出す箱が出てしまう（修正前の不具合）
+  const raw = sontaOverlayBox({ width: 371, height: 659 }, OBSTACLES_320);
+  assert(
+    raw !== null && raw.left + raw.width > 320,
+    `unclamped 371×659 would put the box off-screen: ${boxJson(raw)}`,
+  );
+}
+
+// 縮め方：全幅の障害物の間の帯（高さ B）。B が減るほど箱は小さくなり、46 で最小 40、45 で出さない
+{
+  const vp = { width: 400, height: 800 };
+  const band = (b: number) => [
+    rect(0, 0, 400, 400),
+    rect(0, 400 + b, 400, 800),
+  ];
+  assert(
+    sontaOverlayBox(vp, band(108))?.height === SONTA_OVERLAY_MAX_H,
+    "B=108 → max",
+  );
+  let prev = Infinity;
+  for (
+    let b = 120;
+    b >= SONTA_OVERLAY_SMALL_MIN_H + 2 * SONTA_OVERLAY_SMALL_GAP;
+    b--
+  ) {
+    const box = assertClearSmall(vp, band(b), `band ${b}`);
+    if (!box) throw new Error(`band ${b} fits`);
+    // 通常の探索（間隔 6・高さ 56 以上）は b >= 68。それが無理になる b <= 67 から縮小探索（間隔 3）。
+    // 通常の探索は変えないので、境界（68 → 67）では 56 → 61 と少し増えるが、それぞれの内側では単調に減る
+    const normal = b >= SONTA_OVERLAY_MIN_H + 2 * SONTA_OVERLAY_GAP;
+    if (b === SONTA_OVERLAY_MIN_H + 2 * SONTA_OVERLAY_GAP - 1) prev = Infinity;
+    assert(
+      box.height <= prev,
+      `monotonic at band ${b}: ${box.height} > ${prev}`,
+    );
+    const gap = normal ? SONTA_OVERLAY_GAP : SONTA_OVERLAY_SMALL_GAP;
+    assert(
+      box.height === Math.min(SONTA_OVERLAY_MAX_H, b - 2 * gap),
+      `band ${b} → ${box.height}`,
+    );
+    prev = box.height;
+  }
+  assert(
+    sontaOverlayBox(vp, band(46))?.height === SONTA_OVERLAY_SMALL_MIN_H,
+    "band 46 → exactly the minimum 40",
+  );
+  assert(sontaOverlayBox(vp, band(45)) === null, "band 45 → hidden");
+  assert(sontaOverlayBox(vp, band(0)) === null, "no band → hidden");
+}
+// ヘッダーとカードの間の帯（画面の上側）にも入る
+{
+  const vp = { width: 375, height: 667 };
+  const obs = [rect(0, 0, 375, 62), rect(0, 122, 375, 667)];
+  const b = assertClearSmall(vp, obs, "top band");
+  assert(
+    boxJson(b) === JSON.stringify({ left: 3, top: 65, width: 56, height: 54 }),
+    `fits in the band under the header: ${boxJson(b)}`,
+  );
+}
 
 // 何もなければ上限の大きさで左下、枠が入らないほど詰まっていれば null、壊れた入力でも落ちない
 {
