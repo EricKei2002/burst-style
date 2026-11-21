@@ -39,7 +39,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "cspell": "^8.19.3",
+    "cspell": "^10.5.1",
     "eslint": "^9",
     "eslint-config-next": "^16.4.5",
     "lightningcss": "^1.30.2",
