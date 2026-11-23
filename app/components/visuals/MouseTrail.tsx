@@ -111,13 +111,9 @@ export default function MouseTrail() {
         const alpha = 1 - p.age / 42;
         const size = (1 - p.age / 42) * 2.6;
 
-        // 色の遷移: 緑からフクシアへ
-        // 緑: 34, 197, 94 (およそ tw-green-500)
-        // フクシア: 217, 70, 239 (およそ tw-fuchsia-500)
-
-        ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`; // メインの緑
+        ctx.fillStyle = `rgba(34, 197, 94, ${alpha})`;
         if (p.age > 20) {
-          ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`; // フクシア色へフェード
+          ctx.fillStyle = `rgba(217, 70, 239, ${alpha})`;
         }
 
         ctx.beginPath();

@@ -43,7 +43,6 @@ export default function StarBackground() {
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
     if (window.innerWidth < 768) {
-      // ユーザーの要望により、モバイルでも星の数を大幅に増やす（パフォーマンスとのバランスを取って700程度に）
       if (deviceMemory <= 4 || cpuCores <= 6) return 300;
       return 700;
     }
