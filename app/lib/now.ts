@@ -119,17 +119,15 @@ export async function getNow(): Promise<NowResponse> {
   try {
     const repos = await fetchRepos();
     const nowRepos = await Promise.all(
-      repos.map(
-        async (repo): Promise<NowRepo> => ({
-          name: repo.name,
-          fullName: repo.full_name,
-          url: repo.html_url,
-          description: repo.description,
-          language: repo.language,
-          pushedAt: repo.pushed_at,
-          commits: await fetchCommits(repo.full_name),
-        }),
-      ),
+      repos.map(async (repo): Promise<NowRepo> => ({
+        name: repo.name,
+        fullName: repo.full_name,
+        url: repo.html_url,
+        description: repo.description,
+        language: repo.language,
+        pushedAt: repo.pushed_at,
+        commits: await fetchCommits(repo.full_name),
+      })),
     );
 
     return {
