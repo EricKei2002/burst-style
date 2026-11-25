@@ -20,8 +20,6 @@ jobs:
 
       - run: npm ci
 
-      # .cursor/ 配下のツール用スクリプトはlint対象に含めない(eslint.config.mjsの
-      # デフォルトignoreには未追加のため、CI側でapp/のみに限定)
       - run: npx eslint app
 
       - run: npx prettier --check app
