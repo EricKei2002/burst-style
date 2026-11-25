@@ -66,7 +66,7 @@ export default function TechCarousel() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
-      <div className="w-full overflow-hidden py-16 tech-carousel tech-carousel-wrap">
+      <div className="w-full overflow-hidden py-16 tech-carousel-wrap">
         <ul
           data-sonta-avoid=""
           className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner"
