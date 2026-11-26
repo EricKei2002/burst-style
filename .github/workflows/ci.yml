@@ -30,3 +30,6 @@ jobs:
       - run: npm run build
         env:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+
+      # next build の型検査は TS 6（typescript エイリアス）を使うため、TS 7 の tsc はここで実行する
+      - run: npm run typecheck
