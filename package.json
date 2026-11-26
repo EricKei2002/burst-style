@@ -19,7 +19,8 @@
     "test:home-sections": "npx --yes tsx app/lib/homeSections.test.ts",
     "test:site-copy": "npx --yes tsx app/lib/siteCopy.test.ts",
     "test:sonta": "npx --yes tsx app/lib/sontaMotion.test.ts",
-    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy"
+    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.6.3",
@@ -41,6 +42,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "cspell": "^8.19.3",
     "eslint": "^9",
     "eslint-config-next": "^16.4.6",
@@ -48,7 +50,7 @@
     "playwright": "^1.65.1",
     "prettier": "^3.10.1",
     "tailwindcss": "^4",
-    "typescript": "^7"
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-x64-gnu": "^4.1.18",
