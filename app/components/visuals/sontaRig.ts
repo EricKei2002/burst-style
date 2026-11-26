@@ -37,7 +37,7 @@ import {
 
 let gltfPromise: Promise<GLTF> | null = null;
 
-export function loadSontaGltf(): Promise<GLTF> {
+function loadSontaGltf(): Promise<GLTF> {
   if (!gltfPromise) {
     const pending = (async () => {
       const { GLTFLoader } =

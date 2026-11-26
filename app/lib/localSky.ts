@@ -1,9 +1,9 @@
 /** 見ている人の現地時間と天気を、星空背景へ控えめに反映するための共通定義 */
 
-export const SKY_PHASES = ["morning", "day", "evening", "night"] as const;
+const SKY_PHASES = ["morning", "day", "evening", "night"] as const;
 export type SkyPhase = (typeof SKY_PHASES)[number];
 
-export const SKY_WEATHERS = ["clear", "cloudy", "rain", "snow"] as const;
+const SKY_WEATHERS = ["clear", "cloudy", "rain", "snow"] as const;
 export type SkyWeather = (typeof SKY_WEATHERS)[number];
 
 export type LocalSkyResponse = {
