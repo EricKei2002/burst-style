@@ -16,14 +16,14 @@ function msg(locale: ContactLocale, en: string, ja: string): string {
   return locale === "ja" ? ja : en;
 }
 
-export type ValidatedContactFields = {
+type ValidatedContactFields = {
   name: string;
   email: string;
   message: string;
   locale: ContactLocale;
 };
 
-export type ContactValidationResult =
+type ContactValidationResult =
   | { ok: true; data: ValidatedContactFields }
   | { ok: false; fieldErrors: Partial<Record<ContactField, string>> };
 
