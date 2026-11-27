@@ -139,14 +139,14 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
   },
   "burst-style": {
     description:
-      "Immersive portfolio: spaceship boarding concept, Three.js, cinematic motion.",
+      "Immersive portfolio: a journey through space with Three.js and cinematic motion.",
     detailedDescription:
-      "Burst Style merges heavy visual storytelling with solid engineering. Three.js and motion sell the space journey; Zustand syncs the hangar-door transition with Next.js navigation so the door closes, the route changes, and the interior opens as one beat. Behind the scenes: Turnstile spam protection, Formspree forwarding, and a Resend auto-reply styled like a ship console so the vibe continues after submit.",
+      "Burst Style merges heavy visual storytelling with solid engineering. Three.js and motion sell the space journey; Zustand syncs a full-screen warp with Next.js navigation: the warp covers the screen, the route changes underneath, and the next page appears as you drop out of it. Behind the scenes: Turnstile spam protection, Formspree forwarding, and a Resend auto-reply styled like a ship console so the vibe continues after submit.",
     challenges: [
       {
         title: "Seamless transitions & state",
         description:
-          "Global transition state aligns CSS door animation with `router.push` timing so navigation feels like one continuous scene, not a hard reload.",
+          "Global transition state aligns the full-screen shader warp with `router.push` timing so navigation feels like one continuous scene, not a hard reload. Without WebGL, or with reduced motion on, the page switches without the warp.",
       },
       {
         title: "Narrative contact flow",

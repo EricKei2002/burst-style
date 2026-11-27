@@ -15,6 +15,7 @@ import {
   type ScreenRect,
   type SontaOverlayBox,
 } from "../../lib/sontaMotion";
+import CanvasBoundary from "./CanvasBoundary";
 import { createSontaRig, type SontaRig } from "./sontaRig";
 
 /** タブ復帰などで時間が飛ばないようにする上限（秒） */
@@ -207,30 +208,32 @@ export default function SontaDriftOverlay() {
         height: box.height,
       }}
     >
-      <Canvas
-        flat
-        camera={{
-          fov: SONTA_OVERLAY_FOV_DEG,
-          near: 0.1,
-          far: 20,
-          position: [SONTA_OVERLAY_FRAME.cx, SONTA_OVERLAY_FRAME.cy, 3.1],
-        }}
-        dpr={dpr}
-        frameloop={reduced ? "demand" : hidden ? "never" : "always"}
-        gl={{
-          alpha: true,
-          antialias: true,
-          powerPreference: "low-power",
-        }}
-        onCreated={({ gl }) => {
-          gl.toneMapping = NoToneMapping;
-          gl.outputColorSpace = SRGBColorSpace;
-          gl.setClearColor(0x000000, 0);
-        }}
-        style={{ pointerEvents: "none" }}
-      >
-        <SontaActor reduced={reduced} />
-      </Canvas>
+      <CanvasBoundary>
+        <Canvas
+          flat
+          camera={{
+            fov: SONTA_OVERLAY_FOV_DEG,
+            near: 0.1,
+            far: 20,
+            position: [SONTA_OVERLAY_FRAME.cx, SONTA_OVERLAY_FRAME.cy, 3.1],
+          }}
+          dpr={dpr}
+          frameloop={reduced ? "demand" : hidden ? "never" : "always"}
+          gl={{
+            alpha: true,
+            antialias: true,
+            powerPreference: "low-power",
+          }}
+          onCreated={({ gl }) => {
+            gl.toneMapping = NoToneMapping;
+            gl.outputColorSpace = SRGBColorSpace;
+            gl.setClearColor(0x000000, 0);
+          }}
+          style={{ pointerEvents: "none" }}
+        >
+          <SontaActor reduced={reduced} />
+        </Canvas>
+      </CanvasBoundary>
     </div>
   );
 }

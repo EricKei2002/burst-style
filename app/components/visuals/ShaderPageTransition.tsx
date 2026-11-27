@@ -91,6 +91,9 @@ export default function ShaderPageTransition() {
           }
           const overlay = mod.createShaderWarpOverlay(host, handleContextLost);
           if (!overlay) {
+            // WebGL 不可：作り直しを繰り返さず、待っている遷移もすぐ進める
+            lost = true;
+            useTransitionStore.getState().setShaderUnavailable();
             return;
           }
           overlayRef.current = overlay;

@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
+import CanvasBoundary from "./CanvasBoundary";
 import StarfieldGravity from "./StarfieldGravity";
 
 // Canvas 内（R3F の独自 reconciler）では next/dynamic を使わない。
@@ -140,33 +141,35 @@ export default function StarBackground() {
         aria-hidden="true"
       >
         {isReady && (
-          <Canvas
-            camera={{ position: [0, 0, 1] }}
-            gl={{
-              alpha: false,
-              antialias: false,
-              powerPreference: "high-performance",
-            }}
-            dpr={isMobile ? [0.75, 1] : [1, 1.1]}
-          >
-            <ambientLight intensity={0.1} />
-            <Suspense fallback={null}>
-              {showCelestialBodies && showCelestialsNow && <TheSun />}
-              {showCelestialBodies && showCelestialsNow && <Moon />}
-              {showCelestialBodies && showCelestialsNow && <Earth />}
-            </Suspense>
+          <CanvasBoundary>
+            <Canvas
+              camera={{ position: [0, 0, 1] }}
+              gl={{
+                alpha: false,
+                antialias: false,
+                powerPreference: "high-performance",
+              }}
+              dpr={isMobile ? [0.75, 1] : [1, 1.1]}
+            >
+              <ambientLight intensity={0.1} />
+              <Suspense fallback={null}>
+                {showCelestialBodies && showCelestialsNow && <TheSun />}
+                {showCelestialBodies && showCelestialsNow && <Moon />}
+                {showCelestialBodies && showCelestialsNow && <Earth />}
+              </Suspense>
 
-            <StarfieldGravity
-              count={starCount}
-              strength={isMobile ? 0.38 : 0.68}
-            />
-            <Suspense fallback={null}>
-              {showCelestialsNow && <ShootingStars />}
-            </Suspense>
-            <Suspense fallback={null}>
-              {showSonta && !isMobile && <SontaDrift />}
-            </Suspense>
-          </Canvas>
+              <StarfieldGravity
+                count={starCount}
+                strength={isMobile ? 0.38 : 0.68}
+              />
+              <Suspense fallback={null}>
+                {showCelestialsNow && <ShootingStars />}
+              </Suspense>
+              <Suspense fallback={null}>
+                {showSonta && !isMobile && <SontaDrift />}
+              </Suspense>
+            </Canvas>
+          </CanvasBoundary>
         )}
       </div>
       {/* .star-bg の外（減光・もやの上、本文の下）。pointer-events:none・aria-hidden */}

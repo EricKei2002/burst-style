@@ -17,6 +17,9 @@ interface TransitionState {
   /** シェーダー遷移の読み込み・初期化が済み、すぐ再生できる */
   shaderReady: boolean;
   setShaderReady: (ready: boolean) => void;
+  /** WebGL が使えずシェーダー遷移を作れないと分かった（以後は待たない） */
+  shaderUnavailable: boolean;
+  setShaderUnavailable: () => void;
   /** 現在（直近）の遷移で画面を覆う演出。closing 開始時に決める */
   overlay: PageTransitionOverlay;
   setOverlay: (overlay: PageTransitionOverlay) => void;
@@ -27,6 +30,8 @@ export const useTransitionStore = create<TransitionState>((set) => ({
   setPhase: (phase) => set({ phase }),
   shaderReady: false,
   setShaderReady: (shaderReady) => set({ shaderReady }),
+  shaderUnavailable: false,
+  setShaderUnavailable: () => set({ shaderUnavailable: true }),
   overlay: "none",
   setOverlay: (overlay) => set({ overlay }),
 }));
@@ -36,12 +41,14 @@ export const SHADER_READY_WAIT_MS = 1000;
 
 /**
  * shaderReady になるまで待つ。timeout 後は現在値を返す。
+ * 使えないと分かっているときは待たない。
  */
 export function waitForShaderReady(
   timeoutMs = SHADER_READY_WAIT_MS,
 ): Promise<boolean> {
-  if (useTransitionStore.getState().shaderReady) {
-    return Promise.resolve(true);
+  const { shaderReady, shaderUnavailable } = useTransitionStore.getState();
+  if (shaderReady || shaderUnavailable) {
+    return Promise.resolve(shaderReady);
   }
   return new Promise((resolve) => {
     const timeout = window.setTimeout(() => {
@@ -49,10 +56,10 @@ export function waitForShaderReady(
       resolve(useTransitionStore.getState().shaderReady);
     }, timeoutMs);
     const unsubscribe = useTransitionStore.subscribe((state) => {
-      if (state.shaderReady) {
+      if (state.shaderReady || state.shaderUnavailable) {
         window.clearTimeout(timeout);
         unsubscribe();
-        resolve(true);
+        resolve(state.shaderReady);
       }
     });
   });
