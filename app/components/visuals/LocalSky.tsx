@@ -312,6 +312,7 @@ export default function LocalSky() {
           <button
             type="button"
             aria-describedby="local-sky-info"
+            data-sonta-avoid=""
             onKeyDown={(event) => {
               if (event.key === "Escape") event.currentTarget.blur();
             }}

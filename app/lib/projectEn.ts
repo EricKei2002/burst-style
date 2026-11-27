@@ -156,7 +156,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "Performance vs. visuals",
         description:
-          "Particles plus video cost GPU budget. Reduced unnecessary rerenders and gate the boot sequence with session storage so repeat visits stay smooth.",
+          "A 3D planet scene (Three.js / React Three Fiber) plus a shader warp transition cost GPU budget. Quality tiers adapt resolution, frame rate and shadows to the device, rendering pauses when off-screen or in a hidden tab, and the transition shader loads only on navigation intent.",
       },
     ],
     improvements: [

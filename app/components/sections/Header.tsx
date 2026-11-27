@@ -123,7 +123,11 @@ export default function Header({
     // 上端から下端まで不透明のバー（.site-header）。外側に余白（margin）を作らず、
     // 2 枚のパネルの間や上の余白から本文が透けないようにする。
     // Home の先頭だけ CSS がバーを透明にし、パネルの周りに星空を見せる
-    <header ref={headerRef} className="site-header sticky inset-x-0 top-0 z-30">
+    <header
+      ref={headerRef}
+      data-sonta-avoid=""
+      className="site-header sticky inset-x-0 top-0 z-30"
+    >
       <div className="mx-auto flex w-full max-w-7xl flex-col items-stretch gap-3 px-2 py-1.5 sm:px-6 sm:pt-8 sm:pb-4 md:flex-row md:items-stretch md:justify-between md:gap-4 lg:gap-6 lg:px-8">
         <div
           aria-hidden="true"
@@ -183,6 +187,7 @@ export default function Header({
             {/* スマホでは画面下の固定タブバー（親指で届く位置）。PC ではヘッダー内に並べる */}
             <ul
               ref={listRef}
+              data-sonta-avoid=""
               className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-5 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
             >
               {enhanced && (

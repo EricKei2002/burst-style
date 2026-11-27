@@ -12,6 +12,14 @@ const TheSun = lazy(() => import("./TheSun"));
 const Moon = lazy(() => import("./Moon"));
 const Earth = lazy(() => import("./Earth"));
 const ShootingStars = lazy(() => import("./ShootingStars"));
+// 宇宙を漂う Sontaくん（GLB とローダーは作品ページと共用。同じ Canvas に乗せて WebGL を増やさない）
+const SontaDrift = lazy(() => import("./SontaDrift"));
+// スマホ（幅 768 未満）では、共有 Canvas の隅ではなく専用の小さな Canvas に出す
+// （星空の減光・色かぶりを受けず、dpr・アンチエイリアス・画角を Sontaくん向けにできる）
+const SontaDriftOverlay = lazy(() => import("./SontaDriftOverlay"));
+
+/** 天体が出てから、この時間内の空き時間で Sontaくんを読み込む */
+const SONTA_IDLE_TIMEOUT_MS = 3000;
 
 export default function StarBackground() {
   const observerRef = useRef<HTMLDivElement>(null);
@@ -35,7 +43,6 @@ export default function StarBackground() {
 
     if (deviceMemory <= 2 || cpuCores <= 2) return 0;
     if (window.innerWidth < 768) {
-      // ユーザーの要望により、モバイルでも星の数を大幅に増やす（パフォーマンスとのバランスを取って700程度に）
       if (deviceMemory <= 4 || cpuCores <= 6) return 300;
       return 700;
     }
@@ -96,6 +103,26 @@ export default function StarBackground() {
     return () => clearTimeout(timer);
   }, [isReady, showCelestialBodies]);
 
+  // Sontaくんは天体と同じ品質の段階（極端な低スペック・節約モードでは出さない）で、
+  // 天体が出たあとの空き時間に読み込む（初回描画・星の立ち上がりを邪魔しない）
+  const [showSonta, setShowSonta] = useState(false);
+  useEffect(() => {
+    if (!showCelestialsNow || !showCelestialBodies) return;
+    const saveData =
+      (navigator as Navigator & { connection?: { saveData?: boolean } })
+        .connection?.saveData === true;
+    if (saveData) return;
+    const activate = () => setShowSonta(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, {
+        timeout: SONTA_IDLE_TIMEOUT_MS,
+      });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(activate, 1000);
+    return () => clearTimeout(timer);
+  }, [showCelestialsNow, showCelestialBodies]);
+
   if (starCount === 0) {
     return (
       <div
@@ -106,37 +133,48 @@ export default function StarBackground() {
   }
 
   return (
-    <div
-      ref={observerRef}
-      className="star-bg fixed inset-0 -z-50 h-full w-full bg-[#050505]"
-      aria-hidden="true"
-    >
-      {isReady && (
-        <Canvas
-          camera={{ position: [0, 0, 1] }}
-          gl={{
-            alpha: false,
-            antialias: false,
-            powerPreference: "high-performance",
-          }}
-          dpr={isMobile ? [0.75, 1] : [1, 1.1]}
-        >
-          <ambientLight intensity={0.1} />
-          <Suspense fallback={null}>
-            {showCelestialBodies && showCelestialsNow && <TheSun />}
-            {showCelestialBodies && showCelestialsNow && <Moon />}
-            {showCelestialBodies && showCelestialsNow && <Earth />}
-          </Suspense>
+    <>
+      <div
+        ref={observerRef}
+        className="star-bg fixed inset-0 -z-50 h-full w-full bg-[#050505]"
+        aria-hidden="true"
+      >
+        {isReady && (
+          <Canvas
+            camera={{ position: [0, 0, 1] }}
+            gl={{
+              alpha: false,
+              antialias: false,
+              powerPreference: "high-performance",
+            }}
+            dpr={isMobile ? [0.75, 1] : [1, 1.1]}
+          >
+            <ambientLight intensity={0.1} />
+            <Suspense fallback={null}>
+              {showCelestialBodies && showCelestialsNow && <TheSun />}
+              {showCelestialBodies && showCelestialsNow && <Moon />}
+              {showCelestialBodies && showCelestialsNow && <Earth />}
+            </Suspense>
 
-          <StarfieldGravity
-            count={starCount}
-            strength={isMobile ? 0.38 : 0.68}
-          />
-          <Suspense fallback={null}>
-            {showCelestialsNow && <ShootingStars />}
-          </Suspense>
-        </Canvas>
+            <StarfieldGravity
+              count={starCount}
+              strength={isMobile ? 0.38 : 0.68}
+            />
+            <Suspense fallback={null}>
+              {showCelestialsNow && <ShootingStars />}
+            </Suspense>
+            <Suspense fallback={null}>
+              {showSonta && !isMobile && <SontaDrift />}
+            </Suspense>
+          </Canvas>
+        )}
+      </div>
+      {/* .star-bg の外（減光・もやの上、本文の下）。pointer-events:none・aria-hidden */}
+      {isMobile && showSonta && (
+        <Suspense fallback={null}>
+          <SontaDriftOverlay />
+        </Suspense>
       )}
-    </div>
+    </>
   );
 }

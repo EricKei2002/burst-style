@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           check-latest: true
@@ -20,12 +20,16 @@ jobs:
 
       - run: npm ci
 
-      # .cursor/ 配下のツール用スクリプトはlint対象に含めない(eslint.config.mjsの
-      # デフォルトignoreには未追加のため、CI側でapp/のみに限定)
       - run: npx eslint app
 
       - run: npx prettier --check app
 
+      # ブラウザ・サーバー不要の Node 単体テスト
+      - run: npm test
+
       - run: npm run build
         env:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+
+      # next build の型検査は TS 6（typescript エイリアス）を使うため、TS 7 の tsc はここで実行する
+      - run: npm run typecheck

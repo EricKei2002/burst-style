@@ -3,26 +3,13 @@ import { isHomeSection, type HomeSection } from "./homeSections";
 export type Rgb = readonly [number, number, number];
 
 export type PlanetTerrain =
-  | "dunes"
-  | "fog-flats"
-  | "facets"
-  | "canyons"
-  | "hangar"
-  | "crater";
+  "dunes" | "fog-flats" | "facets" | "canyons" | "hangar" | "crater";
 
 export type PlanetParticles =
-  | "embers"
-  | "mist"
-  | "shards"
-  | "aurora"
-  | "sparks"
-  | "ash";
+  "embers" | "mist" | "shards" | "aurora" | "sparks" | "ash";
 
 export type WarpJourney =
-  | "enter-planet"
-  | "leave-space"
-  | "fly-between"
-  | "neutral";
+  "enter-planet" | "leave-space" | "fly-between" | "neutral";
 
 export type PlanetTheme = {
   id: string;

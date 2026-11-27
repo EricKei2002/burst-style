@@ -49,6 +49,8 @@ export function buildSiteCopy(locale: Locale) {
         en: '"Burst Style": creativity that explodes into unfamiliar, memorable experiences.',
         ja: "「Burst Style」\u00a0—\u00a0創造性を爆発させ、未知の体験を形にする。",
       }),
+      // tagline1 と tagline2 の間。スマホでは改行が無いので、英語だけ空白でつなぐ（和文の句点の後には空けない）
+      taglineSeparator: pick(locale, { en: " ", ja: "" }),
       tagline2: pick(locale, {
         en: "As a web engineer, I ship value that breaks the usual frame, with passion as the engine.",
         ja: "Webエンジニアとしての情熱を原動力に、既存の枠を打ち破る新しい価値を実装します。",
@@ -252,6 +254,21 @@ export function buildSiteCopy(locale: Locale) {
       sendAnother: pick(locale, {
         en: "< Send another message",
         ja: "< 別のメッセージを送る",
+      }),
+    },
+    /** 作品ページ（/projects/sonta-kun）の 3D の Sontaくん */
+    sonta: {
+      imageAlt: pick(locale, {
+        en: "Sonta-kun, a round blue-and-orange robot giving a thumbs-up and holding a schedule clipboard, with the tagline “The first AI that reads the air”",
+        ja: "親指を立てて予定表を持つ、青とオレンジの丸いロボット「Sontaくん」と「空気を読む、はじめてのAI」のキャッチコピー",
+      }),
+      thumbsUpAria: pick(locale, {
+        en: "Sonta-kun 3D model — press to get a thumbs-up",
+        ja: "Sontaくんの 3D モデル — 押すとサムズアップします",
+      }),
+      staticAria: pick(locale, {
+        en: "Sonta-kun 3D model (still pose)",
+        ja: "Sontaくんの 3D モデル（静止ポーズ）",
       }),
     },
   };

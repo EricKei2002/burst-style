@@ -7,10 +7,7 @@ import {
   getShootingStarDelayFactor,
   isPrecipitating,
 } from "../../lib/localSky";
-
-const reducedMotion =
-  typeof window !== "undefined" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+import { prefersReducedMotion } from "../../lib/pageTransitionTiming";
 
 // 初期遅延をコンポーネント外で生成（lintルール準拠）
 let nextDelay = 0;
@@ -31,7 +28,7 @@ const ShootingStar = () => {
 
     if (!activeRef.current) {
       // 動きを減らす設定のとき・雨や雪のときは流れ星を出さない（雨が星の落下に見えないように）
-      if (reducedMotion || isPrecipitating()) return;
+      if (prefersReducedMotion() || isPrecipitating()) return;
       delayRef.current -= delta;
       if (delayRef.current <= 0) {
         activeRef.current = true;

@@ -13,7 +13,7 @@ import {
   SiDiscord,
   SiBlender,
   SiHtml5,
-  SiCss3,
+  SiCss,
   SiJavascript,
   SiDocker,
   SiLinux,
@@ -24,7 +24,7 @@ import {
 
 const techStack = [
   { name: "HTML", icon: SiHtml5, color: "text-[#E34F26]" },
-  { name: "CSS", icon: SiCss3, color: "text-[#1572B6]" },
+  { name: "CSS", icon: SiCss, color: "text-[#1572B6]" },
   { name: "JavaScript", icon: SiJavascript, color: "text-[#F7DF1E]" },
   { name: "React", icon: SiReact, color: "text-[#61DAFB]" },
   { name: "Next.js", icon: SiNextdotjs, color: "text-white" },
@@ -66,8 +66,11 @@ export default function TechCarousel() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: carouselStyles }} />
-      <div className="w-full overflow-hidden py-16 tech-carousel tech-carousel-wrap">
-        <ul className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner">
+      <div className="w-full overflow-hidden py-16 tech-carousel-wrap">
+        <ul
+          data-sonta-avoid=""
+          className="flex w-max gap-10 md:gap-16 lg:gap-24 tech-carousel-inner"
+        >
           {loopStack.map((tech, index) => (
             <li
               key={`${tech.name}-${index}`}

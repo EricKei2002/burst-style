@@ -75,12 +75,15 @@ export default function Top() {
 
   return (
     <section id="top" className="relative min-h-screen w-full">
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8 lg:pt-14">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8 lg:pt-14 short-phone:pt-2">
         {/* 読み出しの列：PC では左 2/3 ほどだけを使い、右は宇宙に空ける */}
-        <div className="instrument-panel px-5 pt-4 pb-7 sm:px-8 sm:pt-5 sm:pb-9 lg:w-[min(100%,56rem)]">
+        <div
+          data-sonta-avoid=""
+          className="instrument-panel px-5 pt-4 pb-7 sm:px-8 sm:pt-5 sm:pb-9 lg:w-[min(100%,56rem)] short-phone:px-4 short-phone:pt-2 short-phone:pb-3"
+        >
           <p
             aria-hidden="true"
-            className="instrument-label enter-rise flex items-center justify-between gap-4 border-b border-white/10 pb-3"
+            className="instrument-label enter-rise flex items-center justify-between gap-4 border-b border-white/10 pb-3 short-phone:pb-1.5"
           >
             <span>[{sectionPageLabel("home")}] ~/home</span>
             <span className="tabular-nums text-zinc-400">
@@ -88,12 +91,12 @@ export default function Top() {
             </span>
           </p>
 
-          <h1 className="enter-rise mt-8 text-left text-white [--i:1] sm:mt-12">
-            <span className="block font-mono text-lg font-normal tracking-normal text-green-300 sm:text-2xl">
+          <h1 className="enter-rise mt-8 text-left text-white [--i:1] sm:mt-12 short-phone:mt-2">
+            <span className="block font-mono text-lg font-normal tracking-normal text-green-300 sm:text-2xl short-phone:text-sm">
               <span className="text-[rgb(var(--planet-accent))]">&gt;</span>{" "}
               <span className="title-char">Hello, I&apos;m</span>
             </span>
-            <span className="mt-2 flex items-end font-sans text-[clamp(3.25rem,12vw,9.5rem)] leading-[0.88] font-black tracking-[-0.055em] sm:mt-3">
+            <span className="mt-2 flex items-end font-sans text-[clamp(3.25rem,12vw,9.5rem)] leading-[0.88] font-black tracking-[-0.055em] sm:mt-3 short-phone:mt-1 short-phone:text-[2.5rem]">
               <span className="inline-block pb-[0.06em]">
                 <GlitchText text="Eric Kei." />
               </span>
@@ -107,11 +110,11 @@ export default function Top() {
           </h1>
 
           {/* 計器ラベル（左）と読み出し（右）の 2 列。スマホではラベルが上に乗る */}
-          <dl className="mt-10 grid gap-x-8 gap-y-2 border-t border-white/10 pt-6 font-mono sm:mt-14 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-y-6">
-            <dt className="instrument-label enter-rise pt-1 [--i:2]">
+          <dl className="mt-10 grid gap-x-8 gap-y-2 border-t border-white/10 pt-6 font-mono sm:mt-14 sm:grid-cols-[7.5rem_minmax(0,1fr)] sm:gap-y-6 short-phone:mt-2 short-phone:pt-2">
+            <dt className="instrument-label enter-rise pt-1 [--i:2] short-phone:sr-only">
               {ja ? "接続" : "link"}
             </dt>
-            <dd className="loading-text enter-rise text-base leading-relaxed text-green-300 [--i:2] max-[389px]:min-h-[6.5rem] sm:text-xl">
+            <dd className="loading-text enter-rise text-base leading-relaxed text-green-300 [--i:2] sm:text-xl short-phone:text-[13px] short-phone:leading-normal">
               {copy.hero.establishing}
               <br />
               {copy.hero.question}{" "}
@@ -129,13 +132,13 @@ export default function Top() {
                 <span className="sr-only"> {copy.hero.enterAria}</span>
               </button>
             </dd>
-            <dt className="instrument-label enter-rise mt-4 pt-1 [--i:3] sm:mt-0">
+            <dt className="instrument-label enter-rise mt-4 pt-1 [--i:3] sm:mt-0 short-phone:sr-only">
               {ja ? "概要" : "brief"}
             </dt>
             {/* 行長は和文で 34 字前後、欧文で 65 字前後に収める。
                 サーバーは英語で描き、ブラウザが日本語なら描画後に切り替わるので、
                 英語の高さ（長いほう）を最小の高さとして確保し、下のカルーセルを動かさない */}
-            <dd className="enter-rise min-h-[10.75rem] max-w-[34em] text-[15px] leading-[1.8] text-green-200 [--i:3] max-[389px]:min-h-[14rem] sm:min-h-[11.5rem] sm:text-base md:min-h-[8rem]">
+            <dd className="enter-rise min-h-[10.75rem] max-w-[34em] text-[15px] leading-[1.8] text-green-200 [--i:3] sm:min-h-[11.5rem] sm:text-base md:min-h-[8rem] short-phone:min-h-[6.5rem] short-phone:text-xs short-phone:leading-[1.55] short-phone:max-[359px]:min-h-[7.75rem]">
               <span
                 className={`desc-char block transition-opacity duration-200 ease-out ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
               >
@@ -152,14 +155,17 @@ export default function Top() {
       </div>
 
       {/* テックカルーセル（全幅）。見出しは左寄せの計器ラベルと罫線にする */}
-      <div className="relative z-10 mt-14 min-h-[320px] w-full sm:mt-20">
+      <div className="relative z-10 mt-14 min-h-[320px] w-full sm:mt-20 short-phone:mt-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2
             className={`tech-carousel-title flex items-center gap-3 font-mono text-lg text-green-100 transition-opacity duration-200 md:text-xl ${
               skillsVisible ? "opacity-100" : "opacity-0"
             }`}
           >
-            <span className="rounded-[3px] border border-white/15 bg-[rgb(7_7_11/0.95)] px-2.5 py-1">
+            <span
+              data-sonta-avoid=""
+              className="rounded-[3px] border border-white/15 bg-[rgb(7_7_11/0.95)] px-2.5 py-1"
+            >
               <span className="text-[rgb(var(--planet-accent))]">&gt;</span> My
               Skills
             </span>

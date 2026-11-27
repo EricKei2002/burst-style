@@ -12,7 +12,7 @@ Next.js 16 (App Router) のパフォーマンスと、Three.js / GSAP による�
 ### 1. 没入型 3D 背景 (Immersive Visuals)
 
 - **StarBackground (トップページ)**: Three.js を使用し、無数の星が流れるワープ空間（WarpStars）を描画。
-- **Spaceship Interior (プロジェクト詳細)**: プロジェクトページへ移動すると、背景が「無限に続く宇宙船の通路（Infinite Video Loop）」へとシームレスに切り替わります。
+- **Planet Interior（各セクション・プロジェクト詳細）**: ルートに応じて Three.js の惑星背景（`PlanetInterior`）へ切り替わり、ページ遷移はシェーダー・ワープで覆います（シェーダー未準備時はハンガードアにフォールバック）。
 
 ### 2. シームレスな遷移 (Hangar Door Transition)
 

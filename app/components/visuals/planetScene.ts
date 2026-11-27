@@ -901,15 +901,13 @@ export async function createPlanetSceneAsync(
     const textures = new Set<Texture>();
     built.scene.traverse((o) => {
       const mat = (o as Mesh).material as unknown as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
       if (!mat) return;
       for (const v of Object.values(mat)) {
         if (v instanceof Texture) textures.add(v);
       }
       const uniforms = mat.uniforms as
-        | Record<string, { value: unknown }>
-        | undefined;
+        Record<string, { value: unknown }> | undefined;
       for (const u of Object.values(uniforms ?? {})) {
         if (u.value instanceof Texture) textures.add(u.value);
       }

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* 小さい画面（幅 389px まで、または縦 800px までのスマホ）。ヒーローを詰めて、
+   そんたくんの場所を残す。sm（640px〜）とは重ならない */
+@custom-variant short-phone {
+  @media (max-width: 389px), (max-width: 639px) and (max-height: 800px) {
+    @slot;
+  }
+}
+
 @theme inline {
   --font-sans: Helvetica, Arial, sans-serif;
   --font-mono:
@@ -341,6 +349,21 @@
   }
 }
 
+/* スマホのトップで漂う Sontaくんの専用 Canvas（SontaDriftOverlay）。
+   .star-bg の外に置くので、星空の減光（--sky-weather-dim）も色かぶりも受けない。
+   z-index は veil(-40)・haze(-39)・雨と雪(-38)・濡れた地面(-37) の上、本文の下。操作は受けない */
+.sonta-overlay {
+  position: fixed;
+  z-index: -36;
+  pointer-events: none;
+  contain: layout paint;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sonta-overlay {
+    animation: local-sky-fade-in 0.8s ease both;
+  }
+}
+
 /* 動きを減らす設定では雨と雪を出さず、もやも止める（色と星の明るさだけ変える） */
 @media (prefers-reduced-motion: reduce) {
   .local-sky-precip,
@@ -568,6 +591,11 @@ html {
 .skip-to-work:hover {
   color: rgb(var(--planet-accent));
 }
+/* そんたくんが避ける「予約枠」。見えるリンクと同じ見た目・位置で、見えず・触れず・読み上げられない */
+.skip-to-work-slot {
+  visibility: hidden;
+  pointer-events: none;
+}
 /* トップ（下部タブあり）だけ、タブの直上に置く。作品詳細や 404 は上に吊るす */
 @media (max-width: 639px) {
   :root[data-home-section] .skip-to-work {
@@ -578,7 +606,7 @@ html {
     border-radius: 4px;
   }
   /* 定番の visually-hidden。display / visibility は使わず、Tab で届くまま見た目だけ消す */
-  :root[data-home-section] .skip-to-work:not(:focus) {
+  :root[data-home-section] .skip-to-work:not(.skip-to-work-slot):not(:focus) {
     width: 1px;
     height: 1px;
     padding: 0;
