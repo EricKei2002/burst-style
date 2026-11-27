@@ -9,9 +9,9 @@ type EnOverlay = Pick<
 const EN_BY_SLUG: Record<string, EnOverlay> = {
   drill: {
     description:
-      "A daily 10-question drill PWA covering three study tracks—AWS SAA, WordPress, and security. Google sign-in and Supabase sync progress across devices.",
+      "A daily 10-question drill PWA covering three study tracks: AWS SAA, WordPress, and security. Google sign-in and Supabase sync progress across devices.",
     detailedDescription:
-      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect – Associate exam, WordPress admin/dev practice, and security, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics are recorded as weak spots and prioritized in the Weak-Spot Drill (a dedicated practice screen); the old Review tab was retired so review has a single entry point there. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS, and the security pack draws on vulnerability-info RSS feeds such as JVN, IPA, and JPCERT/CC), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
+      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect (Associate) exam, WordPress admin/dev practice, and security, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics are recorded as weak spots and prioritized in the Weak-Spot Drill (a dedicated practice screen); the old Review tab was retired so review has a single entry point there. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS, and the security pack draws on vulnerability-info RSS feeds such as JVN, IPA, and JPCERT/CC), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
     challenges: [
       {
         title: "Deterministic daily question selection",
@@ -21,7 +21,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "Carrying pre-login progress into an account",
         description:
-          "Users can start solving immediately before signing in—progress is stashed in sessionStorage until Google login completes, then merged into Supabase via RPC (fetch_progress / push_progress). This preserves a 'try 10 questions, then sign in if you like it' flow while still syncing across devices.",
+          "Users can start solving immediately before signing in. Progress is stashed in sessionStorage until Google login completes, then merged into Supabase via RPC (fetch_progress / push_progress). This preserves a 'try 10 questions, then sign in if you like it' flow while still syncing across devices.",
       },
       {
         title: "A study-pack architecture for multiple subjects",
@@ -33,7 +33,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "More study packs",
         description:
-          "Currently AWS SAA, WordPress, and security—planning to add packs for more certifications and technical subjects over time.",
+          "Currently AWS SAA, WordPress, and security, with plans to add packs for more certifications and technical subjects over time.",
       },
       {
         title: "Deeper study analytics",
@@ -44,9 +44,9 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
   },
   "sonta-kun": {
     description:
-      "AI scheduling that reads the room—natural language to calendar slots.",
+      "AI scheduling that reads the room: natural language to calendar slots.",
     detailedDescription:
-      'Sonta-kun is an AI scheduling agent inspired by Japanese "reading the air" (sontaku). It uses Google Gemini to turn fuzzy wishes like "sometime next week, earlier afternoon" into real constraints, checks Google Calendar availability, and proposes the best times—with Zoom and email wired in via Server Actions.',
+      'Sonta-kun is an AI scheduling agent inspired by Japanese "reading the air" (sontaku). It uses Google Gemini to turn fuzzy wishes like "sometime next week, earlier afternoon" into real constraints, checks Google Calendar availability, and proposes the best times, with Zoom and email wired in via Server Actions.',
     challenges: [
       {
         title: "Fuzzy natural language → concrete constraints",
@@ -56,7 +56,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "Seamless external integrations",
         description:
-          "Combined Google Calendar, Zoom, and Resend inside Server Actions with solid token handling and errors—users get one smooth flow without seeing the plumbing.",
+          "Combined Google Calendar, Zoom, and Resend inside Server Actions with solid token handling and errors, so users get one smooth flow without seeing the plumbing.",
       },
     ],
     improvements: [
@@ -76,7 +76,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
     description:
       "Cutting-sticker brand site: gallery UI, intuitive browsing, MicroCMS for updates.",
     detailedDescription:
-      "Official site for Cutting Works, a cutting-sticker studio and shop. Built a strong gallery-first UI so visitors can scan a large catalog quickly. MicroCMS lets the client publish portfolio pieces and news without touching code—operations stay lightweight.",
+      "Official site for Cutting Works, a cutting-sticker studio and shop. Built a strong gallery-first UI so visitors can scan a large catalog quickly. MicroCMS lets the client publish portfolio pieces and news without touching code, so operations stay lightweight.",
     challenges: [
       {
         title: "Image-heavy performance",
@@ -106,7 +106,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
     description:
       "Discord onboarding bot: self-serve intro + role grant, home server + CI/CD.",
     detailedDescription:
-      "A Discord bot for community onboarding: users click verify, fill a modal, and get a role automatically—cutting manual admin work and lowering the join barrier. Runs on a home Raspberry Pi. Audit trail uses embed posts to a mod channel instead of a database.",
+      "A Discord bot for community onboarding: users click verify, fill a modal, and get a role automatically, cutting manual admin work and lowering the join barrier. Runs on a home Raspberry Pi. Audit trail uses embed posts to a mod channel instead of a database.",
     challenges: [
       {
         title: "Uptime & error handling",

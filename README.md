@@ -12,12 +12,12 @@ Next.js 16 (App Router) のパフォーマンスと、Three.js / GSAP による�
 ### 1. 没入型 3D 背景 (Immersive Visuals)
 
 - **StarBackground (トップページ)**: Three.js を使用し、無数の星が流れるワープ空間（WarpStars）を描画。
-- **Planet Interior（各セクション・プロジェクト詳細）**: ルートに応じて Three.js の惑星背景（`PlanetInterior`）へ切り替わり、ページ遷移はシェーダー・ワープで覆います（シェーダー未準備時はハンガードアにフォールバック）。
+- **Planet Interior（各セクション・プロジェクト詳細）**: ルートに応じて Three.js の惑星背景（`PlanetInterior`）へ切り替わり、ページ遷移はシェーダー・ワープで覆います（シェーダー未準備時は覆わずに切り替え）。
 
-### 2. シームレスな遷移 (Hangar Door Transition)
+### 2. シームレスな遷移 (Warp Transition)
 
-- **Hangar Door Effect**: ページ遷移時に左右から異なるカラー（左: Cyan, 右: Purple）の重厚なドアが閉まり、ローディング時間を隠蔽。
-- **Seamless Navigation**: `Zustand` による状態管理でルーティングとドアのアニメーションを完全同期。宇宙船のハッチを開けて内部へ入るような一貫した体験を提供します。
+- **Warp Effect**: ページ遷移時に全画面シェーダーのワープで画面を覆い、切り替えの瞬間を隠します。WebGL が使えないときや動きを減らす設定では、覆わずにそのまま切り替えます。
+- **Seamless Navigation**: `Zustand` による状態管理でルーティングとワープの再生を同期します。
 
 ### 3. パフォーマンス最適化 (Smart Boot Sequence)
 
@@ -127,7 +127,7 @@ app/
 │   ├── demos/            # プロジェクト詳細ページ用のインタラクティブデモ
 │   ├── sections/         # 主要なページセクション (Hero, About, Projects, Contact)
 │   ├── ui/               # 再利用可能なUIパーツ (ボタン, カード, テキストエフェクト)
-│   ├── visuals/          # 3D/Canvas コンポーネント (Three.js, Stars, HangarDoor)
+│   ├── visuals/          # 3D/Canvas コンポーネント (Three.js, Stars, Warp)
 │   └── SmoothScroll.tsx  # スムーススクロール用コンポーネント
 ├── lib/                  # 共有ロジック・データ (Data, Store)
 ├── projects/             # プロジェクト詳細ページ (動的ルーティング: /projects/[slug])

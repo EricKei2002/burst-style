@@ -105,22 +105,22 @@ export default function ContactSection({
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="instrument-panel mb-16 max-w-2xl p-6">
-          <p className="instrument-label mb-4 text-sm">
+          <p className="instrument-label enter-rise mb-4 text-sm">
             <span aria-hidden="true">[{sectionPageLabel("contact")}] </span>
             ~/contact
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-6">
+          <h2 className="enter-rise mb-6 font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
             <DecryptedText text="Get In Touch" animateOnHover speed={30} />
           </h2>
           <p className="text-zinc-200 leading-relaxed">
             {copy.contact.leadLine1}
-            <br className="hidden sm:block" />
+            <br />
             {copy.contact.leadLine2}
           </p>
         </div>
 
         <div className="relative mx-auto max-w-3xl">
-          <div className="relative w-full rounded-2xl border border-zinc-800 bg-[rgb(7_7_11/0.95)] p-8 sm:p-12 overflow-hidden">
+          <div className="relative w-full rounded-[6px] border border-white/12 bg-[rgb(7_7_11/0.95)] p-8 sm:p-12 overflow-hidden">
             {!isSent ? (
               <form
                 ref={formRef}
@@ -132,7 +132,7 @@ export default function ContactSection({
                   <div className="space-y-2">
                     <label
                       htmlFor="name"
-                      className="text-xs font-mono text-fuchsia-300 ml-1"
+                      className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                     >
                       {copy.contact.formName}
                     </label>
@@ -149,7 +149,7 @@ export default function ContactSection({
                       className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.name
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                          : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                          : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                       }`}
                       placeholder={copy.contact.placeholderName}
                     />
@@ -165,7 +165,7 @@ export default function ContactSection({
                   <div className="space-y-2">
                     <label
                       htmlFor="email"
-                      className="text-xs font-mono text-fuchsia-300 ml-1"
+                      className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                     >
                       {copy.contact.formEmail}
                     </label>
@@ -182,7 +182,7 @@ export default function ContactSection({
                       className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 font-sans ${
                         fieldErrors.email
                           ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                          : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                          : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                       }`}
                       placeholder={copy.contact.placeholderEmail}
                     />
@@ -200,7 +200,7 @@ export default function ContactSection({
                 <div className="space-y-2">
                   <label
                     htmlFor="message"
-                    className="text-xs font-mono text-fuchsia-300 ml-1"
+                    className="text-xs font-mono text-[rgb(var(--planet-accent))] ml-1"
                   >
                     {copy.contact.formMessage}
                   </label>
@@ -216,7 +216,7 @@ export default function ContactSection({
                     className={`w-full bg-zinc-950/70 border rounded-lg px-4 py-3 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus-visible:ring-2 transition-[border-color,box-shadow] duration-150 resize-none font-sans ${
                       fieldErrors.message
                         ? "border-red-500/60 focus:border-red-500/60 focus:ring-red-500/40 focus-visible:ring-red-300"
-                        : "border-zinc-600 focus:border-fuchsia-500/50 focus:ring-fuchsia-500/50 focus-visible:ring-fuchsia-300"
+                        : "border-zinc-600 focus:border-[rgb(var(--planet-accent)/0.5)] focus:ring-[rgb(var(--planet-accent)/0.45)] focus-visible:ring-[rgb(var(--planet-accent))]"
                     }`}
                     placeholder={copy.contact.placeholderMessage}
                   />
@@ -290,7 +290,7 @@ export default function ContactSection({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-[color,background-color,scale] duration-150 ease-out hover:bg-fuchsia-500/20 hover:text-fuchsia-100 motion-safe:enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="relative overflow-hidden group min-h-11 rounded-md border border-green-300/45 bg-zinc-950 px-6 py-3 font-mono text-sm text-green-100 transition-[color,background-color,scale] duration-150 ease-out hover:border-[rgb(var(--planet-accent))] hover:text-white motion-safe:enabled:active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span className="relative z-10 flex items-center gap-2">
                         {isSubmitting
@@ -319,7 +319,7 @@ export default function ContactSection({
               </form>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center transition-opacity duration-500 starting:opacity-0">
-                <div className="w-16 h-16 bg-fuchsia-500/30 text-fuchsia-200 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-[6px] border border-[rgb(var(--planet-accent)/0.45)] bg-[rgb(7_7_11/0.95)] text-[rgb(var(--planet-accent))]">
                   <svg
                     width="32"
                     height="32"
@@ -350,7 +350,7 @@ export default function ContactSection({
                 <button
                   type="button"
                   onClick={() => setIsSent(false)}
-                  className="mt-8 text-sm text-fuchsia-300 hover:text-fuchsia-200 underline underline-offset-4 font-mono uppercase tracking-wider"
+                  className="mt-8 text-sm text-[rgb(var(--planet-accent))] hover:text-[rgb(var(--planet-accent))] underline underline-offset-4 font-mono uppercase tracking-wider"
                 >
                   {copy.contact.sendAnother}
                 </button>

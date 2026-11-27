@@ -12,12 +12,7 @@ export default function BackButton() {
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
     preloadShaderTransition();
-    // 詳細から Projects セクションへ。同じ惑星の中に留まる。
-    void beginLeaveTransition({
-      journey: "fly-between",
-      planetId: "projects",
-      fromPlanetId: "projects",
-    }).then((navigateDelayMs) => {
+    void beginLeaveTransition().then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
         router.push("/#projects");
@@ -33,9 +28,9 @@ export default function BackButton() {
           onClick={handleBack}
           onPointerEnter={() => preloadShaderTransition()}
           onFocus={() => preloadShaderTransition()}
-          className="group relative flex items-center gap-3 px-5 py-3 rounded-md bg-[rgb(7_7_11/0.95)] border border-white/15 shadow-[inset_2px_0_0_rgb(var(--planet-accent)/0.85)] hover:border-white/30 transition-[border-color] duration-200 ease-out"
+          className="group relative flex items-center gap-3 px-5 py-3 rounded-md bg-[rgb(7_7_11/0.95)] border border-white/15 shadow-[inset_2px_0_0_rgb(var(--planet-accent)/0.85)] hover:border-[rgb(var(--planet-accent)/0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--planet-accent))] transition-[border-color] duration-200 ease-out"
         >
-          <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/5 group-hover:bg-fuchsia-500/20 transition-colors">
+          <div className="relative flex items-center justify-center w-8 h-8 rounded-[3px] border border-white/10 transition-colors">
             <svg
               width="16"
               height="16"
@@ -45,7 +40,7 @@ export default function BackButton() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-zinc-400 group-hover:text-fuchsia-400 transition-[color,translate] duration-200 ease-out group-hover:-translate-x-0.5"
+              className="text-zinc-400 group-hover:text-[rgb(var(--planet-accent))] transition-[color,translate] duration-200 ease-out group-hover:-translate-x-0.5"
             >
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
@@ -54,9 +49,6 @@ export default function BackButton() {
           <span className="text-sm font-mono text-zinc-100 group-hover:text-white transition-colors tracking-wide pr-1">
             Back to Projects
           </span>
-
-          {/* Hover Glow */}
-          <div className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-fuchsia-500/10 blur-md transition-opacity duration-200 ease-out -z-10" />
         </Link>
       </MagneticButton>
     </div>

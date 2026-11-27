@@ -10,7 +10,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "spell": "cspell .",
-    "test:timing": "npx --yes tsx app/lib/hangarTransitionTiming.test.ts",
     "test:contact": "npx --yes tsx app/api/contact/validateContactForm.test.ts",
     "test:page-transition": "npx --yes tsx app/lib/pageTransitionTiming.test.ts",
     "test:solar": "npx --yes tsx app/lib/solar.test.ts",
@@ -19,7 +18,7 @@
     "test:home-sections": "npx --yes tsx app/lib/homeSections.test.ts",
     "test:site-copy": "npx --yes tsx app/lib/siteCopy.test.ts",
     "test:sonta": "npx --yes tsx app/lib/sontaMotion.test.ts",
-    "test": "npm run test:timing && npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy",
+    "test": "npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

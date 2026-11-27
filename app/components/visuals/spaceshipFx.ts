@@ -5,19 +5,16 @@ import {
   DoubleSide,
   LinearFilter,
   LinearMipmapLinearFilter,
-  NormalBlending,
   RGBAFormat,
   ShaderMaterial,
   UnsignedByteType,
   type Side,
 } from "three";
-import { drain } from "./frameSlicer";
 import { fbm, mulberry32, smooth } from "./proceduralNoise";
 
 /**
- * 宇宙船オーバーレイ用の柔らかい素材（雲・排気・プラズマ・大気）。
+ * 惑星シーン用の柔らかい素材（雲・光の点・大気）。
  * テクスチャは画像を読まず、初期化時に小さな DataTexture を手続き生成する。
- * spaceshipOverlay と同じ動的チャンクにだけ入る。
  */
 
 function finishTexture(tex: DataTexture, mipmaps: boolean): DataTexture {
@@ -26,14 +23,6 @@ function finishTexture(tex: DataTexture, mipmaps: boolean): DataTexture {
   tex.magFilter = LinearFilter;
   tex.needsUpdate = true;
   return tex;
-}
-
-/**
- * 2x2 アトラスの雲パフ。R = 陰影（上が明るい、薄い縁が明るい）、A = 密度。
- * 各セルの縁は必ず 0 に落ちるので板の輪郭が出ない。
- */
-export function createCloudAtlas(size: number): DataTexture {
-  return drain(cloudAtlasSteps(size));
 }
 
 /** createCloudAtlas の分割版（行ごとに yield する。FrameSlicer.run に渡す） */
@@ -121,107 +110,6 @@ export function createSoftDot(size = 32): DataTexture {
     new DataTexture(data, size, size, RGBAFormat, UnsignedByteType),
     false,
   );
-}
-
-/** インスタンス雲：アトラスの 1 セルを貼った柔らかいビルボード。カメラ近く / 遠くで溶ける */
-export function createCloudMaterial(atlas: DataTexture): ShaderMaterial {
-  return new ShaderMaterial({
-    uniforms: {
-      uMap: { value: atlas },
-      uLit: { value: new Color(1, 1, 1) },
-      uShade: { value: new Color(0.4, 0.45, 0.6) },
-      uGlow: { value: new Color(0, 0, 0) },
-      uOpacity: { value: 0.3 },
-    },
-    vertexShader: /* glsl */ `
-      attribute float aAlpha;
-      attribute float aVariant;
-      varying vec2 vUv;
-      varying float vAlpha;
-      void main() {
-        float v = aVariant;
-        vec2 cell = vec2(mod(v, 2.0), floor(v / 2.0)) * 0.5;
-        vUv = cell + uv * 0.5;
-        vec4 mv = modelViewMatrix * instanceMatrix * vec4(position, 1.0);
-        float d = -mv.z;
-        float nearFade = smoothstep(0.35, 3.2, d);
-        float farFade = 1.0 - smoothstep(34.0, 72.0, d);
-        vAlpha = aAlpha * nearFade * farFade;
-        gl_Position = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      uniform sampler2D uMap;
-      uniform vec3 uLit;
-      uniform vec3 uShade;
-      uniform vec3 uGlow;
-      uniform float uOpacity;
-      varying vec2 vUv;
-      varying float vAlpha;
-      void main() {
-        vec4 t = texture2D(uMap, vUv);
-        float a = t.a * vAlpha * uOpacity;
-        if (a < 0.002) discard;
-        vec3 col = mix(uShade, uLit, t.r);
-        // 陰側ほどプラズマや地平の照り返しを受ける
-        col += uGlow * (1.0 - t.r);
-        gl_FragColor = vec4(col, a);
-        #include <colorspace_fragment>
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: NormalBlending,
-  });
-}
-
-/**
- * 丸いソフトパーティクル（加算）。サイズはワールド単位で距離減衰。
- * aLife は 0（生まれたて）→ 1（消える）。古いほど広がって薄くなる。
- */
-export function createSoftPointsMaterial(): ShaderMaterial {
-  return new ShaderMaterial({
-    uniforms: {
-      uViewportH: { value: 800 },
-      uOpacity: { value: 1 },
-    },
-    vertexShader: /* glsl */ `
-      attribute float aSize;
-      attribute float aLife;
-      attribute vec3 aColor;
-      uniform float uViewportH;
-      varying vec3 vColor;
-      varying float vFade;
-      void main() {
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        float life = clamp(aLife, 0.0, 1.0);
-        float grow = 0.55 + life * 2.4;
-        gl_PointSize = aSize * grow * projectionMatrix[1][1] * uViewportH * 0.5 / max(0.05, -mv.z);
-        vColor = aColor;
-        vFade = pow(1.0 - life, 1.7);
-        gl_Position = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      uniform float uOpacity;
-      varying vec3 vColor;
-      varying float vFade;
-      void main() {
-        vec2 p = gl_PointCoord - 0.5;
-        float d = length(p) * 2.0;
-        if (d > 1.0 || vFade < 0.002) discard;
-        float core = exp(-d * d * 5.0);
-        float a = core * (1.0 - d) * vFade * uOpacity;
-        // 中心は白っぽく
-        vec3 col = mix(vColor, vec3(1.0), core * core * 0.35 * vFade);
-        gl_FragColor = vec4(col, a);
-        #include <colorspace_fragment>
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: AdditiveBlending,
-  });
 }
 
 /**

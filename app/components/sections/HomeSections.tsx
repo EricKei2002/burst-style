@@ -22,10 +22,6 @@ import {
   swipeDirection,
   type HomeSection,
 } from "../../lib/homeSections";
-import {
-  planetForHomeSection,
-  warpJourneyForSections,
-} from "../../lib/planets";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import {
   beginSectionWarpOpen,
@@ -38,6 +34,48 @@ import {
 
 /** 前のセクションをフェードアウトさせる時間（ms）。CSS の .home-panel.is-leaving と揃える */
 const LEAVE_MS = 90;
+
+/** アンカー保持：最後の高さ変化からこの時間だけ静かなら止める（ms） */
+const ANCHOR_QUIET_MS = 2000;
+/** アンカー保持の上限（開始から、ms） */
+const ANCHOR_MAX_MS = 8000;
+/** 実行中のアンカー保持を止める関数。新しいアンカーへ送るときに前のものを切る */
+let stopAnchorHold: (() => void) | null = null;
+
+/**
+ * アンカーへ送ったあと、上の内容（画像・遅れて描く部品）の高さが変わると行き先がヘッダーの裏へずれる。
+ * 高さが変わるたびに行き先へ送り直し、最後の変化から 2 秒静かになったら止める（開始から最長 8 秒）。
+ * ユーザーが自分で操作（wheel / touchstart / keydown / pointerdown）したら即座に止める。
+ * 余白は html の scroll-padding-top（globals.css）に任せる
+ */
+function scrollToAnchor(el: HTMLElement) {
+  stopAnchorHold?.();
+  el.scrollIntoView({ block: "start" });
+  const userEvents = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+  let quietTimer = 0;
+  const armQuiet = () => {
+    window.clearTimeout(quietTimer);
+    quietTimer = window.setTimeout(stop, ANCHOR_QUIET_MS);
+  };
+  const ro = new ResizeObserver(() => {
+    el.scrollIntoView({ block: "start" });
+    armQuiet();
+  });
+  const maxTimer = window.setTimeout(stop, ANCHOR_MAX_MS);
+  function stop() {
+    ro.disconnect();
+    window.clearTimeout(quietTimer);
+    window.clearTimeout(maxTimer);
+    for (const type of userEvents) window.removeEventListener(type, stop);
+    if (stopAnchorHold === stop) stopAnchorHold = null;
+  }
+  stopAnchorHold = stop;
+  armQuiet();
+  for (const type of userEvents) {
+    window.addEventListener(type, stop, { passive: true });
+  }
+  ro.observe(document.body);
+}
 
 type Props = Record<HomeSection, ReactNode>;
 
@@ -111,7 +149,7 @@ export default function HomeSections(props: Props) {
   const warpInFlight = useRef(false);
   const warpSwapped = useRef(false);
   const localeRef = useRef(locale);
-  /** 宇宙船の準備待ち中に次の操作が来たら、古い要求は捨てる */
+  /** ワープの準備待ち中に次の操作が来たら、古い要求は捨てる */
   const navToken = useRef(0);
 
   useEffect(() => {
@@ -141,7 +179,7 @@ export default function HomeSections(props: Props) {
         const el = anchor ? document.getElementById(anchor) : null;
         if (!el) return false;
         if (!el.hasAttribute("tabindex")) el.tabIndex = -1;
-        el.scrollIntoView({ block: "start" });
+        scrollToAnchor(el);
         el.focus({ preventScroll: true });
         return true;
       };
@@ -153,7 +191,6 @@ export default function HomeSections(props: Props) {
         if (focus) focusHeading(next);
         return;
       }
-      const from = displayedRef.current;
       targetRef.current = next;
       window.clearTimeout(leaveTimer.current);
 
@@ -195,41 +232,23 @@ export default function HomeSections(props: Props) {
         !prefersReducedMotion() &&
         useTransitionStore.getState().shaderReady;
 
-      const warpOpts = (origin: HomeSection, dest: HomeSection) => {
-        const journey = warpJourneyForSections(origin, dest);
-        const destPlanet = planetForHomeSection(dest);
-        const fromPlanet = planetForHomeSection(origin);
-        return {
-          journey,
-          planetId: destPlanet?.id ?? fromPlanet?.id ?? null,
-          fromPlanetId: fromPlanet?.id ?? null,
-        };
-      };
-
       if (useShader) {
         preloadShaderTransition();
-        if (warpInFlight.current && !warpSwapped.current) {
-          const opts = warpOpts(from, next);
-          useTransitionStore
-            .getState()
-            .setWarpContext(opts.journey, opts.planetId, opts.fromPlanetId);
-          return;
-        }
+        // 覆い切る前の連打は、進行中のワープがそのまま最後の行き先へ差し替える
+        if (warpInFlight.current && !warpSwapped.current) return;
         if (warpInFlight.current && warpSwapped.current) {
           clearWarpTimers();
           endSectionWarp();
           warpInFlight.current = false;
         }
-        const opts = warpOpts(from, next);
-        const delay = startSectionWarp(opts);
-        const journey = opts.journey;
+        const delay = startSectionWarp();
         warpInFlight.current = true;
         warpSwapped.current = false;
         warpCloseTimer.current = window.setTimeout(() => {
           swap();
           warpSwapped.current = true;
           useTransitionStore.getState().setPhase("closed");
-          const { openAt, idleAt } = scheduleSectionWarpOpen(journey);
+          const { openAt, idleAt } = scheduleSectionWarpOpen();
           warpOpenTimer.current = window.setTimeout(() => {
             beginSectionWarpOpen();
             warpIdleTimer.current = window.setTimeout(() => {
@@ -258,7 +277,7 @@ export default function HomeSections(props: Props) {
 
   /**
    * URL を書き換えてから切り替える（ヘッダー・下部タブ・キー・スワイプ共通）。
-   * 宇宙船の準備がまだなら、ページ遷移と同じく最大 1 秒待ってから宇宙船か短いフェードかを決める。
+   * ワープの準備がまだなら、ページ遷移と同じく最大 1 秒待ってからワープか短いフェードかを決める。
    */
   const navigate = useCallback(
     (section: HomeSection, focus: boolean, anchor: string | null = null) => {
@@ -281,7 +300,7 @@ export default function HomeSections(props: Props) {
         go();
         return;
       }
-      preloadShaderTransition(true);
+      preloadShaderTransition();
       void waitForShaderReady().then(go);
     },
     [show],
@@ -306,7 +325,7 @@ export default function HomeSections(props: Props) {
           anchorId && anchorId !== initial
             ? document.getElementById(anchorId)
             : null;
-        if (anchor) anchor.scrollIntoView({ block: "start" });
+        if (anchor) scrollToAnchor(anchor);
         else window.scrollTo({ top: 0, behavior: "instant" });
         window.dispatchEvent(
           new CustomEvent(HOME_SECTION_EVENT, {

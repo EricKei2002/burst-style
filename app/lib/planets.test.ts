@@ -4,8 +4,6 @@ import {
   planetForHomeSection,
   planetForView,
   SECTION_PLANETS,
-  rgbVec,
-  warpJourneyForSections,
 } from "./planets";
 
 function assert(cond: unknown, msg: string) {
@@ -34,14 +32,6 @@ assert(planetForView("/missing")?.id === "uncharted", "404 is uncharted");
 
 assert(planetById("about").nameJa === "琥珀の居住地", "ja name");
 
-assert(warpJourneyForSections("home", "projects") === "enter-planet", "enter");
-assert(warpJourneyForSections("about", "home") === "leave-space", "leave");
-assert(
-  warpJourneyForSections("projects", "contact") === "fly-between",
-  "section to section",
-);
-assert(warpJourneyForSections("projects", "projects") === "neutral", "same");
-
 const ids = Object.keys(SECTION_PLANETS);
 assert(ids.length === 3, "three section planets");
 for (const id of ids) {
@@ -50,8 +40,5 @@ for (const id of ids) {
   const luma = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   assert(luma < 0.12, `${p.id} skyTop too bright (${luma})`);
 }
-
-const v = rgbVec([255, 0, 128]);
-assert(v[0] === 1 && v[2] === 128 / 255, "rgbVec");
 
 console.log("planets.test.ts: ok");

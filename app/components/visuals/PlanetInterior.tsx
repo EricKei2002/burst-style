@@ -148,6 +148,7 @@ export default function PlanetInterior({ theme }: Props) {
               sceneRef.current?.dispose();
               sceneRef.current = null;
               root.dataset.planetLoop = "paused";
+              delete root.dataset.planetScene;
             },
             exhibits: projectsData.map((p) => ({
               slug: p.slug,
@@ -168,6 +169,8 @@ export default function PlanetInterior({ theme }: Props) {
         return;
       }
       sceneRef.current = scene;
+      // 駐機窓の段階ラベル（接近 → 駐機）を CSS で切り替える合図
+      root.dataset.planetScene = "ready";
       sync();
       // 組み立て中にテーマが変わっていたら、分割して追いつく（同じテーマなら何もしない）
       const catchUp = new FrameSlicer({ urgent: true });
@@ -247,6 +250,7 @@ export default function PlanetInterior({ theme }: Props) {
     window.addEventListener("home-section-change", onScroll);
 
     const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+    let inspectBay: HTMLElement | null = null;
     const onPointer = (e: PointerEvent) => {
       const s = sceneRef.current;
       if (!s) return;
@@ -258,8 +262,29 @@ export default function PlanetInterior({ theme }: Props) {
       }
       // 駐機窓の上では、看板に乗ったときだけ指のカーソルにする
       const bay = (e.target as Element | null)?.closest?.("[data-hangar-bay]");
+      // 下の点検の札にキーボードのフォーカスがある間は、点検の表示をポインターで消さない
+      const focusHolds = (el: HTMLElement) =>
+        el.contains(document.activeElement) &&
+        Boolean(document.activeElement?.matches?.(":focus-visible"));
+      if (inspectBay && inspectBay !== bay) {
+        if (!focusHolds(inspectBay)) delete inspectBay.dataset.inspect;
+        inspectBay = null;
+      }
       if (bay instanceof HTMLElement) {
-        bay.style.cursor = s.pickExhibit(e.clientX, e.clientY) ? "pointer" : "";
+        // 札の上ではボタン自身のカーソルに任せる
+        const onSign = Boolean(
+          (e.target as Element | null)?.closest?.("[data-hangar-sign]"),
+        );
+        const over = !onSign && Boolean(s.pickExhibit(e.clientX, e.clientY));
+        bay.style.cursor = over ? "pointer" : "";
+        // 看板（または札）に乗っている間は段階ラベルを「点検」にする
+        if (over || onSign) {
+          bay.dataset.inspect = "";
+          inspectBay = bay;
+        } else {
+          if (!focusHolds(bay)) delete bay.dataset.inspect;
+          inspectBay = null;
+        }
       }
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
@@ -269,6 +294,8 @@ export default function PlanetInterior({ theme }: Props) {
       if (e.defaultPrevented || e.button !== 0) return;
       const target = e.target as Element | null;
       if (!target?.closest?.("[data-hangar-bay]")) return;
+      // 点検の札は自分で HANGAR_EXHIBIT_EVENT を流す（二重に開かない）
+      if (target.closest("[data-hangar-sign]")) return;
       const slug = sceneRef.current?.pickExhibit(e.clientX, e.clientY);
       if (!slug) return;
       e.preventDefault();
@@ -329,6 +356,8 @@ export default function PlanetInterior({ theme }: Props) {
       sceneRef.current = null;
       syncRef.current = () => {};
       delete root.dataset.planetLoop;
+      delete root.dataset.planetScene;
+      if (inspectBay) delete inspectBay.dataset.inspect;
     };
   }, []);
 

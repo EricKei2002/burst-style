@@ -31,7 +31,7 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
         aria-label="システム構成図を拡大表示"
         aria-haspopup="dialog"
         aria-expanded={isExpanded}
-        className="group w-full overflow-hidden rounded-2xl border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600"
+        className="group w-full overflow-hidden rounded-[6px] border border-zinc-800 bg-[#0d1117] text-left transition-all hover:border-zinc-600"
         onClick={() => setIsExpanded(true)}
       >
         <div className="border-b border-zinc-800 bg-[#010409] px-4 py-3 flex items-center justify-between">
@@ -62,14 +62,14 @@ export default function ProjectDocs({ documentation }: ProjectDocsProps) {
 
       {isExpanded && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 sm:p-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8"
           onClick={() => setIsExpanded(false)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-label="システム構成図"
-            className="relative flex h-[95vh] w-full max-w-[98vw] flex-col overflow-hidden rounded-xl border border-zinc-700 bg-[#0d1117] shadow-2xl"
+            className="relative flex h-[95vh] w-full max-w-[98vw] flex-col overflow-hidden rounded-[6px] border border-zinc-700 bg-[#0d1117]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">

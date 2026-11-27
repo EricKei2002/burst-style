@@ -3,86 +3,40 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
-  SHADER_FLY_CLOSE_MS,
-  SHADER_FLY_OPEN_MS,
+  SHADER_OPEN_PAUSE_MS,
+  SHADER_OPEN_TO_IDLE_MS,
   SHADER_WARP_CLOSE_MS,
   SHADER_WARP_OPEN_MS,
-  SHADER_WARP_REVEAL_MS,
-  prefersReducedMotion,
 } from "../../lib/pageTransitionTiming";
-import { sectionFromLocation } from "../../lib/homeSections";
-import {
-  isHomePath,
-  planetById,
-  planetForView,
-  rgbVec,
-  type WarpJourney,
-} from "../../lib/planets";
 import {
   loadShaderTransitionModule,
   onShaderTransitionIntent,
 } from "../../lib/shaderTransitionLoader";
 import { useTransitionStore } from "../../lib/store";
-import { FrameSlicer } from "./frameSlicer";
 
 type ShaderWarpHandle = {
   playClose(durationMs: number): void;
   playOpen(durationMs: number): void;
   playReveal(durationMs: number): void;
-  setJourney(
-    journey: WarpJourney,
-    atmo: [number, number, number],
-    horizon: [number, number, number],
-    fromAtmo?: [number, number, number],
-    fromHorizon?: [number, number, number],
-  ): void;
   hide(): void;
   dispose(): void;
 };
 
-function applyWarpLook(
-  overlay: ShaderWarpHandle,
-  journey: WarpJourney,
-  planetId: string | null,
-  fromPlanetId: string | null = null,
-) {
-  const planet = planetById(planetId);
-  const from = planetById(fromPlanetId ?? planetId);
-  overlay.setJourney(
-    journey,
-    rgbVec(planet.haze),
-    rgbVec(planet.accent),
-    rgbVec(from.haze),
-    rgbVec(from.accent),
-  );
-}
-
-function closeMsFor(journey: WarpJourney): number {
-  return journey === "fly-between" ? SHADER_FLY_CLOSE_MS : SHADER_WARP_CLOSE_MS;
-}
-
-function openMsFor(journey: WarpJourney): number {
-  return journey === "fly-between" ? SHADER_FLY_OPEN_MS : SHADER_WARP_OPEN_MS;
-}
-
 /**
  * 先読み（低優先）は load のあと、この時間だけ待ってから空き時間で始める。
- * ラボ計測（Lighthouse）の操作可能までの静かな時間帯に重い評価を割り込ませない。
- * 実際の利用者はそれより先にポインター・スクロール・フォーカスで前倒しされる。
+ * ラボ計測（Lighthouse）の操作可能までの静かな時間帯に three の評価を割り込ませない。
+ * 実際の利用者はそれより先にポインター・スクロール・キー・リンクへの接近で前倒しされる。
  */
 const IDLE_PRELOAD_AFTER_LOAD_MS = 6000;
-/** ポインターがメニュー（ナビ）にこの距離まで近づいたら急ぎの準備に切り替える */
-const NEAR_NAV_PX = 160;
-const INTENT_SELECTOR =
-  'a[href], button, [role="tab"], [data-transition-intent]';
 
 /**
- * 全画面の宇宙船遷移の薄いラッパー。three 本体は動的 import でのみ読み込み、
- * 使えない（読み込み前・WebGL 不可・コンテキスト喪失・動きを減らす設定）ときは
- * shaderReady=false のままにしてハンガー扉に任せる。
+ * 全画面シェーダー（ハイパースペース・ワープ）遷移の薄いラッパー。three 本体は
+ * 動的 import でのみ読み込み、使えない（読み込み前・WebGL 不可・コンテキスト喪失・
+ * 動きを減らす設定）ときは shaderReady=false のままにして普通の切り替えに任せる。
  *
- * 準備は FrameSlicer で数 ms ずつ進める（低優先は requestIdleCallback の空き時間だけ、
- * 操作の意図が来たら MessageChannel で急ぐ）。どちらも 50ms を超える長いタスクを作らない。
+ * 戻る/進む（popstate）ではワープしない。Next のルート差し替えは popstate と同時に
+ * 起きるため、覆う前に新しいページが一瞬見えてしまう。履歴移動は普通に切り替える
+ * （ホーム内のセクションは HomeSections が覆ってから差し替えるのでワープする）。
  */
 export default function ShaderPageTransition() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -92,26 +46,23 @@ export default function ShaderPageTransition() {
   const phase = useTransitionStore((s) => s.phase);
   const overlayKind = useTransitionStore((s) => s.overlay);
 
-  // 遅延読み込みと初期化・破棄（宇宙船シーン）
+  // 遅延読み込みと初期化・破棄
   useEffect(() => {
     const { setShaderReady } = useTransitionStore.getState();
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     let cancelled = false;
+    let loading = false;
     let lost = false;
-    let slicer: FrameSlicer | null = null;
-    let idleHandle = 0;
-    let delayTimer = 0;
+    let idleHandle: number | null = null;
 
     const teardown = () => {
-      slicer?.cancel();
-      slicer = null;
       overlayRef.current?.dispose();
       overlayRef.current = null;
       setShaderReady(false);
-      // 再生途中ならハンガー扉に引き継ぐ（phase はそのまま）
+      // 再生途中なら覆いを外し、普通の切り替えに引き継ぐ（phase はそのまま）
       const state = useTransitionStore.getState();
       if (state.overlay === "shader") {
-        state.setOverlay("hangar");
+        state.setOverlay("none");
       }
     };
 
@@ -120,106 +71,74 @@ export default function ShaderPageTransition() {
       teardown();
     };
 
-    const init = (urgent: boolean) => {
-      if (cancelled || lost || overlayRef.current || motionQuery.matches) {
+    const init = () => {
+      if (
+        cancelled ||
+        loading ||
+        lost ||
+        overlayRef.current ||
+        motionQuery.matches
+      ) {
         return;
       }
-      if (slicer) {
-        // 準備中に操作の意図が来たら急ぐ
-        if (urgent) slicer.setUrgent();
-        return;
-      }
-      const current = new FrameSlicer({ urgent });
-      slicer = current;
-      document.documentElement.dataset.shipPrep = urgent ? "urgent" : "idle";
+      loading = true;
       loadShaderTransitionModule()
-        .then(async (mod) => {
+        .then((mod) => {
+          loading = false;
           const host = hostRef.current;
-          if (current.isCancelled || !host) return;
-          // モジュール評価のあとは必ず一度譲る
-          await current.pause();
-          const overlay = await mod.createShaderWarpOverlayAsync(
-            host,
-            handleContextLost,
-            current,
-          );
-          if (current.isCancelled || cancelled || motionQuery.matches) {
-            overlay?.dispose();
+          if (cancelled || motionQuery.matches || !host || overlayRef.current) {
             return;
           }
-          if (slicer === current) slicer = null;
-          if (!overlay) return;
+          const overlay = mod.createShaderWarpOverlay(host, handleContextLost);
+          if (!overlay) {
+            return;
+          }
           overlayRef.current = overlay;
-          document.documentElement.dataset.shipPrep = "ready";
           setShaderReady(true);
         })
         .catch(() => {
-          // 打ち切り・読み込み失敗時はハンガー扉のまま（次の意図で再試行）
-          if (slicer === current) slicer = null;
+          // 読み込み失敗時は普通の切り替えのまま（次の意図で再試行）
+          loading = false;
         });
     };
 
     // 低優先の先読み：load → 一定時間 → 空き時間
+    let delayTimer: number | null = null;
     const scheduleIdle = () => {
       delayTimer = window.setTimeout(() => {
-        delayTimer = 0;
+        delayTimer = null;
         if (typeof window.requestIdleCallback === "function") {
           idleHandle = window.requestIdleCallback(() => {
-            idleHandle = 0;
-            init(false);
+            idleHandle = null;
+            init();
           });
         } else {
-          init(false);
+          init();
         }
       }, IDLE_PRELOAD_AFTER_LOAD_MS);
     };
     if (document.readyState === "complete") scheduleIdle();
     else window.addEventListener("load", scheduleIdle, { once: true });
 
-    // 意図の弱い操作（動かす・スクロール・触れる）は低優先で開始
-    const onSoftIntent = () => init(false);
-    // 意図の強い操作（押す・キー・リンクに乗る・フォーカス）は急ぎ
-    const onHardIntent = () => init(true);
-    const onPointerOver = (e: PointerEvent) => {
-      const target = e.target as Element | null;
-      if (target?.closest?.(INTENT_SELECTOR)) init(true);
-    };
-    const onFocusIn = (e: FocusEvent) => {
-      const target = e.target as Element | null;
-      if (target?.closest?.(INTENT_SELECTOR)) init(true);
-    };
-    // ポインターがナビに近づいた（まだ乗っていない）段階で急ぐ
-    let nearRaf = 0;
-    let lastPointer: { x: number; y: number } | null = null;
-    const checkNear = () => {
-      nearRaf = 0;
-      if (!lastPointer || overlayRef.current || slicer?.isUrgent) return;
-      const navs = document.querySelectorAll("nav, [data-transition-intent]");
-      for (const nav of navs) {
-        const r = nav.getBoundingClientRect();
-        const dx = Math.max(r.left - lastPointer.x, 0, lastPointer.x - r.right);
-        const dy = Math.max(r.top - lastPointer.y, 0, lastPointer.y - r.bottom);
-        if (Math.hypot(dx, dy) <= NEAR_NAV_PX) {
-          init(true);
-          return;
-        }
-      }
-    };
-    const onPointerMove = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
-      init(false);
-      lastPointer = { x: e.clientX, y: e.clientY };
-      if (!nearRaf) nearRaf = requestAnimationFrame(checkNear);
-    };
-
-    const passive = { passive: true } as const;
-    window.addEventListener("pointermove", onPointerMove, passive);
-    window.addEventListener("scroll", onSoftIntent, passive);
-    window.addEventListener("touchstart", onSoftIntent, passive);
-    window.addEventListener("pointerdown", onHardIntent, passive);
-    window.addEventListener("keydown", onHardIntent);
-    document.addEventListener("pointerover", onPointerOver, passive);
-    document.addEventListener("focusin", onFocusIn);
+    // ポインタやキーの最初の操作でも先読みする（初回クリックに間に合わせる）
+    const onFirstInput = () => init();
+    window.addEventListener("pointermove", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("pointerdown", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("keydown", onFirstInput, { once: true });
+    window.addEventListener("scroll", onFirstInput, {
+      once: true,
+      passive: true,
+    });
+    window.addEventListener("touchstart", onFirstInput, {
+      once: true,
+      passive: true,
+    });
 
     const unsubscribeIntent = onShaderTransitionIntent(init);
 
@@ -232,89 +151,74 @@ export default function ShaderPageTransition() {
 
     return () => {
       cancelled = true;
-      if (delayTimer) window.clearTimeout(delayTimer);
-      if (idleHandle && typeof window.cancelIdleCallback === "function") {
+      if (delayTimer !== null) window.clearTimeout(delayTimer);
+      if (idleHandle !== null && "cancelIdleCallback" in window) {
         window.cancelIdleCallback(idleHandle);
       }
-      if (nearRaf) cancelAnimationFrame(nearRaf);
       window.removeEventListener("load", scheduleIdle);
       unsubscribeIntent();
-      window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("scroll", onSoftIntent);
-      window.removeEventListener("touchstart", onSoftIntent);
-      window.removeEventListener("pointerdown", onHardIntent);
-      window.removeEventListener("keydown", onHardIntent);
-      document.removeEventListener("pointerover", onPointerOver);
-      document.removeEventListener("focusin", onFocusIn);
+      window.removeEventListener("pointermove", onFirstInput);
+      window.removeEventListener("pointerdown", onFirstInput);
+      window.removeEventListener("keydown", onFirstInput);
+      window.removeEventListener("scroll", onFirstInput);
+      window.removeEventListener("touchstart", onFirstInput);
       motionQuery.removeEventListener("change", handleMotionChange);
       teardown();
     };
   }, []);
 
-  const warpJourney = useTransitionStore((s) => s.warpJourney);
-  const warpPlanetId = useTransitionStore((s) => s.warpPlanetId);
-  const warpFromPlanetId = useTransitionStore((s) => s.warpFromPlanetId);
-
-  // ストアの phase に合わせて宇宙船の飛行を再生する
-  useEffect(() => {
-    const overlay = overlayRef.current;
-    if (!overlay || overlayKind !== "shader") {
-      return;
-    }
-    applyWarpLook(overlay, warpJourney, warpPlanetId, warpFromPlanetId);
-  }, [overlayKind, warpJourney, warpPlanetId, warpFromPlanetId]);
-
+  // ストアの phase に合わせてワープを再生する
   useEffect(() => {
     const overlay = overlayRef.current;
     if (!overlay || overlayKind !== "shader") {
       return;
     }
     if (phase === "closing") {
-      overlay.playClose(closeMsFor(warpJourney));
+      overlay.playClose(SHADER_WARP_CLOSE_MS);
     } else if (phase === "opening") {
-      overlay.playOpen(openMsFor(warpJourney));
+      overlay.playOpen(SHADER_WARP_OPEN_MS);
     }
-  }, [phase, overlayKind, warpJourney]);
+  }, [phase, overlayKind]);
 
-  // 戻る/進む：履歴は遅らせず、覆った最高潮から開く演出を見せる
+  // ルートが変わったあとの後始末。
+  // - こちらから始めた遷移（closing / closed）：少し覆ったまま待ってから開き、idle に戻す
+  // - 戻る/進む：ワープせず普通に切り替える。開いている途中に履歴移動が割り込んだら覆いを外す
+  const openTimer = useRef<number | undefined>(undefined);
+  const idleTimer = useRef<number | undefined>(undefined);
+
   useEffect(() => {
     if (prevPathname.current === pathname) {
       return;
     }
-    const prevPath = prevPathname.current;
     prevPathname.current = pathname;
-    const overlay = overlayRef.current;
-    const currentPhase = useTransitionStore.getState().phase;
-    // closing/closed はこちらから始めた離脱。履歴戻りの割り込みは
-    // idle だけでなく opening 中でも最高潮から開く演出を出す。
-    if (
-      !overlay ||
-      currentPhase === "closing" ||
-      currentPhase === "closed" ||
-      prefersReducedMotion()
-    ) {
-      return;
-    }
-    const toSection = isHomePath(pathname)
-      ? (sectionFromLocation(window.location.hash, window.location.search) ??
-        "home")
-      : null;
-    const fromPlanet = planetForView(
-      prevPath,
-      prevPath.startsWith("/projects/") ? "projects" : "home",
-    );
-    const toPlanet = planetForView(pathname, toSection);
-    let journey: WarpJourney = "neutral";
-    if (!fromPlanet && toPlanet) journey = "enter-planet";
-    else if (fromPlanet && !toPlanet) journey = "leave-space";
-    else if (fromPlanet && toPlanet) journey = "fly-between";
-    const planet = journey === "leave-space" ? fromPlanet : toPlanet;
-    applyWarpLook(overlay, journey, planet?.id ?? null, fromPlanet?.id ?? null);
-    overlay.playReveal(SHADER_WARP_REVEAL_MS);
-    if (currentPhase !== "idle") {
-      useTransitionStore.getState().setPhase("idle");
+    const { phase, overlay, setPhase } = useTransitionStore.getState();
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(idleTimer.current);
+    if (phase === "closing" || phase === "closed") {
+      if (overlay !== "shader") {
+        setPhase("idle");
+        return;
+      }
+      openTimer.current = window.setTimeout(() => {
+        setPhase("opening");
+        idleTimer.current = window.setTimeout(
+          () => setPhase("idle"),
+          SHADER_OPEN_TO_IDLE_MS,
+        );
+      }, SHADER_OPEN_PAUSE_MS);
+    } else if (phase === "opening") {
+      overlayRef.current?.hide();
+      setPhase("idle");
     }
   }, [pathname]);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(openTimer.current);
+      window.clearTimeout(idleTimer.current);
+    },
+    [],
+  );
 
   return (
     <div
