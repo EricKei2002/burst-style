@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+
 import NotFoundText from "./components/ui/NotFoundText";
-import WarpLink from "./components/ui/WarpLink";
 
 export const metadata: Metadata = {
   title: "404 — Signal Lost",
@@ -41,18 +42,18 @@ export default function NotFound() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <WarpLink
+          <Link
             href="/"
             className="flex items-center justify-center rounded-lg border border-[rgb(var(--planet-accent)/0.3)] bg-[rgb(var(--planet-accent)/0.1)] px-5 py-3 text-xs tracking-wider text-[rgb(var(--planet-accent))] uppercase transition-colors hover:bg-[rgb(var(--planet-accent)/0.15)]"
           >
             <NotFoundText en="< Return to base" ja="< トップへ戻る" />
-          </WarpLink>
-          <WarpLink
+          </Link>
+          <Link
             href="/#projects"
             className="flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 px-5 py-3 text-xs tracking-wider text-zinc-300 uppercase transition-colors hover:bg-zinc-700"
           >
             <NotFoundText en="View projects" ja="プロジェクトを見る" />
-          </WarpLink>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,9 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { planetForView } from "../../lib/planets";
+import {
+  HOME_SECTION_EVENT,
+  isHomeSection,
+  type HomeSection,
+} from "../../lib/homeSections";
+import { isHomePath, planetForView } from "../../lib/planets";
 
 const StarBackground = dynamic(() => import("./StarBackground"), {
   ssr: false,
@@ -13,15 +18,33 @@ const PlanetInterior = dynamic(() => import("./PlanetInterior"), {
   ssr: false,
 });
 
-/**
- * 背景。トップの全セクション（Home / Projects / About / Contact）と 404 は
- * 惑星が回る宇宙（StarBackground）。作品詳細（/projects/*）だけ Projects 惑星の地表。
- * 星空は最初の操作か 8 秒の待機のあとに出す（モバイルの TBT / TTI を守る）。
- */
+function readHomeSection(): HomeSection {
+  if (typeof document === "undefined") return "home";
+  const value = document.documentElement.dataset.homeSection ?? null;
+  return isHomeSection(value) ? value : "home";
+}
+
 export default function ClientVisuals() {
   const pathname = usePathname();
+  // サーバー描画と同じ "home" から始め、描画前（useLayoutEffect）に URL の状態へ合わせる。
+  // 初回から <html data-home-section> を読むと、#projects などの直リンクで水和が食い違う
+  const [homeSection, setHomeSection] = useState<HomeSection>("home");
   const cameFromPlanet = useRef(false);
-  const planet = planetForView(pathname);
+
+  useLayoutEffect(() => {
+    if (!isHomePath(pathname)) {
+      return;
+    }
+    const sync = () => setHomeSection(readHomeSection());
+    sync();
+    window.addEventListener(HOME_SECTION_EVENT, sync);
+    return () => window.removeEventListener(HOME_SECTION_EVENT, sync);
+  }, [pathname]);
+
+  const planet = planetForView(
+    pathname,
+    isHomePath(pathname) ? homeSection : null,
+  );
 
   const [config, setConfig] = useState<{
     ready: boolean;

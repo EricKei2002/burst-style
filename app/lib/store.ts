@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { SPACESHIP_TRANSITIONS_ENABLED } from "./featureFlags";
 import {
   SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS,
   SHADER_FLY_OPEN_TO_IDLE_MS,
@@ -77,14 +76,8 @@ export function waitForShaderReady(
 }
 
 /**
- * ワープが使えないときの代わり。宇宙船を止めている間は覆わずに普通に切り替える
- * （ハンガー扉は宇宙船の遷移と組で使っていたため、フラグを戻したときだけ出す）。
- */
-const LEAVE_FALLBACK = SPACESHIP_TRANSITIONS_ENABLED ? "hangar" : "none";
-
-/**
  * ページ離脱の演出を開始し、router.push までの待機（ms）を返す。
- * シェーダーがまだなら短い時間だけ待ち、使えなければ LEAVE_FALLBACK。
+ * シェーダーがまだなら短い時間だけ待ち、使えなければ従来どおりハンガー扉。
  */
 export async function beginLeaveTransition(opts?: {
   journey?: WarpJourney;
@@ -105,7 +98,6 @@ export async function beginLeaveTransition(opts?: {
   const overlay = pickPageTransitionOverlay({
     shaderReady,
     reducedMotion: prefersReducedMotion(),
-    fallback: LEAVE_FALLBACK,
   });
   setOverlay(overlay);
   setPhase("closing");

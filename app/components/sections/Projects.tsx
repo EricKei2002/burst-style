@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, type CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -11,6 +11,10 @@ import { getLocalizedProject } from "../../lib/projectEn";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import { sectionPageLabel } from "../../lib/homeSections";
 import { beginLeaveTransition, useTransitionStore } from "../../lib/store";
+import {
+  HANGAR_EXHIBIT_EVENT,
+  type HangarExhibitDetail,
+} from "../../lib/hangarExhibit";
 
 export default function Projects() {
   const { locale } = useLocale();
@@ -20,10 +24,11 @@ export default function Projects() {
 
   const handleNavigation = (url: string) => {
     preloadShaderTransition();
-    // Projects セクションは宇宙。詳細は Projects 惑星の地表なので突入する。
+    // 詳細も Projects の惑星の中。突入ではなく、同じ大気の中を進む。
     void beginLeaveTransition({
-      journey: "enter-planet",
+      journey: "fly-between",
       planetId: "projects",
+      fromPlanetId: "projects",
     }).then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
@@ -31,6 +36,17 @@ export default function Projects() {
       }, navigateDelayMs);
     });
   };
+
+  // 格納庫の看板（3D の展示物）が選ばれたら、カードと同じ遷移で詳細を開く
+  useEffect(() => {
+    const onExhibit = (event: Event) => {
+      const { slug } = (event as CustomEvent<HangarExhibitDetail>).detail;
+      if (!projectsData.some((p) => p.slug === slug)) return;
+      handleNavigation(`/projects/${slug}`);
+    };
+    window.addEventListener(HANGAR_EXHIBIT_EVENT, onExhibit);
+    return () => window.removeEventListener(HANGAR_EXHIBIT_EVENT, onExhibit);
+  });
 
   const ja = locale === "ja";
 
@@ -40,37 +56,137 @@ export default function Projects() {
       className="relative w-full pt-6 pb-24 sm:pt-10 sm:pb-32"
     >
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* 見出しの計器 */}
-        <div className="instrument-panel max-w-2xl p-5 sm:p-6">
-          <p className="instrument-label enter-rise mb-4 flex items-center justify-between gap-3">
-            <span>
-              <span aria-hidden="true">[{sectionPageLabel("projects")}] </span>
-              ~/projects
-            </span>
-            <span aria-hidden="true" className="tabular-nums text-zinc-400">
-              {String(projectsData.length).padStart(2, "0")}{" "}
-              {ja ? "件" : "items"}
-            </span>
-          </p>
-          <h2 className="enter-rise mb-4 font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
-            Projects
-          </h2>
-          <p className="text-[15px] leading-relaxed text-zinc-100">
-            {copy.projects.introLine1}
-            <br className="hidden sm:block" />
-            {copy.projects.introLine2}
-          </p>
-          <p className="mt-5 border-t border-white/10 pt-4 text-[13px] leading-relaxed text-zinc-300">
-            {ja
-              ? "下のカードか、文字だけの一覧から開けます。"
-              : "Open any project from the cards or the text-only index."}{" "}
-            <a
-              href="#projects-index"
-              className="font-semibold text-fuchsia-200 underline decoration-fuchsia-300/60 underline-offset-4 hover:text-white"
+        {/* 見出しの計器と、駐機機体を見せる窓（PC は横並び、スマホは縦） */}
+        <div className="grid gap-4 lg:grid-cols-12 lg:gap-6">
+          <div className="instrument-panel self-start p-5 sm:p-6 lg:col-span-5">
+            <p className="instrument-label enter-rise mb-4 flex items-center justify-between gap-3">
+              <span>
+                <span aria-hidden="true">
+                  [{sectionPageLabel("projects")}]{" "}
+                </span>
+                ~/projects
+              </span>
+              <span aria-hidden="true" className="tabular-nums text-zinc-400">
+                {String(projectsData.length).padStart(2, "0")}{" "}
+                {ja ? "件" : "items"}
+              </span>
+            </p>
+            <h2 className="enter-rise mb-4 font-sans text-4xl font-black tracking-[-0.04em] text-white [--i:1] sm:text-5xl">
+              Projects
+            </h2>
+            <p className="text-[15px] leading-relaxed text-zinc-100">
+              {copy.projects.introLine1}
+              <br className="hidden sm:block" />
+              {copy.projects.introLine2}
+            </p>
+            <p className="mt-5 border-t border-white/10 pt-4 text-[13px] leading-relaxed text-zinc-300">
+              {ja
+                ? "下のカード、格納庫の看板、文字だけの一覧のどれからでも開けます。"
+                : "Open any project from the cards, the hangar signs, or the text-only index."}{" "}
+              <a
+                href="#projects-index"
+                className="font-semibold text-fuchsia-200 underline decoration-fuchsia-300/60 underline-offset-4 hover:text-white"
+              >
+                {ja ? "作品一覧（テキスト）へ" : "Text index"}
+              </a>
+            </p>
+          </div>
+          {/* 駐機窓：この枠の中に 3D の駐機機体と看板が収まる（PlanetInterior がカメラを合わせる） */}
+          <div
+            data-hangar-bay
+            className="hangar-bay relative h-[36vh] min-h-[220px] lg:col-span-7 lg:h-[min(52vh,460px)]"
+          >
+            <span
+              aria-hidden="true"
+              className="hangar-bay__corner hangar-bay__corner--tl"
+            />
+            <span
+              aria-hidden="true"
+              className="hangar-bay__corner hangar-bay__corner--tr"
+            />
+            <span
+              aria-hidden="true"
+              className="hangar-bay__corner hangar-bay__corner--bl"
+            />
+            <span
+              aria-hidden="true"
+              className="hangar-bay__corner hangar-bay__corner--br"
+            />
+            {/* 駐機の段階。どれが点くかは CSS が決める（3D の準備完了は <html data-planet-scene>、
+                看板に乗っている間は駐機窓の data-inspect）。読み上げには出さない */}
+            <ol
+              aria-hidden="true"
+              className="hangar-stage instrument-tag absolute top-2 left-3"
             >
-              {ja ? "作品一覧（テキスト）へ" : "Text index"}
-            </a>
-          </p>
+              <li className="hangar-stage__pad">PAD-01</li>
+              <li data-stage="approach">{ja ? "接近" : "approach"}</li>
+              <li data-stage="docked">{ja ? "駐機" : "docked"}</li>
+              <li data-stage="inspect">{ja ? "点検" : "inspect"}</li>
+            </ol>
+            {/* 看板ごとの点検の札（キーボードと読み上げの入口）。押すと看板のクリックと同じく
+                HANGAR_EXHIBIT_EVENT を流し、上の handleNavigation（宇宙船の fly-between）で開く。
+                フォーカス中は駐機窓に data-inspect を付け、段階ラベルを「点検」にする */}
+            <ul
+              aria-label={ja ? "格納庫の看板" : "Hangar signs"}
+              className="hangar-signs"
+              onFocus={(e) => {
+                const bay =
+                  e.currentTarget.closest<HTMLElement>("[data-hangar-bay]");
+                if (bay) bay.dataset.inspect = "";
+              }}
+              onBlur={(e) => {
+                const bay =
+                  e.currentTarget.closest<HTMLElement>("[data-hangar-bay]");
+                const next = e.relatedTarget as Node | null;
+                if (bay && !(next && bay.contains(next))) {
+                  delete bay.dataset.inspect;
+                }
+              }}
+            >
+              {projectsData.map((raw, index) => {
+                const project = getLocalizedProject(raw, locale);
+                return (
+                  <li key={project.slug}>
+                    <button
+                      type="button"
+                      data-hangar-sign={project.slug}
+                      aria-label={
+                        ja
+                          ? `${project.title}の看板を点検して開く`
+                          : `Inspect and open ${project.title}`
+                      }
+                      onPointerEnter={() => {
+                        preloadShaderTransition();
+                        router.prefetch(`/projects/${project.slug}`);
+                      }}
+                      onFocus={() => {
+                        preloadShaderTransition();
+                        router.prefetch(`/projects/${project.slug}`);
+                      }}
+                      onClick={(e) => {
+                        // 3D の看板のクリック判定（document の click）には渡さない
+                        e.preventDefault();
+                        window.dispatchEvent(
+                          new CustomEvent<HangarExhibitDetail>(
+                            HANGAR_EXHIBIT_EVENT,
+                            { detail: { slug: project.slug } },
+                          ),
+                        );
+                      }}
+                      className="hangar-sign"
+                    >
+                      <span aria-hidden="true" className="hangar-sign__no">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span aria-hidden="true" className="hangar-sign__name">
+                        {project.title}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
         <div className="mt-10 mb-6 flex items-baseline justify-between gap-4 sm:mt-14">

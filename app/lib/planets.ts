@@ -1,4 +1,4 @@
-import type { HomeSection } from "./homeSections";
+import { isHomeSection, type HomeSection } from "./homeSections";
 
 export type Rgb = readonly [number, number, number];
 
@@ -121,14 +121,40 @@ export function isHomePath(pathname: string): boolean {
   return pathname === "/" || pathname === "";
 }
 
+/** Home セクションは宇宙。Projects / About / Contact はそれぞれの惑星。 */
+export function planetForHomeSection(
+  section: HomeSection | string | null,
+): PlanetTheme | null {
+  if (!section || section === "home") return null;
+  if (section === "projects" || section === "about" || section === "contact") {
+    return SECTION_PLANETS[section];
+  }
+  return null;
+}
+
 /**
- * 今見えている面の惑星。惑星の地表があるのは作品詳細（/projects/*）だけで、
- * Projects 惑星の中に降りた扱い。トップの各セクション（Home / Projects / About /
- * Contact）と 404 は、どれも惑星が回る宇宙（StarBackground）。
+ * 今見えている面の惑星。
+ * /projects/* の詳細は Projects と同じ惑星（セクションが惑星、詳細はその中）。
  */
-export function planetForView(pathname: string): PlanetTheme | null {
+export function planetForView(
+  pathname: string,
+  homeSection: HomeSection | string | null = null,
+): PlanetTheme | null {
   if (pathname.startsWith("/projects/")) {
     return SECTION_PLANETS.projects;
+  }
+  if (isHomePath(pathname)) {
+    const section = isHomeSection(homeSection)
+      ? homeSection
+      : homeSection === "home"
+        ? "home"
+        : null;
+    return planetForHomeSection(section);
+  }
+  if (pathname === "/_not-found") return UNCHARTED;
+  // 未知のパス（404）も未踏の月
+  if (!isHomePath(pathname) && !pathname.startsWith("/api/")) {
+    return UNCHARTED;
   }
   return null;
 }
@@ -139,6 +165,16 @@ export function planetById(id: string | null | undefined): PlanetTheme {
   if (id === "about") return ABOUT;
   if (id === "contact") return CONTACT;
   return UNCHARTED;
+}
+
+export function warpJourneyForSections(
+  from: HomeSection,
+  to: HomeSection,
+): WarpJourney {
+  if (from === to) return "neutral";
+  if (from === "home") return "enter-planet";
+  if (to === "home") return "leave-space";
+  return "fly-between";
 }
 
 export function rgbCss(color: Rgb, alpha = 1): string {

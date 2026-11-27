@@ -12,9 +12,9 @@ export default function BackButton() {
   const handleBack = (e: React.MouseEvent) => {
     e.preventDefault();
     preloadShaderTransition();
-    // 詳細（Projects 惑星の地表）から、宇宙にある Projects セクションへ上がる。
+    // 詳細から Projects セクションへ。同じ惑星の中に留まる。
     void beginLeaveTransition({
-      journey: "leave-space",
+      journey: "fly-between",
       planetId: "projects",
       fromPlanetId: "projects",
     }).then((navigateDelayMs) => {
