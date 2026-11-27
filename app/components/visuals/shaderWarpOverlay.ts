@@ -165,7 +165,7 @@ function smoothstep(e0: number, e1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-/** WebGL が使えない場合は null（呼び出し側はハンガー扉に戻す） */
+/** WebGL が使えない場合は null（呼び出し側は覆わずに切り替える） */
 export function createShaderWarpOverlay(
   host: HTMLElement,
   onContextLost: () => void,

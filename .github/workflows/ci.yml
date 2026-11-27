@@ -33,3 +33,12 @@ jobs:
 
       # next build の型検査は TS 6（typescript エイリアス）を使うため、TS 7 の tsc はここで実行する
       - run: npm run typecheck
+
+      # WebGL が無効でもページが落ちないことを、ビルドした実物のブラウザで確かめる
+      - run: npx playwright install --with-deps chromium
+
+      - name: Test without WebGL
+        run: |
+          npm start &
+          timeout 60 bash -c 'until curl -sf http://localhost:3000 >/dev/null; do sleep 1; done'
+          npm run test:no-webgl

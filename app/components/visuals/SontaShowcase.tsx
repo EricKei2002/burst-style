@@ -3,15 +3,14 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
-  Component,
   useCallback,
   useEffect,
   useRef,
   useState,
   type KeyboardEvent,
   type PointerEvent,
-  type ReactNode,
 } from "react";
+import CanvasBoundary from "./CanvasBoundary";
 import { prefersReducedMotion } from "../../lib/pageTransitionTiming";
 import type { SontaShowcaseApi } from "./SontaShowcaseCanvas";
 
@@ -32,23 +31,6 @@ type Props = {
 };
 
 type State = "idle" | "loading" | "ready" | "fallback";
-
-/** Canvas の生成（WebGL コンテキスト）などで例外が出たら、画像に戻す */
-class CanvasBoundary extends Component<
-  { onError(): void; children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  componentDidCatch() {
-    this.props.onError();
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
 
 function hasWebGL(): boolean {
   try {
