@@ -1,7 +1,5 @@
 import { create } from "zustand";
 import {
-  SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS,
-  SHADER_FLY_OPEN_TO_IDLE_MS,
   SHADER_NAVIGATE_AFTER_CLOSE_MS,
   SHADER_OPEN_PAUSE_MS,
   SHADER_OPEN_TO_IDLE_MS,
@@ -10,7 +8,6 @@ import {
   prefersReducedMotion,
   type PageTransitionOverlay,
 } from "./pageTransitionTiming";
-import type { WarpJourney } from "./planets";
 
 type TransitionPhase = "idle" | "closing" | "closed" | "opening";
 
@@ -23,15 +20,6 @@ interface TransitionState {
   /** 現在（直近）の遷移で画面を覆う演出。closing 開始時に決める */
   overlay: PageTransitionOverlay;
   setOverlay: (overlay: PageTransitionOverlay) => void;
-  /** ホーム↔惑星の突入 / 離脱 / 惑星間の飛び移り。closing 開始時に決める */
-  warpJourney: WarpJourney;
-  warpPlanetId: string | null;
-  warpFromPlanetId: string | null;
-  setWarpContext: (
-    journey: WarpJourney,
-    planetId: string | null,
-    fromPlanetId?: string | null,
-  ) => void;
 }
 
 export const useTransitionStore = create<TransitionState>((set) => ({
@@ -39,13 +27,8 @@ export const useTransitionStore = create<TransitionState>((set) => ({
   setPhase: (phase) => set({ phase }),
   shaderReady: false,
   setShaderReady: (shaderReady) => set({ shaderReady }),
-  overlay: "hangar",
+  overlay: "none",
   setOverlay: (overlay) => set({ overlay }),
-  warpJourney: "neutral",
-  warpPlanetId: null,
-  warpFromPlanetId: null,
-  setWarpContext: (warpJourney, warpPlanetId, warpFromPlanetId = null) =>
-    set({ warpJourney, warpPlanetId, warpFromPlanetId }),
 }));
 
 /** クリック時点で未準備なら、この時間まで読み込み完了を待つ */
@@ -77,24 +60,14 @@ export function waitForShaderReady(
 
 /**
  * ページ離脱の演出を開始し、router.push までの待機（ms）を返す。
- * シェーダーがまだなら短い時間だけ待ち、使えなければ従来どおりハンガー扉。
+ * シェーダーがまだなら短い時間だけ待ち、使えなければ覆わずに切り替える。
  */
-export async function beginLeaveTransition(opts?: {
-  journey?: WarpJourney;
-  planetId?: string | null;
-  fromPlanetId?: string | null;
-}): Promise<number> {
+export async function beginLeaveTransition(): Promise<number> {
   let { shaderReady } = useTransitionStore.getState();
   if (!shaderReady && !prefersReducedMotion()) {
     shaderReady = await waitForShaderReady(SHADER_READY_WAIT_MS);
   }
-  const { setOverlay, setPhase, setWarpContext } =
-    useTransitionStore.getState();
-  setWarpContext(
-    opts?.journey ?? "neutral",
-    opts?.planetId ?? null,
-    opts?.fromPlanetId ?? null,
-  );
+  const { setOverlay, setPhase } = useTransitionStore.getState();
   const overlay = pickPageTransitionOverlay({
     shaderReady,
     reducedMotion: prefersReducedMotion(),
@@ -105,31 +78,16 @@ export async function beginLeaveTransition(opts?: {
 }
 
 /** ホーム内セクション切り替え用。shaderReady 前提。履歴は遅らせない。 */
-export function startSectionWarp(opts: {
-  journey: WarpJourney;
-  planetId: string | null;
-  fromPlanetId?: string | null;
-}): number {
-  const { setOverlay, setPhase, setWarpContext } =
-    useTransitionStore.getState();
-  setWarpContext(opts.journey, opts.planetId, opts.fromPlanetId ?? null);
+export function startSectionWarp(): number {
+  const { setOverlay, setPhase } = useTransitionStore.getState();
   setOverlay("shader");
   setPhase("closing");
-  return opts.journey === "fly-between"
-    ? SHADER_FLY_NAVIGATE_AFTER_CLOSE_MS
-    : SHADER_NAVIGATE_AFTER_CLOSE_MS;
+  return SHADER_NAVIGATE_AFTER_CLOSE_MS;
 }
 
 /** セクションを差し替えたあと、覆いから開いて idle に戻す。 */
-export function scheduleSectionWarpOpen(journey: WarpJourney): {
-  openAt: number;
-  idleAt: number;
-} {
-  const openToIdle =
-    journey === "fly-between"
-      ? SHADER_FLY_OPEN_TO_IDLE_MS
-      : SHADER_OPEN_TO_IDLE_MS;
-  return { openAt: SHADER_OPEN_PAUSE_MS, idleAt: openToIdle };
+export function scheduleSectionWarpOpen(): { openAt: number; idleAt: number } {
+  return { openAt: SHADER_OPEN_PAUSE_MS, idleAt: SHADER_OPEN_TO_IDLE_MS };
 }
 
 export function beginSectionWarpOpen(): void {

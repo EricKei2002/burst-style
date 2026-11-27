@@ -8,9 +8,6 @@ export type PlanetTerrain =
 export type PlanetParticles =
   "embers" | "mist" | "shards" | "aurora" | "sparks" | "ash";
 
-export type WarpJourney =
-  "enter-planet" | "leave-space" | "fly-between" | "neutral";
-
 export type PlanetTheme = {
   id: string;
   section: HomeSection | null;
@@ -154,24 +151,9 @@ export function planetById(id: string | null | undefined): PlanetTheme {
   return UNCHARTED;
 }
 
-export function warpJourneyForSections(
-  from: HomeSection,
-  to: HomeSection,
-): WarpJourney {
-  if (from === to) return "neutral";
-  if (from === "home") return "enter-planet";
-  if (to === "home") return "leave-space";
-  return "fly-between";
-}
-
 export function rgbCss(color: Rgb, alpha = 1): string {
   if (alpha >= 1) {
     return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   }
   return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-}
-
-/** シェーダー向け 0–1 */
-export function rgbVec(color: Rgb): [number, number, number] {
-  return [color[0] / 255, color[1] / 255, color[2] / 255];
 }

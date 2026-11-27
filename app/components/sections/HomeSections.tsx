@@ -22,10 +22,6 @@ import {
   swipeDirection,
   type HomeSection,
 } from "../../lib/homeSections";
-import {
-  planetForHomeSection,
-  warpJourneyForSections,
-} from "../../lib/planets";
 import { preloadShaderTransition } from "../../lib/shaderTransitionLoader";
 import {
   beginSectionWarpOpen,
@@ -153,7 +149,7 @@ export default function HomeSections(props: Props) {
   const warpInFlight = useRef(false);
   const warpSwapped = useRef(false);
   const localeRef = useRef(locale);
-  /** 宇宙船の準備待ち中に次の操作が来たら、古い要求は捨てる */
+  /** ワープの準備待ち中に次の操作が来たら、古い要求は捨てる */
   const navToken = useRef(0);
 
   useEffect(() => {
@@ -195,7 +191,6 @@ export default function HomeSections(props: Props) {
         if (focus) focusHeading(next);
         return;
       }
-      const from = displayedRef.current;
       targetRef.current = next;
       window.clearTimeout(leaveTimer.current);
 
@@ -237,41 +232,23 @@ export default function HomeSections(props: Props) {
         !prefersReducedMotion() &&
         useTransitionStore.getState().shaderReady;
 
-      const warpOpts = (origin: HomeSection, dest: HomeSection) => {
-        const journey = warpJourneyForSections(origin, dest);
-        const destPlanet = planetForHomeSection(dest);
-        const fromPlanet = planetForHomeSection(origin);
-        return {
-          journey,
-          planetId: destPlanet?.id ?? fromPlanet?.id ?? null,
-          fromPlanetId: fromPlanet?.id ?? null,
-        };
-      };
-
       if (useShader) {
         preloadShaderTransition();
-        if (warpInFlight.current && !warpSwapped.current) {
-          const opts = warpOpts(from, next);
-          useTransitionStore
-            .getState()
-            .setWarpContext(opts.journey, opts.planetId, opts.fromPlanetId);
-          return;
-        }
+        // 覆い切る前の連打は、進行中のワープがそのまま最後の行き先へ差し替える
+        if (warpInFlight.current && !warpSwapped.current) return;
         if (warpInFlight.current && warpSwapped.current) {
           clearWarpTimers();
           endSectionWarp();
           warpInFlight.current = false;
         }
-        const opts = warpOpts(from, next);
-        const delay = startSectionWarp(opts);
-        const journey = opts.journey;
+        const delay = startSectionWarp();
         warpInFlight.current = true;
         warpSwapped.current = false;
         warpCloseTimer.current = window.setTimeout(() => {
           swap();
           warpSwapped.current = true;
           useTransitionStore.getState().setPhase("closed");
-          const { openAt, idleAt } = scheduleSectionWarpOpen(journey);
+          const { openAt, idleAt } = scheduleSectionWarpOpen();
           warpOpenTimer.current = window.setTimeout(() => {
             beginSectionWarpOpen();
             warpIdleTimer.current = window.setTimeout(() => {
@@ -300,7 +277,7 @@ export default function HomeSections(props: Props) {
 
   /**
    * URL を書き換えてから切り替える（ヘッダー・下部タブ・キー・スワイプ共通）。
-   * 宇宙船の準備がまだなら、ページ遷移と同じく最大 1 秒待ってから宇宙船か短いフェードかを決める。
+   * ワープの準備がまだなら、ページ遷移と同じく最大 1 秒待ってからワープか短いフェードかを決める。
    */
   const navigate = useCallback(
     (section: HomeSection, focus: boolean, anchor: string | null = null) => {
@@ -323,7 +300,7 @@ export default function HomeSections(props: Props) {
         go();
         return;
       }
-      preloadShaderTransition(true);
+      preloadShaderTransition();
       void waitForShaderReady().then(go);
     },
     [show],

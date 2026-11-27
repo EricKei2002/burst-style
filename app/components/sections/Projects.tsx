@@ -24,12 +24,7 @@ export default function Projects() {
 
   const handleNavigation = (url: string) => {
     preloadShaderTransition();
-    // 詳細も Projects の惑星の中。突入ではなく、同じ大気の中を進む。
-    void beginLeaveTransition({
-      journey: "fly-between",
-      planetId: "projects",
-      fromPlanetId: "projects",
-    }).then((navigateDelayMs) => {
+    void beginLeaveTransition().then((navigateDelayMs) => {
       setTimeout(() => {
         setPhase("closed");
         router.push(url);
@@ -124,7 +119,7 @@ export default function Projects() {
               <li data-stage="inspect">{ja ? "点検" : "inspect"}</li>
             </ol>
             {/* 看板ごとの点検の札（キーボードと読み上げの入口）。押すと看板のクリックと同じく
-                HANGAR_EXHIBIT_EVENT を流し、上の handleNavigation（宇宙船の fly-between）で開く。
+                HANGAR_EXHIBIT_EVENT を流し、上の handleNavigation（ワープ）で開く。
                 フォーカス中は駐機窓に data-inspect を付け、段階ラベルを「点検」にする */}
             <ul
               aria-label={ja ? "格納庫の看板" : "Hangar signs"}

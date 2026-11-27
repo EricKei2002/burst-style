@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import SmoothScroll from "./components/SmoothScroll";
-import HangarDoorTransition from "./components/visuals/HangarDoorTransition";
-// three / 宇宙船演出は ShaderPageTransition 内で動的 import（初期 JS に含めない）
+// three / ワープは ShaderPageTransition 内で動的 import（初期 JS に含めない）
 import ShaderPageTransition from "./components/visuals/ShaderPageTransition";
 // StarBackground・MouseTrailはクライアントラッパー内でdynamic（ssr:false）取り込み
 import ClientVisuals from "./components/visuals/ClientVisuals";
@@ -102,7 +101,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-[#0a0a0a] text-zinc-100 antialiased font-mono">
         <ClientVisuals />
-        <HangarDoorTransition />
         <ShaderPageTransition />
         <SmoothScroll>
           <LocaleProvider>
