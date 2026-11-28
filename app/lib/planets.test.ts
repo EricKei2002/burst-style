@@ -13,6 +13,16 @@ function assert(cond: unknown, msg: string) {
 assert(isHomePath("/"), "home /");
 assert(!isHomePath("/projects/drill"), "project is not home");
 
+// Vercel の ISR 再生成では、サーバー側の usePathname() がトップを "/index" と返す。
+// ブラウザ側の "/" と判定が分かれると水和エラー（React #418）になる
+assert(isHomePath("/index"), "home /index (Vercel ISR)");
+for (const section of ["home", "projects", "about", "contact"] as const) {
+  assert(
+    planetForView("/index", section) === planetForView("/", section),
+    `/index and / show the same view: ${section}`,
+  );
+}
+
 assert(planetForHomeSection("home") === null, "home section is space");
 assert(planetForHomeSection("projects")?.id === "projects", "projects planet");
 assert(planetForHomeSection("about")?.id === "about", "about planet");
