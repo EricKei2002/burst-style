@@ -19,6 +19,7 @@
     "test:site-copy": "npx --yes tsx app/lib/siteCopy.test.ts",
     "test:transition-store": "npx --yes tsx app/lib/transitionStore.test.ts",
     "test:no-webgl": "node scripts/test-no-webgl.mjs",
+    "test:hero-intro": "node scripts/test-hero-intro.mjs",
     "test:sonta": "npx --yes tsx app/lib/sontaMotion.test.ts",
     "test": "npm run test:contact && npm run test:page-transition && npm run test:solar && npm run test:local-sky && npm run test:planets && npm run test:home-sections && npm run test:sonta && npm run test:site-copy && npm run test:transition-store",
     "typecheck": "next typegen && tsc --noEmit"
