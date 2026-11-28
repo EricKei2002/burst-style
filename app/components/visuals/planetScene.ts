@@ -872,13 +872,6 @@ type BuiltScene = {
   camera: PerspectiveCamera;
 };
 
-export function createPlanetScene(
-  host: HTMLElement,
-  opts: SceneOpts,
-): PlanetSceneHandle | null {
-  return drain(planetSceneSteps(host, opts))?.handle ?? null;
-}
-
 /**
  * 分割版。組み立てを数 ms ごとに区切り、テーマを当てたあと
  * compileAsync（KHR_parallel_shader_compile）でシェーダーを並列にコンパイルする。

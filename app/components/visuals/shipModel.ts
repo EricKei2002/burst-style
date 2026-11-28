@@ -32,7 +32,6 @@ import {
   type Texture,
 } from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { drain } from "./frameSlicer";
 import { mulberry32, valueNoise } from "./proceduralNoise";
 
 /**
@@ -386,18 +385,7 @@ function bellProfile(
  * 窓が灯る居住リング（スポーク付き）→ 推進剤タンク群と放熱板 →
  * 大きなエンジン・クラスター（中央 1 基＋周囲 6 基、低品質は 4 基）。
  * 背骨の上に高利得のパラボラ、指令モジュールにホイップアンテナと小型ディッシュ。
- */
-export function createShipModel(
-  quality: ShipQuality,
-  rim: { value: Color },
-  softDot: Texture,
-  disposables: Disposable[],
-): ShipModel {
-  return drain(shipModelSteps(quality, rim, softDot, disposables));
-}
-
-/**
- * createShipModel の分割版。テクスチャは数行ごと、組み立ては部位ごとに yield する
+ * テクスチャは数行ごと、組み立ては部位ごとに yield する
  * （FrameSlicer.run に渡すと 1 タスク数 ms に収まる）。
  */
 export function* shipModelSteps(
