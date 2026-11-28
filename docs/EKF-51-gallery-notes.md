@@ -126,6 +126,7 @@ Web フォントは追加していない。
 
 - **スマホのスキップリンク**: トップ（`:root[data-home-section]` かつ 639px 以下）では、常時表示のスキップがタブ直上に浮いてスクロール中の本文（作品索引・Contact のラベル）に重なっていた。DOM 先頭の `.skip-to-work` は最初の Tab のまま、`:not(:focus)` の間は clip / clip-path の定番の隠し方で見た目だけ消し（`display:none` / `visibility:hidden` は使わない）、フォーカスされたらタブの直上に出す。640px 以上とトップ以外（作品詳細・404）は従来どおり上端に吊るして常に見える
 - **常設の /Index**: タッチでも「作品一覧へスキップ」がいつでも使えるよう、下部タブ（と sm 以上のヘッダーメニュー）に `/#projects-index` への素の `<a>` を足した（ラベルは `siteCopy.header.indexLink`、英語 `/Index`・日本語 `/一覧`）。並びは Home / Projects / Index / About / Contact、タブは `grid-cols-5`。`aria-current` は付けず、現在地の目盛りはセクションの /Projects に残す（`.nav-tick` のロジックは変更なし）。5 区画で折れないよう、タブ内のリンクはモバイルだけ 10px・字間なし・`whitespace-nowrap`・左右余白 2px にした（sm 以上は従来の text-sm / tracking-wide）。数字キー 1〜4 はセクションだけで、Index には割り当てない
+  - 2026-11-28 追記：オーナー決定でこの常設リンクは削除した。ナビはセクションと一対一の 4 項目（Home / Projects / About / Contact、タブは `grid-cols-4`）。`#projects-index` のセクションと「作品一覧へスキップ」は残る
 - **下余白を戻した**: スキップが常時は出なくなったので、トップは `pb-[calc(3.5rem+env(safe-area-inset-bottom))] sm:pb-0`、作品詳細はタブが無いので `pb-16`
 - **アンカー保持**: `scrollToAnchor` は、`ResizeObserver` が送り直すたびに 2 秒の静止タイマーを振り直し、最後の高さ変化から 2 秒静かになったら止める。開始から 8 秒で必ず切る。ユーザー操作（wheel / touchstart / keydown / pointerdown）で即停止は維持。新しいアンカーへ送るときは前の保持を止める。余白は従来どおり html の `scroll-padding-top`
 - 下部タブの背景を完全な不透明（`rgb(7 7 11)`）にした。半透明だと作品索引の文字が透けていた
