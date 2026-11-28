@@ -32,9 +32,13 @@ function testDelays() {
   // 覆い切ってから router.push する
   assert.ok(SHADER_NAVIGATE_AFTER_CLOSE_MS >= SHADER_WARP_CLOSE_MS);
   assert.ok(SHADER_OPEN_TO_IDLE_MS >= SHADER_WARP_OPEN_MS);
-  assert.ok(SHADER_WARP_CLOSE_MS >= 1200 && SHADER_WARP_CLOSE_MS <= 1500);
-  assert.ok(SHADER_OPEN_PAUSE_MS >= 200 && SHADER_OPEN_PAUSE_MS <= 400);
-  assert.ok(SHADER_WARP_OPEN_MS >= 1000 && SHADER_WARP_OPEN_MS <= 1500);
+  assert.ok(SHADER_WARP_CLOSE_MS >= 900 && SHADER_WARP_CLOSE_MS <= 1100);
+  assert.ok(SHADER_OPEN_PAUSE_MS >= 150 && SHADER_OPEN_PAUSE_MS <= 300);
+  assert.ok(SHADER_WARP_OPEN_MS >= 750 && SHADER_WARP_OPEN_MS <= 1000);
+  // 覆う → 切り替え → 抜ける の合計（ルート読み込みを除く）
+  const total =
+    SHADER_NAVIGATE_AFTER_CLOSE_MS + SHADER_OPEN_PAUSE_MS + SHADER_WARP_OPEN_MS;
+  assert.ok(total >= 2000 && total <= 2300);
 }
 
 testOverlayChoice();
