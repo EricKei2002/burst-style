@@ -280,7 +280,7 @@ export function createShaderWarpOverlay(
       // 覆ったまま巡航（経路切り替えを隠す）。最高潮の残光を少し長めに残す
       warp = 0.95;
       cover = 1;
-      flash = 0.55 * Math.exp(-(now - coveredAt) / 280);
+      flash = 0.55 * Math.exp(-(now - coveredAt) / 200);
     } else if (mode === "opening") {
       warp = 0.95 * (1 - t) * (1 - t);
       cover = 1 - smoothstep(0.06, 0.82, t);

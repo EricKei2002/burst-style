@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import {
   HOME_SECTIONS,
@@ -35,7 +35,7 @@ export default function Header({
   const index = HOME_SECTIONS.indexOf(active);
 
   // 現在地は塗りではなく、下の目盛り（.nav-tick）が滑って示す。文字は白く太くするだけ。
-  // スマホの下部タブは 5 区画（320px で約 58px 幅）。12px で読めるよう、スマホだけ短いラベル
+  // スマホの下部タブは 4 区画（320px で約 73px 幅）。12px で読めるよう、スマホだけ短いラベル
   // （copy.header.tabShort: /Work・/Mail など）を出し、PC は元のラベルのまま。読み上げ名は見えている文字から取り、
   // 短いラベルが違う語になるタブ（/Work・/Mail）だけ copy.header.tabName（「Work (Projects)」など）を aria-label にする
   const linkClass =
@@ -188,50 +188,32 @@ export default function Header({
             <ul
               ref={listRef}
               data-sonta-avoid=""
-              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-5 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
+              className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(3.5rem+env(safe-area-inset-bottom))] grid-cols-4 gap-1 border-t border-green-300/30 bg-[rgb(7_7_11)] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] sm:relative sm:z-auto sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:items-center sm:gap-x-4 sm:border-0 lg:gap-x-6 sm:bg-transparent sm:p-0"
             >
               {enhanced && (
                 // 現在地の目盛り。スマホは下部タブの上辺、PC はリンクの下を滑る
                 <li ref={tickRef} aria-hidden="true" className="nav-tick" />
               )}
               {HOME_SECTIONS.map((section, i) => (
-                <Fragment key={section}>
-                  <li className="h-full sm:h-auto">
-                    <a
-                      href={SECTION_HREF[section]}
-                      aria-current={
-                        // JS 無し（縦に並ぶ表示）では現在地が決まらないので付けない
-                        enhanced && active === section ? "page" : undefined
-                      }
-                      aria-keyshortcuts={enhanced ? String(i + 1) : undefined}
-                      aria-label={copy.header.tabName[section]}
-                      className={linkClass}
-                    >
-                      <span className="sm:hidden">
-                        {copy.header.tabShort[section]}
-                      </span>
-                      <span className="hidden sm:inline">
-                        /{HOME_SECTION_LABELS[section]}
-                      </span>
-                    </a>
-                  </li>
-                  {section === "projects" && (
-                    // 作品一覧への常設リンク（タッチでもいつでも届く「作品一覧へスキップ」）。
-                    // SkipToWork と同じく素の <a>：HomeSections のハッシュ処理と JS 無しのアンカーを通す。
-                    // 現在地の目盛りはセクションの /Projects に残すので aria-current は付けない
-                    <li className="h-full sm:h-auto">
-                      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                      <a href="/#projects-index" className={linkClass}>
-                        <span className="sm:hidden">
-                          {copy.header.tabShort.index}
-                        </span>
-                        <span className="hidden sm:inline">
-                          {copy.header.indexLink}
-                        </span>
-                      </a>
-                    </li>
-                  )}
-                </Fragment>
+                <li key={section} className="h-full sm:h-auto">
+                  <a
+                    href={SECTION_HREF[section]}
+                    aria-current={
+                      // JS 無し（縦に並ぶ表示）では現在地が決まらないので付けない
+                      enhanced && active === section ? "page" : undefined
+                    }
+                    aria-keyshortcuts={enhanced ? String(i + 1) : undefined}
+                    aria-label={copy.header.tabName[section]}
+                    className={linkClass}
+                  >
+                    <span className="sm:hidden">
+                      {copy.header.tabShort[section]}
+                    </span>
+                    <span className="hidden sm:inline">
+                      /{HOME_SECTION_LABELS[section]}
+                    </span>
+                  </a>
+                </li>
               ))}
             </ul>
             {enhanced && (

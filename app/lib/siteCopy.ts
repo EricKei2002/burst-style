@@ -13,16 +13,13 @@ export function buildSiteCopy(locale: Locale) {
       }),
       langEn: pick(locale, { en: "EN", ja: "EN" }),
       langJa: pick(locale, { en: "JA", ja: "JA" }),
-      /** 下部タブ・ヘッダーメニューに常設する作品一覧（#projects-index）へのリンク */
-      indexLink: pick(locale, { en: "/Index", ja: "/一覧" }),
       /**
-       * スマホの下部タブ（5 区画）だけで使う短いラベル。320px でも 12px で収まるように短くする。
-       * 表示が元の語と同じ（/Home・/Index・/About）なら aria-label は付けず、見えている文字を読ませる
+       * スマホの下部タブ（4 区画）だけで使う短いラベル。320px でも 12px で収まるように短くする。
+       * 表示が元の語と同じ（/Home・/About）なら aria-label は付けず、見えている文字を読ませる
        */
       tabShort: {
         home: "/Home",
         projects: "/Work",
-        index: pick(locale, { en: "/Index", ja: "/一覧" }),
         about: "/About",
         contact: "/Mail",
       },

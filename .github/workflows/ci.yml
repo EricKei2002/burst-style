@@ -37,8 +37,9 @@ jobs:
       # WebGL が無効でもページが落ちないことを、ビルドした実物のブラウザで確かめる
       - run: npx playwright install --with-deps chromium
 
-      - name: Test without WebGL
+      - name: Browser tests (no WebGL, hero intro)
         run: |
           npm start &
           timeout 60 bash -c 'until curl -sf http://localhost:3000 >/dev/null; do sleep 1; done'
           npm run test:no-webgl
+          npm run test:hero-intro
