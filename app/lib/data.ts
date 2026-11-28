@@ -20,9 +20,9 @@ export const projectsData: Project[] = [
     slug: "drill",
     title: "Drill",
     description:
-      "毎日10問で定着させる学習ドリルPWA。AWS SAA・WordPress・セキュリティの3分野に対応し、Googleログイン＋Supabaseで進捗を端末間同期。",
+      "毎日10問の学習ドリルPWA。AWS SAA・WordPress・セキュリティに対応し、進捗は端末間で同期。",
     detailedDescription:
-      "「毎日10問」形式の学習PWAです。問題・用語・出題ドメインの配点比率を分野ごとに切り替えられる『学習パック』方式で設計されており、AWS Certified Solutions Architect（Associate）・WordPress運用/開発・セキュリティの3パックに対応、今後も分野を追加できます。各パックの配点比率に沿って出題ドメインを配分し、「未見→誤答→似た論点→古い」の優先順位で決定論的に10問を選出します。解答直後にその場で解説と「持ち帰る一文」を表示し、間違えた論点は弱点データとして記録して弱点ドリル（練習専用画面）で優先的に再出題する設計です（かつてあった復習タブは廃止し、弱点ドリルに導線を一本化）。Googleログイン（Supabase Auth）で連続学習日数・ドメイン別正答率・目標日カウントダウンをアカウントに紐づけて保存し、スマホと自宅PCなど複数端末で同じ記録を引き継げます。学習タブでは略称をタップすると正式名称と意味がその場で開くグロッサリー機能も搭載。ユーザーが自分のGemini APIキーを設定すると弱点分野の問題をその場でAI生成でき（AWSパックでは公式最新情報のWhat's New RSS、セキュリティパックではJVN・IPA・JPCERT/CCなどの脆弱性情報RSSも加味）、Vercel Cronが毎朝事前生成もしておくため学習時の待ち時間がありません。夜21時にはWeb Push（VAPID）で日課の未消化をリマインドします。問題は公式試験問題の複製ではなく、各分野の公式ドキュメント等を根拠にしたオリジナル演習です。",
+      "AWS SAA・WordPress運用/開発・セキュリティを学べる「毎日10問」のPWA。分野は『学習パック』で追加でき、各パックの配点比率に沿って「未見→誤答→似た論点→古い」の順に10問を決定論的に選びます。解答直後に解説と「持ち帰る一文」を表示し、誤答は弱点ドリルで優先出題。GoogleログインすればSupabaseで連続日数や正答率を端末間同期し、略称はタップで意味を確認できます。自分のGemini APIキーで弱点問題をAI生成でき（公式RSSや脆弱性情報も加味）、Vercel Cronが毎朝事前生成、夜21時はWeb Pushでリマインド。問題は公式ドキュメント等に基づくオリジナルです。",
     image: "/projects/drill-logo.png",
     siteUrl: "https://drill.burst.style",
     githubUrl: "https://github.com/EricKei2002/saa-drill",
@@ -45,29 +45,28 @@ export const projectsData: Project[] = [
       {
         title: "「今日の10問」の決定論的な抽選",
         description:
-          "日付文字列をシードにしたハッシュ関数で疑似乱数を生成し、同じ日にアプリを開き直しても同じ10問が出るようにしました。出題は「未出題→誤答率が高い→似た論点→出題から日数が経っている」の優先順位で並べ替えてから抽選することで、弱点補強と新規学習のバランスを取っています。",
+          "日付をシードにした疑似乱数で、同じ日なら同じ10問に。未出題・誤答率・似た論点・経過日数で優先順位をつけ、弱点補強と新規学習を両立しました。",
       },
       {
         title: "未ログイン進捗とアカウントの引き継ぎ",
         description:
-          "ログイン前でもすぐ学習を始められるよう、Googleログイン直前まではsessionStorageに進捗を退避し、ログイン完了と同時にSupabase側のRPC（fetch_progress / push_progress）へマージする設計にしました。これにより「まず10問解いてから、気に入ったらログイン」という体験を崩さずに端末間同期を実現しています。",
+          "ログイン前の進捗はsessionStorageに退避し、Googleログイン後にSupabaseのRPC（fetch_progress / push_progress）へマージ。「先に解いて、気に入ったらログイン」を実現しました。",
       },
       {
         title: "学習パック方式による複数分野対応",
         description:
-          "問題・用語・出題ドメインの配点比率をAWS SAA固有の実装から切り離し、『学習パック（StudyPack）』として抽象化しました。抽選ロジックや弱点管理・AI生成エンジンは分野に依存しない共通コアとして実装し、WordPress運用/開発向けパックやセキュリティパックを追加した際も新しいパック定義を書くだけで済みました。",
+          "問題・用語・配点比率を『学習パック（StudyPack）』に分離。抽選・弱点管理・AI生成は共通コアなので、パック定義を書くだけで分野を追加できます。",
       },
     ],
     improvements: [
       {
         title: "学習パックのさらなる拡充",
-        description:
-          "現在はAWS SAA・WordPress・セキュリティの3パックですが、他の資格・技術分野の学習パックを追加し、対応領域を広げていきたいと考えています。",
+        description: "他の資格・技術分野のパックを追加したいと考えています。",
       },
       {
         title: "学習分析の強化",
         description:
-          "ドメイン別正答率に加えて、間違えた論点同士の関連性を可視化するダッシュボードを検討しています。",
+          "間違えた論点同士の関連を可視化するダッシュボードを検討中です。",
       },
     ],
     documentation: {
@@ -79,7 +78,7 @@ export const projectsData: Project[] = [
     title: "Sontaくん",
     description: "空気を読む、AI日程調整ツール",
     detailedDescription:
-      "「何も言わなくても、良きに計らっておきました」というAIの振る舞いを表現した、日本独特の文化「忖度（そんたく）」から生まれたAI日程調整エージェント。Google Geminiを活用して自然言語の「ふんわりした希望」から制約条件を読み取り、Googleカレンダーの空き状況と照らし合わせて最適な日時を提案します。",
+      "日本の「忖度」から生まれたAI日程調整エージェント。Google Geminiが「ふんわりした希望」から条件を読み取り、Googleカレンダーの空きと照合して最適な日時を提案します。",
     image: "/sontakun.jpg",
     siteUrl: "https://sontakun.burst.style/",
     githubUrl: "https://github.com/EricKei2002/Sontakun",
@@ -95,24 +94,22 @@ export const projectsData: Project[] = [
       {
         title: "自然言語からの曖昧な制約抽出",
         description:
-          "「来週の午後早め」といった曖昧な表現を、Google Gemini APIを用いて具体的な日時範囲（ISO文字列等）に変換する「忖度エンジン」を開発。プロンプトエンジニアリングにより、文脈を汲み取った精度の高い抽出を実現しました。",
+          "「来週の午後早め」をGemini APIで日時範囲（ISO文字列）に変換する「忖度エンジン」を開発しました。",
       },
       {
         title: "シームレスな外部連携",
         description:
-          "Google Calendar、Zoom、Resendといった複数の外部サービスをServer Actions内で統合。トークン管理やエラーハンドリングを徹底し、ユーザーが裏側の複雑さを感じることなく、ワンストップで調整が完了する体験を構築しました。",
+          "Google Calendar・Zoom・ResendをServer Actionsで統合し、トークン管理とエラー処理でワンストップの調整を実現しました。",
       },
     ],
     improvements: [
       {
         title: "「気遣い」ロジックの強化",
-        description:
-          "単なる空き枠ではなく、前後の移動時間や昼休み時間を考慮した「本当に嬉しい提案」ができるよう、アルゴリズムを改良予定です。",
+        description: "移動時間や昼休みも考慮した提案へ改良予定です。",
       },
       {
         title: "マルチモーダル・複数人対応",
-        description:
-          "複数人のカレンダー同期や、チャットボット形式以外でのインターフェース拡充を検討しています。",
+        description: "複数人のカレンダー同期や、チャット以外のUIを検討中です。",
       },
     ],
     documentation: {
@@ -123,9 +120,9 @@ export const projectsData: Project[] = [
     slug: "cutting-works",
     title: "Cutting Works",
     description:
-      "多彩なカッティングステッカー・デザインサイト制作。ユーザーが直感的にデザインを選べるUIと、制作実績のギャラリー機能を実装。",
+      "カッティングステッカーのデザインサイト。直感的に選べるUIと制作実績ギャラリーを実装。",
     detailedDescription:
-      "カッティングステッカーの制作・販売を行う「Cutting Works」の公式ウェブサイトです。ユーザーが豊富なデザインカタログから直感的に好みのステッカーを選べるよう、視覚的に優れたギャラリーUIを構築しました。制作実績はNext.jsのビルド時に読み込む静的なTypeScriptデータ（app/data/works.ts）として管理し、画像はnext/imageで最適化配信することで、CMSを介さずシンプルかつ高速な構成にしています。お問い合わせはmailtoリンク経由です。",
+      "カッティングステッカー制作・販売「Cutting Works」の公式サイト。直感的に選べるギャラリーUIを構築しました。実績は静的TypeScriptデータ（app/data/works.ts）で管理し、画像はnext/imageで最適化。CMSなしの高速な構成で、お問い合わせはmailtoです。",
     image: "/projects/bg cwb.jpeg",
     siteUrl: "https://cuttingworks.burst.style",
     githubUrl: "https://github.com/EricKei2002/cutting-works-burst",
@@ -141,24 +138,24 @@ export const projectsData: Project[] = [
       {
         title: "画像中心のパフォーマンス最適化",
         description:
-          "数多くのステッカー画像をギャラリーとして表示するため、ページの読み込み速度が課題となりました。Next.jsのImageコンポーネントを適切に設定し、WebPフォーマットへの変換や遅延読み込みを活用することで、高画質を維持したままCore Web Vitalsの数値を改善しました。",
+          "next/image、WebP、遅延読み込みで、画質を保ちつつCore Web Vitalsを改善しました。",
       },
       {
         title: "シンプルな静的構成による運用",
         description:
-          "制作実績の更新頻度がそれほど高くないことを踏まえ、CMSは導入せずapp/data/works.tsの静的配列で管理する構成にしました。デプロイのたびにVercelが再ビルドするだけで反映されるため、外部サービスへの依存や管理画面の学習コストなしに、Gitでの変更履歴管理と両立できています。",
+          "更新頻度が低いためCMSは使わず静的配列で管理。Vercelの再ビルドで反映でき、履歴もGitに残ります。",
       },
     ],
     improvements: [
       {
         title: "検索・フィルタリング機能の強化",
         description:
-          "ステッカーの種類やカテゴリが増えた際に、ユーザーが目的のデザインに素早く辿り着けるよう、インスタントサーチ機能の実装を計画しています。",
+          "目的のデザインを素早く探せるインスタントサーチを計画中です。",
       },
       {
         title: "お問い合わせ体験の改善",
         description:
-          "現在はmailtoリンクでメールアプリを起動する形ですが、お気に入りのデザインを選択した状態でスムーズに見積もり依頼が出せるよう、サイト内でのフォーム実装を検討しています。",
+          "選んだデザインのまま見積もり依頼できるサイト内フォームを検討中です。",
       },
     ],
     documentation: {
@@ -168,10 +165,9 @@ export const projectsData: Project[] = [
   {
     slug: "discord-role-bot",
     title: "Discord 自己紹介認証Bot",
-    description:
-      "コミュニティ運営を効率化する自己紹介認証Discord Bot。自宅サーバー × CI/CD による実運用経験",
+    description: "自己紹介で認証するDiscord Bot。自宅サーバー × CI/CDで実運用",
     detailedDescription:
-      "Discordコミュニティにおいて、新規参加者が認証ボタンをクリックし、表示されるモーダル（フォーム）に必要事項を入力して送信することで、自動的に特定のロール（権限）を付与するBotアプリケーションです。これにより、管理者の手動承認の手間を省き、コミュニティへの参加障壁を下げることに成功しました。自宅のRaspberry Piサーバー上で稼働させています。また、管理ログ（成功/失敗）はデータベースを使用せず、管理チャンネルにEmbed形式で保存する設計を採用しています。",
+      "新規参加者が認証ボタンからモーダルに入力すると、ロールを自動付与するBot。手動承認をなくし、参加障壁を下げました。自宅のRaspberry Piで稼働し、管理ログはDBを使わず管理チャンネルにEmbedで保存します。",
     image: "/projects/discord.png",
     githubUrl: "https://github.com/EricKei2002/role-bot-ts",
     tags: ["Node.js", "Discord.js", "TypeScript"],
@@ -187,29 +183,29 @@ export const projectsData: Project[] = [
       {
         title: "安定稼働とエラーハンドリング",
         description:
-          "24時間365日稼働させる必要があるため、ネットワークの瞬断やAPIのレート制限に対する堅牢性が求められました。Dockerを用いたコンテナ管理の導入や、適切な例外処理と自動再接続ロジックを実装することで、長期間の安定稼働を実現しました。",
+          "Docker、例外処理、自動再接続で、瞬断やレート制限に耐える24時間365日の稼働を実現しました。",
       },
       {
         title: "デプロイの自動化",
         description:
-          "開発環境から自宅サーバーへのデプロイを手動で行うのは手間であり、ミスも発生しやすいため、GitHub Actionsを用いたCI/CDパイプラインを構築しました。mainブランチへのプッシュをトリガーに自動的にテストとデプロイが行われるようになりました。",
+          "GitHub ActionsのCI/CDで、mainへのプッシュから自動テスト・デプロイします。",
       },
       {
         title: "ロジックの品質保証",
         description:
-          "Botの認証ロジックなどのコア機能について、Discord APIに依存せず単体テストを行うためにVitestを導入しました。これにより、外部サービスの影響を受けずにロジックの正当性を検証できる環境を構築し、保守性を向上させました。",
+          "VitestでDiscord APIに依存せず認証ロジックを単体テストし、保守性を高めました。",
       },
     ],
     improvements: [
       {
         title: "設定のWebダッシュボード化",
         description:
-          "現在は設定ファイルで管理していますが、WebブラウザからBotの設定（対象チャンネルや付与するロール）を変更できるダッシュボード機能の実装を目指しています。",
+          "対象チャンネルや付与ロールをブラウザで変更できるようにしたいです。",
       },
       {
         title: "複数サーバー対応",
         description:
-          "現在は単一サーバー向けに最適化されていますが、複数のDiscordサーバーに導入できるよう、データベース（MongoDB等）を導入して設定を永続化する改修を計画しています。",
+          "DB（MongoDB等）に設定を保存し、複数サーバーへの導入を計画中です。",
       },
     ],
     documentation: {
@@ -220,9 +216,9 @@ export const projectsData: Project[] = [
     slug: "burst-style",
     title: "Burst Style",
     description:
-      "没入型Web体験を追求した自身のポートフォリオサイト。「宇宙への旅」をコンセプトに、Three.jsと映像演出を駆使したSPA。",
+      "「宇宙への旅」をコンセプトに、Three.jsと映像演出を駆使した没入型ポートフォリオSPA。",
     detailedDescription:
-      "「Burst Style」は、没入感あふれるビジュアル体験と堅牢なバックエンド設計を融合させたポートフォリオサイトです。「宇宙への旅」をテーマにしたThree.jsによる3D演出やシームレスな遷移アニメーションに加え、実用的な機能面も徹底しました。特にフロントエンドでは、Zustandを用いた軽量な状態管理により、全画面ワープの再生とページ遷移を同期。ハイパースペース風のシェーダー演出が画面全体を覆っている間にページを切り替え、ワープを抜けると移動先が現れる、シームレスな移動を実現しています。バックエンドでは、Cloudflare Turnstileによるスパム対策やResend APIを用いた自動返信メールなど、見えない部分の体験設計（User Experience）にもこだわっています。",
+      "「宇宙への旅」がテーマのポートフォリオ。Three.jsの3D演出に加え、Zustandで全画面ワープとページ遷移を同期し、シェーダーが画面を覆う間にページを切り替え、抜けると移動先が現れます。Cloudflare Turnstileのスパム対策やResendの自動返信など、裏側の体験にもこだわりました。",
     image: "/og/burst-style-card",
     siteUrl: "https://www.burst.style",
     githubUrl: "https://github.com/EricKei2002/burst-style",
@@ -240,29 +236,28 @@ export const projectsData: Project[] = [
       {
         title: "シームレスな遷移と状態管理",
         description:
-          "「ワープが画面を覆い切ってからページが切り替わり、ワープを抜けると移動先が現れる」という一連のシーケンスを実現するために、Zustandを用いたグローバルな状態管理（`useTransitionStore`）を導入しました。Next.jsの`router.push`のタイミングとシェーダーの再生を同期させることで、ブラウザのロードを感じさせない没入感のある移動体験を作り出しています。WebGLが使えない環境や動きを減らす設定では、ワープを省いてページを切り替えます。",
+          "Zustand（`useTransitionStore`）で`router.push`とシェーダー再生を同期し、読み込みを感じさせない移動を実現。WebGL非対応や動きを減らす設定では、ワープを省きます。",
       },
       {
         title: "物語性のあるAPI/コンタクト機能",
         description:
-          "単なる「送信完了」ではなく、物語の一部としてのコンタクト機能を実装しました。Next.jsのサーバーレス関数内で、Turnstile認証（セキュリティ）、Formspree転送（通知）、Resend送信（自動返信）を一連のフローとして処理。特に自動返信メールは宇宙船のコンソールを模したHTMLデザインを採用し、サイトを離れた後も世界観が続くよう設計されています。",
+          "サーバーレス関数でTurnstile認証、Formspree通知、Resend自動返信を処理。返信メールは宇宙船コンソール風で、世界観が続きます。",
       },
       {
         title: "パフォーマンスとビジュアルの両立",
         description:
-          "背景はThree.js / React Three Fiberで描く惑星の3Dシーン、ページ遷移はシェーダーによるワープ演出のため、描画負荷が課題となりました。端末性能に応じて解像度・フレームレート・影などの品質を段階的に切り替え、画面外やタブ非表示のときは描画を止めています。遷移用のシェーダーも操作の兆しを検知してから読み込むことで、初期表示を軽く保っています。",
+          "Three.js / React Three Fiberの惑星は、端末性能に応じて解像度・フレームレート・影を調整し、画面外やタブ非表示では停止。遷移シェーダーは操作の兆しで読み込み、初期表示を軽くしています。",
       },
     ],
     improvements: [
       {
         title: "インタラクティブ性の向上",
         description:
-          "現在は背景演出がメインですが、ユーザーのマウス操作やスクロールに合わせて3D空間がよりダイナミックに反応するようなインタラクションの追加を検討しています。",
+          "マウスやスクロールに3D空間がより反応する演出を検討中です。",
       },
       {
         title: "国際化（i18n）対応",
-        description:
-          "海外のビジターにもポートフォリオを見てもらえるよう、英語対応を含めた多言語化サポートの実装を計画しています。",
+        description: "日英切り替えは公開済み。今後は表現を磨きます。",
       },
     ],
     documentation: {
