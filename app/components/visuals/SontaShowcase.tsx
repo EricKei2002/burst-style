@@ -41,7 +41,7 @@ function hasWebGL(): boolean {
   }
 }
 
-/** 品質の段階（planetScene の detectConfig と同じ考え方）で描画ピクセル比の上限を決める */
+/** 品質の段階で描画ピクセル比の上限を決める */
 function detectDprCap(): number {
   const nav = navigator as Navigator & {
     deviceMemory?: number;

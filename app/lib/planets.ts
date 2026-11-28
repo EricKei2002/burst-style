@@ -2,94 +2,63 @@ import { isHomeSection, type HomeSection } from "./homeSections";
 
 export type Rgb = readonly [number, number, number];
 
-export type PlanetTerrain =
-  "dunes" | "fog-flats" | "facets" | "canyons" | "hangar" | "crater";
-
-export type PlanetParticles =
-  "embers" | "mist" | "shards" | "aurora" | "sparks" | "ash";
+/** public/backgrounds/<名前>-<wide|tall>.<avif|webp>（scripts/blender/ で作る） */
+export type PlanetBackdrop =
+  "projects" | "detail" | "about" | "contact" | "404";
 
 export type PlanetTheme = {
   id: string;
   section: HomeSection | null;
-  name: string;
-  nameJa: string;
-  terrain: PlanetTerrain;
-  particles: PlanetParticles;
-  /** 空の上部。本文コントラストのため暗く保つ */
+  backdrop: PlanetBackdrop;
+  /** 以下は背景画像の読み込み中・失敗時に見せるグラデーションの色 */
   skyTop: Rgb;
   skyHorizon: Rgb;
   ground: Rgb;
   groundHi: Rgb;
-  accent: Rgb;
-  accent2: Rgb;
-  haze: Rgb;
 };
 
 /** Projects セクション：航路の工房（サイトのフクシア／シアン） */
 const PROJECTS: PlanetTheme = {
   id: "projects",
   section: "projects",
-  name: "Hangar Dawn",
-  nameJa: "航路の工房",
-  terrain: "hangar",
-  particles: "sparks",
+  backdrop: "projects",
   skyTop: [8, 4, 12],
-  skyHorizon: [64, 20, 72],
-  ground: [10, 6, 14],
-  groundHi: [40, 16, 48],
-  accent: [232, 121, 249],
-  accent2: [34, 211, 238],
-  haze: [120, 40, 140],
+  skyHorizon: [118, 45, 125],
+  ground: [18, 10, 24],
+  groundHi: [64, 32, 72],
 };
 
 /** About セクション：琥珀の居住地（人となり・経歴） */
 const ABOUT: PlanetTheme = {
   id: "about",
   section: "about",
-  name: "Hearth Dunes",
-  nameJa: "琥珀の居住地",
-  terrain: "dunes",
-  particles: "embers",
+  backdrop: "about",
   skyTop: [12, 6, 4],
-  skyHorizon: [72, 32, 10],
-  ground: [18, 9, 5],
-  groundHi: [58, 28, 10],
-  accent: [245, 158, 11],
-  accent2: [251, 146, 60],
-  haze: [140, 60, 18],
+  skyHorizon: [160, 76, 40],
+  ground: [30, 14, 8],
+  groundHi: [96, 48, 26],
 };
 
 /** Contact セクション：交信の谷 */
 const CONTACT: PlanetTheme = {
   id: "contact",
   section: "contact",
-  name: "Signal Canyon",
-  nameJa: "交信の谷",
-  terrain: "canyons",
-  particles: "aurora",
+  backdrop: "contact",
   skyTop: [6, 7, 18],
-  skyHorizon: [40, 46, 120],
-  ground: [8, 9, 22],
-  groundHi: [28, 34, 90],
-  accent: [88, 101, 242],
-  accent2: [129, 140, 248],
-  haze: [60, 70, 180],
+  skyHorizon: [60, 66, 154],
+  ground: [10, 11, 28],
+  groundHi: [34, 38, 92],
 };
 
+/** 404：未踏の灰月 */
 const UNCHARTED: PlanetTheme = {
   id: "uncharted",
   section: null,
-  name: "Uncharted Ash",
-  nameJa: "未踏の灰月",
-  terrain: "crater",
-  particles: "ash",
-  skyTop: [8, 8, 9],
-  skyHorizon: [32, 28, 26],
-  ground: [10, 10, 11],
-  groundHi: [36, 32, 30],
-  accent: [168, 162, 158],
-  accent2: [113, 113, 122],
-  haze: [60, 56, 52],
+  backdrop: "404",
+  skyTop: [3, 3, 6],
+  skyHorizon: [24, 23, 27],
+  ground: [14, 13, 14],
+  groundHi: [48, 46, 47],
 };
 
 export const SECTION_PLANETS: Record<
@@ -144,12 +113,12 @@ export function planetForView(
   return null;
 }
 
-export function planetById(id: string | null | undefined): PlanetTheme {
-  if (!id) return UNCHARTED;
-  if (id === "projects") return PROJECTS;
-  if (id === "about") return ABOUT;
-  if (id === "contact") return CONTACT;
-  return UNCHARTED;
+/** 今の面に敷く画像。作品の詳細は Projects の惑星の格納庫内（本文向けの静かな構図） */
+export function backdropForView(
+  pathname: string,
+  theme: PlanetTheme,
+): PlanetBackdrop {
+  return pathname.startsWith("/projects/") ? "detail" : theme.backdrop;
 }
 
 export function rgbCss(color: Rgb, alpha = 1): string {

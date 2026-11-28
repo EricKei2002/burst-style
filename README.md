@@ -9,10 +9,11 @@ Next.js 16 (App Router) のパフォーマンスと、Three.js / GSAP による�
 
 ## 🚀 主な機能 (Features)
 
-### 1. 没入型 3D 背景 (Immersive Visuals)
+### 1. 没入型の背景 (Immersive Visuals)
 
 - **StarBackground (トップページ)**: Three.js を使用し、無数の星が流れるワープ空間（WarpStars）を描画。
-- **Planet Interior（各セクション・プロジェクト詳細）**: ルートに応じて Three.js の惑星背景（`PlanetInterior`）へ切り替わり、ページ遷移はシェーダー・ワープで覆います（シェーダー未準備時は覆わずに切り替え）。
+- **惑星の背景（Projects / About / Contact / 作品詳細 / 404）**: Blender で事前レンダリングした静止画（`public/backgrounds/`）を敷きます（`PlanetInterior`）。ページ遷移はシェーダー・ワープで覆います（シェーダー未準備時は覆わずに切り替え）。
+- **背景の作り直し**: 素材はすべてスクリプトで生成します（外部素材なし）。`Blender -b --factory-startup -P scripts/blender/render_backgrounds.py -- --page <projects|detail|about|contact|404> --variant <wide|tall>` のあと `node scripts/blender/encode.mjs`。
 
 ### 2. シームレスな遷移 (Warp Transition)
 

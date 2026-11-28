@@ -1,6 +1,7 @@
+import { existsSync, statSync } from "node:fs";
 import {
+  backdropForView,
   isHomePath,
-  planetById,
   planetForHomeSection,
   planetForView,
   SECTION_PLANETS,
@@ -40,7 +41,27 @@ assert(
 );
 assert(planetForView("/missing")?.id === "uncharted", "404 is uncharted");
 
-assert(planetById("about").nameJa === "琥珀の居住地", "ja name");
+// 面ごとの背景画像が public/backgrounds/ にそろっている
+const views = [
+  ["/", "projects", "projects"],
+  ["/", "about", "about"],
+  ["/", "contact", "contact"],
+  ["/projects/drill", null, "detail"],
+  ["/missing", null, "404"],
+] as const;
+for (const [pathname, section, expected] of views) {
+  const theme = planetForView(pathname, section);
+  assert(theme, `${pathname} has a planet`);
+  const backdrop = backdropForView(pathname, theme!);
+  assert(backdrop === expected, `${pathname} ${section}: ${backdrop}`);
+  for (const variant of ["wide", "tall"]) {
+    for (const format of ["avif", "webp"]) {
+      const file = `public/backgrounds/${backdrop}-${variant}.${format}`;
+      assert(existsSync(file), `${file} exists`);
+      assert(statSync(file).size <= 200 * 1024, `${file} is 200KB or less`);
+    }
+  }
+}
 
 const ids = Object.keys(SECTION_PLANETS);
 assert(ids.length === 3, "three section planets");
