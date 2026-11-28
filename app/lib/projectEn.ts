@@ -151,7 +151,7 @@ const EN_BY_SLUG: Record<string, EnOverlay> = {
       {
         title: "Performance vs. visuals",
         description:
-          "The Three.js / React Three Fiber planet adapts resolution, frame rate, and shadows, and pauses off-screen or in hidden tabs. The warp shader loads on navigation intent.",
+          "Planet backdrops are stills pre-rendered in Blender, so they cost no rendering time on the device. The React Three Fiber starfield on Home adapts to the hardware, and the warp shader loads on navigation intent.",
       },
     ],
     improvements: [

@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Blender の書き出し中間ファイル
+/.blender-out/
+__pycache__/

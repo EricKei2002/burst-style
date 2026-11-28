@@ -8,7 +8,7 @@ import {
   isHomeSection,
   type HomeSection,
 } from "../../lib/homeSections";
-import { isHomePath, planetForView } from "../../lib/planets";
+import { backdropForView, isHomePath, planetForView } from "../../lib/planets";
 
 const StarBackground = dynamic(() => import("./StarBackground"), {
   ssr: false,
@@ -132,7 +132,12 @@ export default function ClientVisuals() {
   }, [planet]);
 
   if (planet) {
-    return <PlanetInterior theme={planet} />;
+    return (
+      <PlanetInterior
+        theme={planet}
+        backdrop={backdropForView(pathname, planet)}
+      />
+    );
   }
 
   if (!config.ready) return null;

@@ -64,12 +64,10 @@ for (const f of jsFiles) {
   const gz = gzipSync(buf, { level: 9 });
   const text = buf.toString("utf8");
   const markers = [];
-  if (/WebGLRenderer|THREE|from ['"]three['"]/.test(text) || /createShaderWarpOverlay|createPlanetScene|MeshPhysicalMaterial|RoomEnvironment/.test(text))
+  if (/WebGLRenderer|THREE|from ['"]three['"]/.test(text) || /createShaderWarpOverlay|MeshPhysicalMaterial|RoomEnvironment/.test(text))
     markers.push("three-ish");
-  if (/createShaderWarpOverlayAsync|createShipModel|habitation|radiator/.test(text))
-    markers.push("ship");
-  if (/createPlanetSceneAsync|ATMOS|hangar|setFocus/.test(text))
-    markers.push("planet");
+  if (/createShaderWarpOverlayAsync/.test(text))
+    markers.push("warp");
   if (/FrameSlicer|requestIdleCallback/.test(text) && /shipPrep/.test(text))
     markers.push("transition-wrapper");
   all.push({

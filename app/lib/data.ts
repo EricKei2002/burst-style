@@ -246,7 +246,7 @@ export const projectsData: Project[] = [
       {
         title: "パフォーマンスとビジュアルの両立",
         description:
-          "Three.js / React Three Fiberの惑星は、端末性能に応じて解像度・フレームレート・影を調整し、画面外やタブ非表示では停止。遷移シェーダーは操作の兆しで読み込み、初期表示を軽くしています。",
+          "惑星の背景はBlenderで事前レンダリングした静止画にして、端末の描画負荷をなくしています。ホームの星空はReact Three Fiberで端末性能に応じて調整し、遷移シェーダーは操作の兆しで読み込んで初期表示を軽くしています。",
       },
     ],
     improvements: [
