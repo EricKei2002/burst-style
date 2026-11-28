@@ -9,166 +9,159 @@ type EnOverlay = Pick<
 const EN_BY_SLUG: Record<string, EnOverlay> = {
   drill: {
     description:
-      "A daily 10-question drill PWA covering three study tracks: AWS SAA, WordPress, and security. Google sign-in and Supabase sync progress across devices.",
+      "Daily 10-question drill PWA for AWS SAA, WordPress, and security, synced across devices.",
     detailedDescription:
-      "A daily-practice PWA built around a 'study pack' architecture: questions, glossary, and domain weighting are swappable per subject, currently covering the AWS Certified Solutions Architect (Associate) exam, WordPress admin/dev practice, and security, with room to add more. Each day's 10 questions are allocated across a pack's domains and picked in deterministic priority order: unseen → missed → related topics → stale. Answers show an explanation and a one-line takeaway immediately, and missed topics are recorded as weak spots and prioritized in the Weak-Spot Drill (a dedicated practice screen); the old Review tab was retired so review has a single entry point there. Signing in with Google (via Supabase Auth) ties streaks, per-domain accuracy, and the target-date countdown to your account, so progress carries over between phone and desktop. A Learn tab lets you tap underlined acronyms to pop open their full name and meaning inline. Set your own Gemini API key and weak-spot questions get generated on the fly (the AWS pack also factors in the official What's New RSS, and the security pack draws on vulnerability-info RSS feeds such as JVN, IPA, and JPCERT/CC), with Vercel Cron pre-generating each morning so there's no wait. Questions are original exercises grounded in each subject's official docs, not copies of real exam questions.",
+      "A 10-questions-a-day PWA for AWS SAA, WordPress admin/dev, and security. Subjects are swappable 'study packs'; 10 questions are picked deterministically by domain weighting, in order: unseen → missed → related → stale. Answers show an explanation and takeaway at once, and misses get priority in the Weak-Spot Drill. Google sign-in syncs streaks and accuracy via Supabase, and tapping an acronym shows its meaning. With your own Gemini API key, weak-spot questions are AI-generated (using official and vulnerability RSS feeds), pre-generated each morning by Vercel Cron; Web Push reminds you at 9 pm. Questions are originals based on official docs.",
     challenges: [
       {
         title: "Deterministic daily question selection",
         description:
-          "A date-seeded hash drives a pseudo-random shuffle so reopening the app on the same day always yields the same 10 questions. Candidates are ranked unseen → high miss-rate → related topic → stale before drawing, balancing weak-spot review with new material.",
+          "A date-seeded shuffle gives the same 10 questions all day. Ranking by unseen, miss rate, related topic, and age balances review with new material.",
       },
       {
         title: "Carrying pre-login progress into an account",
         description:
-          "Users can start solving immediately before signing in. Progress is stashed in sessionStorage until Google login completes, then merged into Supabase via RPC (fetch_progress / push_progress). This preserves a 'try 10 questions, then sign in if you like it' flow while still syncing across devices.",
+          "Pre-login progress sits in sessionStorage, then merges into Supabase via RPC (fetch_progress / push_progress) after Google login: try first, sign in later.",
       },
       {
         title: "A study-pack architecture for multiple subjects",
         description:
-          "Pulled questions, glossary, and domain weighting out of the AWS-specific code into a 'study pack' (StudyPack) abstraction. Selection logic, weak-spot tracking, and the AI generation engine stayed subject-agnostic in a shared core, so adding the WordPress and security packs meant just writing a new pack definition.",
+          "Questions, glossary, and weighting live in a StudyPack. Selection, weak spots, and AI generation are shared, so a new subject is just a new pack.",
       },
     ],
     improvements: [
       {
         title: "More study packs",
         description:
-          "Currently AWS SAA, WordPress, and security, with plans to add packs for more certifications and technical subjects over time.",
+          "Add packs for more certifications and technical subjects.",
       },
       {
         title: "Deeper study analytics",
-        description:
-          "Beyond per-domain accuracy, exploring a dashboard for correlations between missed topics.",
+        description: "Exploring a dashboard linking related missed topics.",
       },
     ],
   },
   "sonta-kun": {
-    description:
-      "AI scheduling that reads the room: natural language to calendar slots.",
+    description: "AI scheduling that reads the room.",
     detailedDescription:
-      'Sonta-kun is an AI scheduling agent inspired by Japanese "reading the air" (sontaku). It uses Google Gemini to turn fuzzy wishes like "sometime next week, earlier afternoon" into real constraints, checks Google Calendar availability, and proposes the best times, with Zoom and email wired in via Server Actions.',
+      'An AI scheduling agent born from sontaku, Japanese "reading the air". Google Gemini turns fuzzy wishes into constraints, checks Google Calendar, and proposes the best times.',
     challenges: [
       {
         title: "Fuzzy natural language → concrete constraints",
         description:
-          'Built a "sontaku engine" on Gemini that maps phrases like "next week, earlier afternoon" to ISO ranges. Prompt design and context handling keep extraction accurate.',
+          'A Gemini-based "sontaku engine" maps "next week, early afternoon" to ISO date ranges.',
       },
       {
         title: "Seamless external integrations",
         description:
-          "Combined Google Calendar, Zoom, and Resend inside Server Actions with solid token handling and errors, so users get one smooth flow without seeing the plumbing.",
+          "Google Calendar, Zoom, and Resend in Server Actions, with token and error handling for one smooth flow.",
       },
     ],
     improvements: [
       {
         title: "Smarter consideration logic",
-        description:
-          "Move beyond bare free slots: factor in travel buffers and lunch so suggestions feel genuinely thoughtful.",
+        description: "Factor travel time and lunch into suggestions.",
       },
       {
         title: "Multi-person & multimodal",
         description:
-          "Exploring multi-calendar sync, more participants, and interfaces beyond pure chat.",
+          "Exploring multi-person calendar sync and UIs beyond chat.",
       },
     ],
   },
   "cutting-works": {
     description:
-      "Cutting-sticker brand site: gallery UI, intuitive browsing, MicroCMS for updates.",
+      "Cutting-sticker design site with intuitive browsing and a portfolio gallery.",
     detailedDescription:
-      "Official site for Cutting Works, a cutting-sticker studio and shop. Built a strong gallery-first UI so visitors can scan a large catalog quickly. MicroCMS lets the client publish portfolio pieces and news without touching code, so operations stay lightweight.",
+      "Official site for Cutting Works, a cutting-sticker maker and shop, with an intuitive gallery UI. Works live in static TypeScript data (app/data/works.ts) and images are optimized with next/image: fast, with no CMS. Inquiries go through mailto.",
     challenges: [
       {
         title: "Image-heavy performance",
         description:
-          "Many sticker assets made LCP a risk. Tuned next/image, WebP, and lazy loading to keep quality while improving Core Web Vitals.",
+          "next/image, WebP, and lazy loading improved Core Web Vitals without losing quality.",
       },
       {
-        title: "Reducing ops load",
+        title: "Simple static operations",
         description:
-          "Moved content updates from engineer-led code changes to MicroCMS so non-technical staff can publish through a simple admin UI.",
+          "Updates are rare, so a static array replaces a CMS. Vercel rebuilds on deploy and Git keeps the history.",
       },
     ],
     improvements: [
       {
         title: "Search & filters",
-        description:
-          "Plan instant search as the catalog grows so people reach the right design fast.",
+        description: "Instant search to find designs quickly.",
       },
       {
-        title: "In-site quote flow",
+        title: "Better inquiry flow",
         description:
-          "Today we link out for quotes; next step is carrying selected designs into an on-site request flow.",
+          "An on-site quote form that carries over the selected design.",
       },
     ],
   },
   "discord-role-bot": {
     description:
-      "Discord onboarding bot: self-serve intro + role grant, home server + CI/CD.",
+      "Discord intro-verification bot, run on a home server with CI/CD.",
     detailedDescription:
-      "A Discord bot for community onboarding: users click verify, fill a modal, and get a role automatically, cutting manual admin work and lowering the join barrier. Runs on a home Raspberry Pi. Audit trail uses embed posts to a mod channel instead of a database.",
+      "New members click verify, fill in a modal, and get a role automatically, removing manual approval and lowering the join barrier. Runs on a home Raspberry Pi; logs go to a mod channel as embeds, with no database.",
     challenges: [
       {
         title: "Uptime & error handling",
         description:
-          "Needed 24/7 resilience to blips and rate limits. Docker plus reconnect logic and careful exception handling keep it stable long term.",
+          "Docker, exception handling, and auto-reconnect keep it up 24/7 through drops and rate limits.",
       },
       {
         title: "Deploy automation",
         description:
-          "GitHub Actions CI/CD deploys from main to the Pi so releases are repeatable and less error-prone than manual SSH.",
+          "GitHub Actions CI/CD tests and deploys on every push to main.",
       },
       {
         title: "Testable core logic",
         description:
-          "Vitest tests the auth flow without hitting Discord live, so rules stay verifiable as the bot evolves.",
+          "Vitest unit-tests the auth logic without the Discord API, easing maintenance.",
       },
     ],
     improvements: [
       {
         title: "Web settings dashboard",
-        description:
-          "Goal: change channels and roles from a browser instead of config files only.",
+        description: "Change channels and roles from a browser.",
       },
       {
         title: "Multi-guild support",
         description:
-          "Today tuned for one server; planning DB-backed config for many installs.",
+          "Store settings in a DB (e.g. MongoDB) to support many servers.",
       },
     ],
   },
   "burst-style": {
     description:
-      "Immersive portfolio: a journey through space with Three.js and cinematic motion.",
+      "Immersive portfolio SPA: a space journey built with Three.js and cinematic motion.",
     detailedDescription:
-      "Burst Style merges heavy visual storytelling with solid engineering. Three.js and motion sell the space journey; Zustand syncs a full-screen warp with Next.js navigation: the warp covers the screen, the route changes underneath, and the next page appears as you drop out of it. Behind the scenes: Turnstile spam protection, Formspree forwarding, and a Resend auto-reply styled like a ship console so the vibe continues after submit.",
+      "A space-journey portfolio. Beyond the Three.js visuals, Zustand syncs a full-screen warp with navigation: the page changes while the shader covers the screen and appears as you drop out. Turnstile spam protection and a Resend auto-reply care for the unseen side too.",
     challenges: [
       {
         title: "Seamless transitions & state",
         description:
-          "Global transition state aligns the full-screen shader warp with `router.push` timing so navigation feels like one continuous scene, not a hard reload. Without WebGL, or with reduced motion on, the page switches without the warp.",
+          "Zustand (`useTransitionStore`) syncs `router.push` with the shader for load-free travel. Without WebGL, or with reduced motion, the warp is skipped.",
       },
       {
         title: "Narrative contact flow",
         description:
-          "Contact is part of the story: verify with Turnstile, notify via Formspree, auto-reply via Resend with on-brand HTML.",
+          "A serverless function runs Turnstile, Formspree notification, and a Resend auto-reply styled like a ship console.",
       },
       {
         title: "Performance vs. visuals",
         description:
-          "A 3D planet scene (Three.js / React Three Fiber) plus a shader warp transition cost GPU budget. Quality tiers adapt resolution, frame rate and shadows to the device, rendering pauses when off-screen or in a hidden tab, and the transition shader loads only on navigation intent.",
+          "The Three.js / React Three Fiber planet adapts resolution, frame rate, and shadows, and pauses off-screen or in hidden tabs. The warp shader loads on navigation intent.",
       },
     ],
     improvements: [
       {
         title: "Richer interaction",
-        description:
-          "Explore scroll- and pointer-driven reactions in the 3D backdrop beyond ambient motion.",
+        description: "Exploring 3D reactions to pointer and scroll.",
       },
       {
         title: "Internationalization",
-        description:
-          "English/Japanese site copy and locale toggle are live; more polish and project-level translations can follow.",
+        description: "The EN/JA toggle is live; copy polish is next.",
       },
     ],
   },
