@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useLocale, useSiteCopy } from "../../lib/locale";
 import { sectionPageLabel } from "../../lib/homeSections";
 import dynamic from "next/dynamic";
@@ -21,11 +21,12 @@ const TechCarousel = dynamic(() => import("../ui/TechCarousel"), {
 export default function Top() {
   const copy = useSiteCopy();
   const { locale } = useLocale();
-  const [descriptionVisible, setDescriptionVisible] = useState(false);
+  const [introDone, setIntroDone] = useState(false);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const [showTechCarousel, setShowTechCarousel] = useState(false);
 
   const carouselTriggerRef = useRef<HTMLDivElement>(null);
+  const briefRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const t2 = setTimeout(() => setSkillsVisible(true), 700);
@@ -51,25 +52,29 @@ export default function Top() {
     return () => observer.disconnect();
   }, [showTechCarousel]);
 
-  const showDescription = useCallback(() => {
-    setDescriptionVisible(true);
-  }, []);
-
+  // 概要は CSS（.hero-brief）が読み込みから約 0.7 秒で自動的に出す。
+  // クリック・タップ・キー・スクロールがあれば待たずに出す。
+  // 一度出たら状態に残し、区画を切り替えて戻っても演出を繰り返さない
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        ["INPUT", "TEXTAREA", "BUTTON", "SELECT", "A"].includes(target.tagName)
-      )
-        return;
-      if (e.key === "Enter") {
-        showDescription();
-      }
+    if (introDone) return;
+    let active = true;
+    const finish = () => {
+      if (active) setIntroDone(true);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showDescription]);
+
+    // 終了済み・演出なし（スマホ幅、視差効果を減らす設定、非表示の区画）なら一覧は空ですぐ解決する
+    const animations = briefRef.current?.getAnimations({ subtree: true }) ?? [];
+    Promise.all(animations.map((a) => a.finished)).then(finish, finish);
+
+    const skipEvents = ["pointerdown", "keydown", "wheel", "scroll"];
+    skipEvents.forEach((type) =>
+      window.addEventListener(type, finish, { passive: true }),
+    );
+    return () => {
+      active = false;
+      skipEvents.forEach((type) => window.removeEventListener(type, finish));
+    };
+  }, [introDone]);
 
   const ja = locale === "ja";
 
@@ -120,9 +125,10 @@ export default function Top() {
               {copy.hero.question}{" "}
               <button
                 type="button"
-                onClick={showDescription}
+                onClick={() => setIntroDone(true)}
+                aria-disabled={introDone}
                 className={`trigger-btn ml-1 inline-block rounded-[3px] border px-2 py-0.5 align-middle font-mono text-xs transition-[color,background-color,border-color,scale] duration-150 ease-out motion-safe:active:scale-[0.97] ${
-                  descriptionVisible
+                  introDone
                     ? "pointer-events-none cursor-default border-zinc-700 bg-zinc-900 text-zinc-400"
                     : "hero-enter-key cursor-pointer border-green-300/50 bg-zinc-950 text-green-100 hover:border-[rgb(var(--planet-accent))] hover:text-white"
                 }`}
@@ -138,14 +144,15 @@ export default function Top() {
             {/* 行長は和文で 34 字前後、欧文で 65 字前後に収める。
                 サーバーは英語で描き、ブラウザが日本語なら描画後に切り替わるので、
                 英語の高さ（長いほう）を最小の高さとして確保し、下のカルーセルを動かさない */}
-            <dd className="enter-rise min-h-[10.75rem] max-w-[34em] text-[15px] leading-[1.8] text-green-200 [--i:3] sm:min-h-[11.5rem] sm:text-base md:min-h-[8rem] short-phone:min-h-[6.5rem] short-phone:text-xs short-phone:leading-[1.55] short-phone:max-[359px]:min-h-[7.75rem]">
-              <span
-                className={`desc-char block transition-opacity duration-200 ease-out ${descriptionVisible ? "opacity-100" : "opacity-0"}`}
-              >
+            <dd
+              ref={briefRef}
+              className="enter-rise min-h-[10.75rem] max-w-[34em] text-[15px] leading-[1.8] text-green-200 [--i:3] sm:min-h-[11.5rem] sm:text-base md:min-h-[8rem] short-phone:min-h-[6.5rem] short-phone:text-xs short-phone:leading-[1.55] short-phone:max-[359px]:min-h-[7.75rem]"
+            >
+              <span className={`block ${introDone ? "" : "hero-brief"}`}>
                 {copy.hero.tagline1}
               </span>
               <span
-                className={`desc-char mt-2 block transition-opacity duration-200 ease-out ${descriptionVisible ? "opacity-100 delay-75" : "opacity-0"}`}
+                className={`mt-2 block ${introDone ? "" : "hero-brief [--i:1]"}`}
               >
                 {copy.hero.tagline2}
               </span>
