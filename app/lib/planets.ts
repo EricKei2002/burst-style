@@ -101,8 +101,9 @@ export const SECTION_PLANETS: Record<
   contact: CONTACT,
 };
 
+// Vercel の ISR 再生成では、サーバー側の usePathname() がトップを "/index" と返す（ブラウザは "/"）
 export function isHomePath(pathname: string): boolean {
-  return pathname === "/" || pathname === "";
+  return pathname === "/" || pathname === "" || pathname === "/index";
 }
 
 /** Home セクションは宇宙。Projects / About / Contact はそれぞれの惑星。 */
